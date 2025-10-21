@@ -1,0 +1,727 @@
+/* Usuarios.module.css */
+
+.pageContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #001f3f;
+  padding: 15px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 25px;
+}
+
+.titleSection h1 {
+  color: #ffffff;
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  size-adjust: 0.5;
+}
+
+.logo {
+  height: 100px;
+  width: auto;
+}
+
+.mainContent {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.tableContainer {
+  overflow-x: auto;
+  margin-bottom: 25px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.userTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  color: black;
+}
+
+.userTable th {
+  background: #001f3f;
+  color: white;
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 600;
+  border-right: 1px solid #001f3f;
+  position: sticky;
+  top: 0;
+}
+
+.userTable th:last-child {
+  border-right: none;
+}
+
+.userTable td {
+  padding: 12px;
+  border-bottom: 1px solid #000000;
+  border-right: 1px solid #000000;
+}
+
+.userTable td:last-child {
+  border-right: none;
+}
+
+.userTable tbody tr {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.userTable tbody tr:hover {
+  background: #f7fafc;
+}
+
+.selectedRow {
+  background: #ebf8ff !important;
+  border-left: 4px solid #4299e1;
+}
+
+/* Estilos para filas en edición/agregar */
+.newRow {
+  background: #f0fff4 !important;
+}
+
+.newRow td {
+  padding: 8px 12px;
+}
+
+.newRow input,
+.newRow select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.newRow input:focus,
+.newRow select:focus {
+  outline: none;
+  border-color: #4a6fa5;
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+}
+
+.newRow input[type="email"] {
+  min-width: 180px;
+}
+
+/* Estilos específicos para campos de contraseña */
+.passwordInput {
+  font-family: monospace;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.passwordInput:focus {
+  outline: none;
+  border-color: #4a6fa5;
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+}
+
+.rolSelect {
+  min-width: 140px;
+}
+
+/* Estilos para el estado activo/inactivo */
+.activoLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.activoLabel:hover {
+  background: #e9ecef;
+}
+
+.activoCheckbox {
+  margin: 0;
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.activoText {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #2d3748;
+  min-width: 60px;
+}
+
+.activoCheckbox:checked + .activoText {
+  color: #059669;
+}
+
+.activoCheckbox:not(:checked) + .activoText {
+  color: #dc2626;
+}
+
+/* Botón de firma */
+.firmaButton {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.firmaButton:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+.fileName {
+  margin-left: 8px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Footer y botones de acción */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  background: #4a6fa5;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.btn:hover:not(:disabled) {
+  background: #3a5a8a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3);
+}
+
+.btn:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.btnGuardar {
+  background: #059669;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.btnGuardar:hover:not(:disabled) {
+  background: #047857;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.btnCancelar {
+  background: #d97706;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.btnCancelar:hover {
+  background: #b45309;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+}
+
+.btnAtras {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.btnAtras:hover {
+  background: #4b5563;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+/* Modal para cambiar contraseña */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  min-width: 400px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.modal h3 {
+  margin: 0 0 20px 0;
+  color: #2d3748;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.passwordForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+/* Modal de Confirmación para Eliminar */
+.confirmModal {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  min-width: 400px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.confirmModal h3 {
+  margin: 0 0 15px 0;
+  color: #2d3748;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.confirmModal p {
+  margin: 0 0 25px 0;
+  color: #4a5568;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Botón de eliminar específico */
+.btnEliminar {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.btnEliminar:hover {
+  background: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* Estilos para campo de fecha */
+.dateInput {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.dateInput:focus {
+  outline: none;
+  border-color: #4a6fa5;
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+}
+
+/* Sistema de Notificaciones */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  min-width: 320px;
+  max-width: 450px;
+  z-index: 10000;
+  animation: slideIn 0.3s ease-out;
+  border-left: 5px solid;
+  overflow: hidden;
+}
+
+.notificationSuccess {
+  border-left-color: #10b981;
+}
+
+.notificationError {
+  border-left-color: #ef4444;
+}
+
+.notificationWarning {
+  border-left-color: #f59e0b;
+}
+
+.notificationContent {
+  display: flex;
+  align-items: center;
+  padding: 18px;
+  gap: 14px;
+}
+
+.notificationIcon {
+  font-size: 22px;
+  font-weight: bold;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.notificationSuccess .notificationIcon {
+  background: #10b981;
+  color: white;
+}
+
+.notificationError .notificationIcon {
+  background: #ef4444;
+  color: white;
+}
+
+.notificationWarning .notificationIcon {
+  background: #f59e0b;
+  color: white;
+}
+
+.notificationMessage {
+  flex: 1;
+  color: #374151;
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.notificationClose {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.notificationClose:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.notificationProgress {
+  height: 4px;
+  background: currentColor;
+  width: 100%;
+  animation: progress 5s linear forwards;
+}
+
+.notificationSuccess .notificationProgress {
+  background: #10b981;
+}
+
+.notificationError .notificationProgress {
+  background: #ef4444;
+}
+
+.notificationWarning .notificationProgress {
+  background: #f59e0b;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Estados de carga y mensajes */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .userTable {
+    font-size: 0.9rem;
+  }
+  
+  .userTable th,
+  .userTable td {
+    padding: 10px 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 10px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .titleSection h1 {
+    font-size: 1.8rem;
+  }
+  
+  .mainContent {
+    padding: 15px;
+  }
+  
+  .footer {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .actionButtons {
+    justify-content: center;
+  }
+  
+  .btn,
+  .btnGuardar,
+  .btnCancelar,
+  .btnAtras {
+    min-width: 100px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .notification {
+    left: 10px;
+    right: 10px;
+    min-width: auto;
+    max-width: none;
+  }
+  
+  .modal,
+  .confirmModal {
+    min-width: 300px;
+    margin: 20px;
+  }
+  
+  .modalButtons {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .userTable {
+    font-size: 0.8rem;
+  }
+  
+  .userTable th,
+  .userTable td {
+    padding: 8px 6px;
+  }
+  
+  .newRow input,
+  .newRow select,
+  .passwordInput,
+  .dateInput {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .actionButtons {
+    gap: 8px;
+  }
+  
+  .btn,
+  .btnGuardar,
+  .btnCancelar,
+  .btnAtras,
+  .btnEliminar {
+    min-width: 80px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Mejoras visuales para inputs en modo edición */
+.newRow input::placeholder {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.newRow input:not(:placeholder-shown) {
+  background: #fafafa;
+  border-color: #9ae6b4;
+}
+
+/* Efectos de transición suaves */
+.userTable tbody tr,
+.btn,
+.notification {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scrollbar personalizado para la tabla */
+.tableContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Estilos para mejorar la legibilidad de la tabla con muchas columnas */
+.userTable th:nth-child(1),
+.userTable td:nth-child(1) {
+  min-width: 120px;
+}
+
+.userTable th:nth-child(4),
+.userTable td:nth-child(4) {
+  min-width: 200px;
+}
+
+.userTable th:nth-child(6),
+.userTable td:nth-child(6) {
+  min-width: 120px;
+}
+
+.userTable th:nth-child(7),
+.userTable td:nth-child(7) {
+  min-width: 80px;
+}
+
+.userTable th:nth-child(10),
+.userTable td:nth-child(10) {
+  min-width: 120px;
+}
+
+.userTable th:nth-child(11),
+.userTable td:nth-child(11) {
+  min-width: 100px;
+}

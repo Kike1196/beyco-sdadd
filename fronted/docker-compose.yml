@@ -1,0 +1,47 @@
+# Versión de la sintaxis de Docker Compose
+version: '3.8'
+
+# Definición de los servicios (contenedores)
+services:
+  # Servicio de la base de datos MySQL
+  db:
+    image: mysql:8.0               # Usa la imagen oficial de MySQL 8.0
+    container_name: beyco-db       # Nombre del contenedor
+    restart: unless-stopped        # Reinicia el contenedor si no se detiene manualmente
+    environment:
+      MYSQL_ROOT_PASSWORD: your_strong_root_password # ¡CAMBIA ESTO!
+      MYSQL_DATABASE: beyco_db                      # Crea esta base de datos
+      MYSQL_USER: beyco_user                        # Crea este usuario
+      MYSQL_PASSWORD: your_strong_user_password     # ¡CAMBIA ESTO!
+    ports:
+      # Mapea el puerto del contenedor al puerto de tu máquina local
+      # Útil para conectar con MySQL Workbench si lo necesitas
+      - "3306:3306"
+    volumes:
+      # 1. Monta el script de inicialización para que se ejecute la primera vez
+      - ./db-init:/docker-entrypoint-initdb.d
+      # 2. Crea un volumen persistente para los datos de la base de datos
+      - mysql-data:/var/lib/mysql
+
+  # Servicio de tu aplicación
+  app:
+    container_name: beyco-app      # Nombre del contenedor
+    # Construye la imagen a partir del Dockerfile en el directorio actual (.)
+    build: .
+    restart: unless-stopped
+    ports:
+      # Mapea el puerto de tu aplicación (ej. 3000) al de tu máquina
+      - "3000:3000"
+    environment:
+      # Pasa las variables de entorno para que tu app se conecte a la BD
+      DB_HOST: db                  # ¡Importante! El host es el nombre del servicio 'db'
+      DB_USER: beyco_user
+      DB_PASSWORD: your_strong_user_password
+      DB_NAME: beyco_db
+    depends_on:
+      # Le dice a Docker que inicie este contenedor solo después de que 'db' esté listo
+      - db
+
+# Define los volúmenes para persistencia de datos
+volumes:
+  mysql-data:

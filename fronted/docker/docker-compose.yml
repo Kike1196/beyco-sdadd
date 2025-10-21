@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-capacitacion
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: capacitacion
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3307:3306"
+    volumes:
+      - ../database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - capacitacion-net
+
+  backend:
+    build: ../backend-java
+    container_name: backend-capacitacion
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8081:8080"
+    networks:
+      - capacitacion-net
+
+networks:
+  capacitacion-net:
+    driver: bridge

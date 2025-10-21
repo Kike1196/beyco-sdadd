@@ -1,0 +1,24 @@
+# Frontend (Next.js)
+fronted/node_modules/
+fronted/.next/
+fronted/out/
+fronted/build/
+fronted/.env.local
+fronted/.env
+fronted/npm-debug.log*
+fronted/yarn-debug.log*
+
+# Backend (Java/Maven)
+backend/target/
+backend/*.class
+backend/*.jar
+backend/.mvn/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Otros
+.DS_Store
+Thumbs.db

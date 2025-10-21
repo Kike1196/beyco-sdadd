@@ -1,0 +1,468 @@
+.pageContainer {
+    background-color: #e9ecef;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #001f3f;
+    color: white;
+    padding: 1.5rem 2.5rem;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.titleSection h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.logo {
+    height: 50px;
+}
+
+.mainContent {
+    background-color: white;
+    padding: 2.5rem;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 0.5rem;
+    color: black;
+}
+
+.searchInput {
+    border: none;
+    padding: 0.75rem;
+    font-size: 1rem;
+    flex-grow: 1;
+    outline: none;
+    background-color: transparent;
+}
+
+.filterOptions {
+    display: flex;
+    gap: 1rem;
+    padding-right: 1rem;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.filterOptions label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+}
+
+.tableContainer {
+    overflow-x: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    color: black;
+}
+
+.cursosTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cursosTable th,
+.cursosTable td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+    white-space: nowrap;
+    color: #212529;
+}
+
+.cursosTable thead {
+    background-color: #f8f9fa;
+}
+
+.cursosTable th {
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+}
+
+.selectedRow {
+    background-color: #e3f2fd !important;
+    cursor: pointer;
+}
+
+.cursosTable tbody tr:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.editingRow {
+    background-color: #fff3cd;
+}
+
+.editingRow td {
+    padding: 0.5rem;
+}
+
+.editingRow input,
+.editingRow select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.editingRow input:focus,
+.editingRow select:focus {
+    outline: none;
+    border-color: #001f3f;
+    box-shadow: 0 0 0 2px rgba(0, 31, 63, 0.2);
+}
+
+.footer {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.actionButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.btn, .btnGuardar, .btnAtras, .btnCancelar, .btnEliminar {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn {
+    background-color: #001f3f;
+    color: white;
+}
+
+.btn:hover:not(:disabled) {
+    background-color: #003366;
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+}
+
+.btnGuardar {
+    background-color: #28a745;
+    color: white;
+}
+
+.btnGuardar:hover:not(:disabled) {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.btnGuardar:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+}
+
+.btnCancelar {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btnCancelar:hover {
+    background-color: #e0a800;
+    transform: translateY(-1px);
+}
+
+.btnEliminar {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btnEliminar:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+.btnAtras {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btnAtras:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+}
+
+.linkButtons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btnLink {
+    background: none;
+    border: none;
+    color: #001f3f;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+.btnLink:hover {
+    color: #003366;
+    text-decoration: none;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.inputError {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
+}
+
+.readOnlyInput {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* --- ESTILOS PARA MODAL DE CONFIRMACIÓN --- */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+  
+.confirmModal {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    min-width: 400px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    color: #212529;
+}
+  
+.confirmModal h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+  
+.confirmModal p {
+    margin: 0 0 25px 0;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* --- ESTILOS PARA NOTIFICACIONES --- */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    min-width: 320px;
+    max-width: 450px;
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+    border-left: 5px solid;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 18px;
+    gap: 14px;
+}
+
+.notification.success { border-left-color: #10b981; }
+.notification.error { border-left-color: #ef4444; }
+.notification.warning { border-left-color: #f59e0b; }
+
+.notificationIcon {
+    font-size: 22px;
+    font-weight: bold;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: white;
+}
+
+.notification.success .notificationIcon { background: #10b981; }
+.notification.error .notificationIcon { background: #ef4444; }
+.notification.warning .notificationIcon { background: #f59e0b; }
+
+.notificationMessage {
+    flex: 1;
+    color: #374151;
+    font-weight: 500;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.notificationClose {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.notificationClose:hover {
+    color: #374151;
+}
+
+.notificationProgress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    animation: progress 5s linear forwards;
+}
+
+.notification.success .notificationProgress { background: #10b981; }
+.notification.error .notificationProgress { background: #ef4444; }
+.notification.warning .notificationProgress { background: #f59e0b; }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes progress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .pageContainer {
+        padding: 1rem;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .titleSection h1 {
+        font-size: 2rem;
+    }
+    
+    .mainContent {
+        padding: 1.5rem;
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .filterOptions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .footer {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .actionButtons {
+        justify-content: center;
+    }
+    
+    .linkButtons {
+        justify-content: center;
+    }
+    
+    .cursosTable th,
+    .cursosTable td {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .confirmModal {
+        min-width: 300px;
+        margin: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .actionButtons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn, .btnGuardar, .btnAtras, .btnCancelar, .btnEliminar {
+        width: 100%;
+    }
+    
+    .linkButtons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btnLink {
+        width: 100%;
+        text-align: center;
+    }
+}
