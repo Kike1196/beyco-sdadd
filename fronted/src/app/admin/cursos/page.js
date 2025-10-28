@@ -28,25 +28,24 @@ const NotificationToast = ({ message, type, onClose }) => {
 // --- Componente de Modal de Confirmación ---
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
     if (!isOpen) return null;
-  
+
     return (
-      <div className={styles.modalOverlay}>
-        <div className={styles.confirmModal}>
-          <h3>{title}</h3>
-          <p>{message}</p>
-          <div className={styles.modalButtons}>
-            <button onClick={onConfirm} className={styles.btnEliminar}>
-              Aceptar
-            </button>
-            <button onClick={onClose} className={styles.btnCancelar}>
-              Cancelar
-            </button>
-          </div>
+        <div className={styles.modalOverlay}>
+            <div className={styles.confirmModal}>
+                <h3>{title}</h3>
+                <p>{message}</p>
+                <div className={styles.modalButtons}>
+                    <button onClick={onConfirm} className={styles.btnEliminar}>
+                        Aceptar
+                    </button>
+                    <button onClick={onClose} className={styles.btnCancelar}>
+                        Cancelar
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
     );
 };
-
 
 // --- Componente para la Fila de Edición ---
 const EditRow = ({ curso, onChange, instructores, empresas, catalogoCursos, formErrors }) => {
@@ -61,7 +60,11 @@ const EditRow = ({ curso, onChange, instructores, empresas, catalogoCursos, form
                     required
                 >
                     <option value="">Seleccionar curso</option>
-                    {catalogoCursos.map(c => <option key={c.id} value={c.nombre}>{c.nombre}</option>)}
+                    {catalogoCursos.map(c => (
+                        <option key={c.id} value={c.nombre}>
+                            {c.nombre}
+                        </option>
+                    ))}
                 </select>
             </td>
             <td>
@@ -84,6 +87,7 @@ const EditRow = ({ curso, onChange, instructores, empresas, catalogoCursos, form
                     placeholder="Horas" 
                     min="1" 
                     className={formErrors.horas ? styles.inputError : ''}
+                    readOnly
                 />
             </td>
             <td>
@@ -115,13 +119,17 @@ const EditRow = ({ curso, onChange, instructores, empresas, catalogoCursos, form
             <td>
                 <select 
                     name="empresaId" 
-                    value={curso.empresaId?.toString() || ''} 
+                    value={curso.empresaId || ''} 
                     onChange={onChange} 
                     className={formErrors.empresaId ? styles.inputError : ''}
                     required
                 >
                     <option value="">Seleccionar empresa</option>
-                    {empresas.map(e => <option key={e.id?.toString()} value={e.id}>{e.nombre}</option>)}
+                    {empresas.map(e => (
+                        <option key={e.id} value={e.id}>
+                            {e.nombre}
+                        </option>
+                    ))}
                 </select>
             </td>
             <td>
@@ -154,7 +162,6 @@ export default function CursosPage() {
     const [formErrors, setFormErrors] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
     const [filterBy, setFilterBy] = useState('nombre');
-
     const [confirmation, setConfirmation] = useState({
         isOpen: false,
         title: '',
@@ -173,20 +180,45 @@ export default function CursosPage() {
         const loadInitialData = async () => {
             try {
                 setLoading(true);
-                const [cursosRes, instructoresRes, empresasRes, catalogoRes] = await Promise.all([
-                    fetch('http://localhost:8080/api/cursos'),
-                    fetch('http://localhost:8080/api/usuarios/instructores'),
-                    fetch('http://localhost:8080/api/empresas'),
-                    fetch('http://localhost:8080/api/catalogo_cursos')
-                ]);
-
+                
+                // Cargar cursos
+                const cursosRes = await fetch('http://localhost:8080/api/cursos');
                 if (!cursosRes.ok) throw new Error(`Error ${cursosRes.status} cargando cursos`);
                 const cursosData = await cursosRes.json();
                 setCursos(cursosData);
 
-                if (instructoresRes.ok) setInstructores(await instructoresRes.json());
-                if (empresasRes.ok) setEmpresas(await empresasRes.json());
-                if (catalogoRes.ok) setCatalogoCursos(await catalogoRes.json());
+                // Cargar instructores
+                try {
+                    const instructoresRes = await fetch('http://localhost:8080/api/usuarios/instructores');
+                    if (instructoresRes.ok) {
+                        const instructoresData = await instructoresRes.json();
+                        setInstructores(instructoresData);
+                    }
+                } catch (error) {
+                    console.warn("Error cargando instructores:", error);
+                }
+
+                // CARGAR EMPRESAS - SOLO EJEMPLOS (SIN BACKEND)
+                const empresasEjemplo = [
+                    { id: 1, nombre: "Manufacturas Coahuilenses S.A. de C.V." },
+                    { id: 2, nombre: "Aceros del Norte y Ensambles SAPI" },
+                    { id: 3, nombre: "Transportes Rapidos Saltillo S. de R.L." },
+                    { id: 4, nombre: "Logstica Industrial del Norte S.A. de C.V." },
+                    { id: 5, nombre: "Autopartes Ensambladas de Mxico SAPI" },
+                    { id: 6, nombre: "Procesadora de Alimentos del Noreste S. de R.L." }
+                ];
+                setEmpresas(empresasEjemplo);
+
+                // Cargar catálogo de cursos
+                try {
+                    const catalogoRes = await fetch('http://localhost:8080/api/catalogo_cursos');
+                    if (catalogoRes.ok) {
+                        const catalogoData = await catalogoRes.json();
+                        setCatalogoCursos(catalogoData);
+                    }
+                } catch (error) {
+                    console.warn("Error cargando catálogo de cursos:", error);
+                }
 
             } catch (error) {
                 console.error("Error cargando datos iniciales:", error);
@@ -201,22 +233,23 @@ export default function CursosPage() {
     const handleSelectCurso = (curso) => {
         if (isAdding || isEditing) return;
         setSelectedCurso(curso);
-        
         const normalizeString = (str) => str.toString().toLowerCase().trim();
-
         const instructorEncontrado = instructores.find(i => 
             normalizeString(`${i.nombre} ${i.apellidoPaterno} ${i.apellidoMaterno}`).includes(normalizeString(curso.instructor))
         );
         const instructorId = instructorEncontrado ? instructorEncontrado.numEmpleado : '';
         
-        const empresaEncontrada = empresas.find(e => e.nombre === curso.empresa);
+        // Buscar empresa por nombre exacto
+        const empresaEncontrada = empresas.find(e => 
+            e.nombre.trim().toLowerCase() === curso.empresa?.trim().toLowerCase()
+        );
         const empresaId = empresaEncontrada ? empresaEncontrada.id : '';
-
+        
         const cursoDelCatalogo = catalogoCursos.find(c => 
             normalizeString(c.nombre) === normalizeString(curso.nombre)
         );
         const stpsValue = cursoDelCatalogo ? (cursoDelCatalogo.stps || '') : (curso.stps || '');
-
+        
         setCursoData({
             nombre: curso.nombre || '',
             stps: stpsValue,
@@ -257,7 +290,7 @@ export default function CursosPage() {
         setFormErrors({});
         closeConfirmation();
     };
-    
+
     const handleCancelarClick = () => {
         showConfirmation(
             "Confirmar Cancelación",
@@ -269,13 +302,13 @@ export default function CursosPage() {
     const validateForm = () => {
         const errors = {};
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Establecer a medianoche para comparar solo la fecha
+        today.setHours(0, 0, 0, 0);
 
         if (!cursoData.nombre) errors.nombre = "El nombre del curso es obligatorio.";
         if (!cursoData.fechaIngreso) {
             errors.fechaIngreso = "La fecha es obligatoria.";
         } else {
-            const fechaIngresada = new Date(cursoData.fechaIngreso + 'T00:00:00'); // Interpretar como local
+            const fechaIngresada = new Date(cursoData.fechaIngreso + 'T00:00:00');
             if (fechaIngresada < today) {
                 errors.fechaIngreso = "La fecha no puede ser en el pasado.";
             }
@@ -284,7 +317,7 @@ export default function CursosPage() {
         if (!cursoData.empresaId) errors.empresaId = "La empresa es obligatoria.";
         if (!cursoData.lugar || !cursoData.lugar.trim()) errors.lugar = "El lugar es obligatorio.";
         if (!cursoData.horas || parseInt(cursoData.horas, 10) <= 0) errors.horas = "Las horas deben ser un número positivo.";
-        
+
         setFormErrors(errors);
         return Object.keys(errors).length === 0;
     };
@@ -293,11 +326,17 @@ export default function CursosPage() {
         const method = isAdding ? 'POST' : 'PUT';
         const url = isAdding ? 'http://localhost:8080/api/cursos' : `http://localhost:8080/api/cursos/${selectedCurso.id}`;
         
+        // Preparar datos para enviar
+        const datosParaEnviar = {
+            ...cursoData,
+            empresaId: Number(cursoData.empresaId)
+        };
+        
         try {
             const response = await fetch(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(cursoData),
+                body: JSON.stringify(datosParaEnviar),
             });
             
             if (!response.ok) {
@@ -305,13 +344,12 @@ export default function CursosPage() {
                 throw new Error(errorBody.message || `Error ${response.status}`);
             }
             
+            // Recargar cursos
             const cursosRes = await fetch('http://localhost:8080/api/cursos');
             const data = await cursosRes.json();
             setCursos(data);
-            
             showNotification(`Curso ${isAdding ? 'creado' : 'actualizado'} correctamente.`, 'success');
             executeCancel();
-
         } catch (error) {
             console.error('Error al guardar:', error);
             showNotification(error.message, 'error');
@@ -333,11 +371,9 @@ export default function CursosPage() {
 
     const executeDelete = async () => {
         if (!selectedCurso) return;
-        
         try {
             const url = `http://localhost:8080/api/cursos/${selectedCurso.id}`;
             const response = await fetch(url, { method: 'DELETE' });
-            
             if (response.status === 204 || response.ok) {
                 setCursos(cursos.filter(c => c.id !== selectedCurso.id));
                 setSelectedCurso(null);
@@ -365,7 +401,7 @@ export default function CursosPage() {
             executeDelete
         );
     };
-    
+
     const showConfirmation = (title, message, onConfirm) => {
         setConfirmation({ isOpen: true, title, message, onConfirm });
     };
@@ -380,6 +416,10 @@ export default function CursosPage() {
         if (name === 'nombre') {
             const cursoSeleccionado = catalogoCursos.find(c => c.nombre === value);
             updatedCursoData.stps = cursoSeleccionado ? (cursoSeleccionado.stps || '') : '';
+            // También actualizar las horas automáticamente desde el catálogo
+            if (cursoSeleccionado && cursoSeleccionado.horas) {
+                updatedCursoData.horas = cursoSeleccionado.horas;
+            }
         }
         setCursoData(updatedCursoData);
     };
@@ -414,6 +454,7 @@ export default function CursosPage() {
                 <div className={styles.titleSection}><h1>Asignación de Cursos</h1></div>
                 <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
             </header>
+
             <main className={styles.mainContent}>
                 <div className={styles.toolbar}>
                     <input 
@@ -486,7 +527,7 @@ export default function CursosPage() {
                                             <td>{curso.nombre}</td>
                                             <td>{curso.stps}</td>
                                             <td>{curso.horas}</td>
-                                            <td>{new Date(curso.fechaIngreso).toLocaleDateString('es-ES', { timeZone: 'UTC' })}</td>
+                                            <td>{curso.fechaIngreso ? new Date(curso.fechaIngreso).toLocaleDateString('es-ES') : 'Sin fecha'}</td>
                                             <td>{curso.instructor}</td>
                                             <td>{curso.empresa}</td>
                                             <td>{curso.lugar}</td>
@@ -497,6 +538,7 @@ export default function CursosPage() {
                         </table>
                     )}
                 </div>
+
                 <footer className={styles.footer}>
                     <div className={styles.actionButtons}>
                         <button onClick={handleAgregarClick} className={styles.btn} disabled={isAdding || isEditing}>Agregar</button>
@@ -509,17 +551,17 @@ export default function CursosPage() {
                     </div>
                     <div className={styles.linkButtons}>
                         <button 
-                            onClick={() => router.push('/historial-cursos')} 
+                            onClick={() => router.push('/admin/historial')}
                             className={styles.btnLink}
                         >
                             Historial de cursos
                         </button>
-                     <button 
-                        onClick={() => router.push('/admin/catalogo')} 
-                        className={styles.btnLink}
-                    >
-                        Catálogo de cursos
-                    </button>
+                        <button 
+                            onClick={() => router.push('/admin/catalogo')}
+                            className={styles.btnLink}
+                        >
+                            Catálogo de cursos
+                        </button>
                     </div>
                     <button onClick={() => router.back()} className={styles.btnAtras}>Atrás</button>
                 </footer>

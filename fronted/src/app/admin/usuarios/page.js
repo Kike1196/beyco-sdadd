@@ -1,749 +1,921 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './Usuarios.module.css';
 
-// --- Componente para la Fila de Edición ---
-const EditRow = ({ user, onChange, onFirmaClick, signatureFileName }) => {
-  // Función para convertir ID de rol a texto
-  const getRolText = (idRol) => {
-    switch(parseInt(idRol)) {
-      case 1: return 'Administrador';
-      case 2: return 'Instructor';
-      case 3: return 'Secretaria';
-      default: return 'Administrador';
-    }
-  };
+// --- Componente de Notificación ---
+const NotificationToast = ({ message, type, onClose }) => {
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onClose();
+        }, 5000);
+        return () => clearTimeout(timer);
+    }, [onClose]);
 
-  // Función para convertir texto de rol a ID
-  const getRolId = (rolText) => {
-    switch(rolText) {
-      case 'Administrador': return 1;
-      case 'Instructor': return 2;
-      case 'Secretaria': return 3;
-      default: return 1;
-    }
-  };
+    const icon = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
 
-  const handleRolChange = (e) => {
-    const rolId = getRolId(e.target.value);
-    const simulatedEvent = {
-      target: {
-        name: 'idRol',
-        value: rolId
-      }
-    };
-    onChange(simulatedEvent);
-  };
-
-  return (
-    <tr className={styles.newRow}>
-      <td><input type="text" name="nombre" value={user.nombre || ''} onChange={onChange} placeholder="Nombre" /></td>
-      <td><input type="text" name="apellidoPaterno" value={user.apellidoPaterno || ''} onChange={onChange} placeholder="A. Paterno" /></td>
-      <td><input type="text" name="apellidoMaterno" value={user.apellidoMaterno || ''} onChange={onChange} placeholder="A. Materno" /></td>
-      <td><input type="email" name="correo" value={user.correo || ''} onChange={onChange} placeholder="Correo" /></td>
-      <td>
-        <input 
-          type="password" 
-          name="contrasena" 
-          value={user.contrasena || ''} 
-          onChange={onChange} 
-          placeholder="Dejar vacío para mantener actual"
-          className={styles.passwordInput}
-        />
-      </td>
-      <td>
-        <select 
-          name="idRol" 
-          value={getRolText(user.idRol)} 
-          onChange={handleRolChange}
-          className={styles.rolSelect}
-        >
-          <option value="Administrador">Administrador</option>
-          <option value="Instructor">Instructor</option>
-          <option value="Secretaria">Secretaria</option>
-        </select>
-      </td>
-      <td>
-        <label className={styles.activoLabel}>
-          <input 
-            type="checkbox" 
-            name="activo" // CORRECCIÓN: Se añade el name
-            checked={user.activo || false} 
-            onChange={onChange} // CORRECCIÓN: Se usa el manejador genérico
-            className={styles.activoCheckbox}
-          />
-          <span className={styles.activoText}>
-            {user.activo ? 'Activo' : 'Inactivo'}
-          </span>
-        </label>
-      </td>
-      <td>
-        <input 
-          type="text" 
-          name="preguntaRecuperacion" 
-          value={user.preguntaRecuperacion || ''} 
-          onChange={onChange} 
-          placeholder="Pregunta de recuperación" 
-        />
-      </td>
-      <td>
-        <input 
-          type="text" 
-          name="respuestaRecuperacion" 
-          value={user.respuestaRecuperacion || ''} 
-          onChange={onChange} 
-          placeholder="Respuesta de recuperación" 
-        />
-      </td>
-      <td>
-        <input 
-          type="date" 
-          name="fechaIngreso" 
-          value={user.fechaIngreso || ''} 
-          onChange={onChange} 
-          className={styles.dateInput}
-        />
-      </td>
-      <td>
-        <button onClick={onFirmaClick} className={styles.firmaButton}>
-          {user.firma && user.firma !== 'default_firma.png' ? 'Cambiar firma' : 'Subir firma'}
-        </button>
-        {signatureFileName && <span className={styles.fileName}>{signatureFileName.substring(0,10)}...</span>}
-        {!signatureFileName && user.firma && user.firma !== 'default_firma.png' && (
-          <span className={styles.fileName}>Firma actual</span>
-        )}
-      </td>
-    </tr>
-  );
+    return (
+        <div className={`${styles.notification} ${styles[type]}`}>
+            <span className={styles.notificationIcon}>{icon[type]}</span>
+            <span className={styles.notificationMessage}>{message}</span>
+            <button onClick={onClose} className={styles.notificationClose}>×</button>
+            <div className={styles.notificationProgress}></div>
+        </div>
+    );
 };
 
-// --- Modal de Confirmación Personalizado ---
+// --- Componente de Modal de Confirmación ---
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
-  if (!isOpen) return null;
+    if (!isOpen) return null;
 
-  return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.confirmModal}>
-        <h3>{title}</h3>
-        <p>{message}</p>
-        <div className={styles.modalButtons}>
-          <button onClick={onConfirm} className={styles.btnEliminar}>
-            Aceptar
-          </button>
-          <button onClick={onClose} className={styles.btnCancelar}>
-            Cancelar
-          </button>
+    return (
+        <div className={styles.modalOverlay}>
+            <div className={styles.confirmModal}>
+                <h3>{title}</h3>
+                <p>{message}</p>
+                <div className={styles.modalButtons}>
+                    <button onClick={onConfirm} className={styles.btnEliminar}>
+                        Aceptar
+                    </button>
+                    <button onClick={onClose} className={styles.btnCancelar}>
+                        Cancelar
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
+// Función para normalizar nombres de campos según la estructura del backend
+const normalizeUsuario = (usuario) => {
+    const mapRolIdToName = (idRol) => {
+        switch (idRol) {
+            case 1: return 'Administrador';
+            case 2: return 'Instructor';
+            case 3: return 'Secretaria';
+            default: return 'Usuario';
+        }
+    };
+
+    const mapRolNameToId = (rolName) => {
+        switch (rolName) {
+            case 'Administrador': return 1;
+            case 'Instructor': return 2;
+            case 'Secretaria': return 3;
+            default: return 4;
+        }
+    };
+
+    return {
+        numEmpleado: usuario.numEmpleado || usuario.Num_Empleado || usuario.id || Math.random().toString(36).substr(2, 9),
+        nombre: usuario.nombre || usuario.Nombre || '',
+        apellidoPaterno: usuario.apellidoPaterno || usuario.Apellido_paterno || usuario.paterno || '',
+        apellidoMaterno: usuario.apellidoMaterno || usuario.Apellido_materno || usuario.materno || '',
+        correo: usuario.correo || usuario.Correo || usuario.email || '',
+        contrasena: usuario.contrasena || usuario.Contrasena || usuario.password || '',
+        idRol: usuario.idRol || usuario.Id_Rol || mapRolNameToId(usuario.rol) || 4,
+        rol: usuario.rol || mapRolIdToName(usuario.idRol) || 'Usuario',
+        activo: usuario.activo !== undefined ? usuario.activo : 
+                (usuario.Activo !== undefined ? usuario.Activo : true),
+        fechaIngreso: usuario.fechaIngreso || usuario.Fecha_Ingreso || usuario.fechaCreacion || new Date().toISOString().split('T')[0],
+        preguntaRecuperacion: usuario.preguntaRecuperacion || usuario.Pregunta_recuperacion || usuario.pregunta || '',
+        respuestaRecuperacion: usuario.respuestaRecuperacion || usuario.Respuesta_recuperacion || usuario.respuesta || '',
+        firma: usuario.firma || usuario.Firma || ''
+    };
+};
+
+// Función para verificar si es un usuario temporal
+const isTemporaryUser = (usuario) => {
+    if (!usuario || !usuario.numEmpleado) return false;
+    
+    if (typeof usuario.numEmpleado === 'string' && usuario.numEmpleado.includes('new-user-')) {
+        return true;
+    }
+    
+    if (typeof usuario.numEmpleado === 'number') {
+        return false;
+    }
+    
+    const numEmpleadoStr = String(usuario.numEmpleado);
+    return numEmpleadoStr.includes('new-user-') || numEmpleadoStr.length > 10;
+};
+
+// ✅ COMPONENTE PRINCIPAL CORREGIDO
 export default function UsuariosPage() {
-  const [usuarios, setUsuarios] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+    const [usuarios, setUsuarios] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+    const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+    const [selectedUsuario, setSelectedUsuario] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
+    const [usuarioData, setUsuarioData] = useState({});
+    const [showInactive, setShowInactive] = useState(false);
+    const [confirmation, setConfirmation] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+    });
+    const [formErrors, setFormErrors] = useState({});
 
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [isAdding, setIsAdding] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    nuevaContrasena: '',
-    confirmarContrasena: ''
-  });
-
-  // Estados para modal de confirmación de eliminación
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [userToDelete, setUserToDelete] = useState(null);
-
-  // Sistema de notificaciones
-  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
-
-  const initialNewUserState = { 
-    nombre: '', apellidoPaterno: '', apellidoMaterno: '', 
-    correo: '', contrasena: '', idRol: 1,
-    preguntaRecuperacion: '', respuestaRecuperacion: '',
-    activo: true, fechaIngreso: new Date().toISOString().split('T')[0],
-    firma: 'default_firma.png'
-  };
-  const [newUser, setNewUser] = useState(initialNewUserState);
-  const [signatureFile, setSignatureFile] = useState(null);
-  const fileInputRef = useRef(null);
-
-  // Función para mostrar notificaciones
-  const showNotification = (message, type = 'error') => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => {
-      setNotification({ show: false, message: '', type: '' });
-    }, 5000);
-  };
-
-  const closeNotification = () => {
-    setNotification({ show: false, message: '', type: '' });
-  };
-
-  // Función para convertir ID de rol a texto (para mostrar en la tabla)
-  const getRolText = (idRol) => {
-    switch(parseInt(idRol)) {
-      case 1: return 'Administrador';
-      case 2: return 'Instructor';
-      case 3: return 'Secretaria';
-      default: return 'Administrador';
-    }
-  };
-
-  // Función para mostrar estado
-  const getActivoStatus = (activo) => {
-    return activo ? '✅ Activo' : '❌ Inactivo';
-  };
-
-  useEffect(() => {
-    const fetchUsuarios = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/api/usuarios');
-        if (!response.ok) {
-          const errorText = await response.text();
-          let errorMsg = `Error ${response.status}: ${response.statusText}`;
-          if (errorText) errorMsg += ` - ${errorText.substring(0, 200)}`;
-          throw new Error(errorMsg);
-        }
-        const data = await response.json();
-        setUsuarios(data);
-      } catch (error) {
-        console.error("No se pudo cargar la lista de usuarios:", error);
-        showNotification("Error al cargar usuarios: " + error.message, 'error');
-      } finally {
-        setLoading(false);
-      }
+    const showNotification = (message, type = 'error') => {
+        setNotification({ show: true, message, type });
     };
-    fetchUsuarios();
-  }, []);
-
-  const handleSelectUser = (usuario) => {
-    if (isAdding || isEditing || isChangingPassword) return;
-    setSelectedUser(usuario);
-  };
-
-  const handleAgregarClick = () => {
-    setIsAdding(true);
-    setSelectedUser(null);
-    setIsEditing(false);
-    setIsChangingPassword(false);
-    setNewUser(initialNewUserState);
-  };
-
-  const handleCancelarClick = () => {
-    setIsAdding(false);
-    setIsEditing(false);
-    setIsChangingPassword(false);
-    setEditingUser(null);
-    setSignatureFile(null);
-    showNotification('Operación cancelada', 'warning');
-  };
-
-  const handleModificarClick = () => {
-    if (!selectedUser) {
-      showNotification("Por favor, selecciona un usuario para modificar.", 'warning');
-      return;
-    }
     
-    // Cargar TODOS los datos correctamente incluyendo pregunta y respuesta
-    const userToEdit = {
-      numEmpleado: selectedUser.numEmpleado,
-      nombre: selectedUser.nombre || '',
-      apellidoPaterno: selectedUser.apellidoPaterno || '',
-      apellidoMaterno: selectedUser.apellidoMaterno || '',
-      correo: selectedUser.correo || '',
-      contrasena: '', // No cargar contraseña real por seguridad
-      idRol: selectedUser.idRol ? Number(selectedUser.idRol) : 1,
-      activo: selectedUser.activo !== undefined ? selectedUser.activo : true,
-      preguntaRecuperacion: selectedUser.preguntaRecuperacion || '',
-      respuestaRecuperacion: selectedUser.respuestaRecuperacion || '',
-      fechaIngreso: selectedUser.fechaIngreso || new Date().toISOString().split('T')[0],
-      firma: selectedUser.firma || 'default_firma.png',
+    const closeNotification = () => {
+        setNotification({ show: false, message: '', type: '' });
     };
 
-    setIsEditing(true);
-    setEditingUser(userToEdit);
-    setIsAdding(false);
-    setIsChangingPassword(false);
-    setSignatureFile(null);
-  };
+    // Función para navegar al dashboard
+    const handleAtrasClick = () => {
+        router.push('/admin');
+    };
 
-  // Función para manejar el clic en "Cambiar Contraseña"
-  const handleCambiarContrasenaClick = () => {
-    if (!selectedUser) {
-      showNotification("Por favor, selecciona un usuario para cambiar la contraseña.", 'warning');
-      return;
-    }
-    setIsChangingPassword(true);
-    setPasswordData({ nuevaContrasena: '', confirmarContrasena: '' });
-  };
+    // Cargar usuarios desde la base de datos
+    useEffect(() => {
+        const loadUsuarios = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch('http://localhost:8080/api/usuarios', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
 
-  // Función para manejar el cambio en los campos de contraseña
-  const handlePasswordChange = (e) => {
-    const { name, value } = e.target;
-    setPasswordData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Función para guardar la nueva contraseña
-  const handleGuardarContrasena = async () => {
-    if (!passwordData.nuevaContrasena || !passwordData.confirmarContrasena) {
-      showNotification("Por favor, completa ambos campos de contraseña.", 'warning');
-      return;
-    }
-
-    if (passwordData.nuevaContrasena !== passwordData.confirmarContrasena) {
-      showNotification("Las contraseñas no coinciden.", 'error');
-      return;
-    }
-
-    if (passwordData.nuevaContrasena.length < 6) {
-      showNotification("La contraseña debe tener al menos 6 caracteres.", 'warning');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:8080/api/usuarios/actualizar-contrasena', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          correo: selectedUser.correo,
-          nuevaContrasena: passwordData.nuevaContrasena
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `Error ${response.status}: ${response.statusText}`;
-        if (errorText) {
-          try {
-            const errorJson = JSON.parse(errorText);
-            errorMessage = errorJson.message || errorJson.error || errorText;
-          } catch {
-            errorMessage = `${errorMessage} - ${errorText}`;
-          }
-        }
-        throw new Error(errorMessage);
-      }
-
-      showNotification("Contraseña actualizada exitosamente", 'success');
-      setIsChangingPassword(false);
-      setPasswordData({ nuevaContrasena: '', confirmarContrasena: '' });
-    } catch (error) {
-      console.error("Error al cambiar la contraseña:", error);
-      showNotification("Error al cambiar la contraseña: " + error.message, 'error');
-    }
-  };
-
-  // Función para cancelar el cambio de contraseña
-  const handleCancelarContrasena = () => {
-    setIsChangingPassword(false);
-    setPasswordData({ nuevaContrasena: '', confirmarContrasena: '' });
-    showNotification('Cambio de contraseña cancelado', 'warning');
-  };
-
-  // Función para eliminar con modal personalizado
-  const handleEliminarClick = () => {
-    if (!selectedUser) {
-      showNotification("Por favor, selecciona un usuario para eliminar.", 'warning');
-      return;
-    }
-    
-    setUserToDelete(selectedUser);
-    setShowDeleteModal(true);
-  };
-
-  const confirmEliminar = async () => {
-    if (!userToDelete) return;
-
-    try {
-      const response = await fetch(`http://localhost:8080/api/usuarios/${userToDelete.numEmpleado}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMsg = `Error ${response.status}: ${response.statusText}`;
-        if (errorText) errorMsg += ` - ${errorText.substring(0, 200)}`;
-        throw new Error(errorMsg);
-      }
-      
-      setUsuarios(usuarios.filter(u => u.numEmpleado !== userToDelete.numEmpleado));
-      setSelectedUser(null);
-      showNotification(`Usuario ${userToDelete.nombre} eliminado exitosamente`, 'success');
-    } catch (error) {
-      console.error("Error al eliminar el usuario:", error);
-      showNotification('No se pudo eliminar el usuario: ' + error.message, 'error');
-    } finally {
-      setShowDeleteModal(false);
-      setUserToDelete(null);
-    }
-  };
-
-  const handleGuardarClick = async () => {
-    if (isAdding) {
-      try {
-        // Validaciones adicionales
-        if (!newUser.nombre || !newUser.correo || !newUser.idRol) {
-          showNotification("Por favor, completa los campos obligatorios: Nombre, Correo y Rol", 'warning');
-          return;
-        }
-
-        const userPayload = { 
-          ...newUser, 
-          preguntaRecuperacion: newUser.preguntaRecuperacion || '',
-          respuestaRecuperacion: newUser.respuestaRecuperacion || '',
-          firma: newUser.firma || 'default_firma.png'
-        };
-
-        const response = await fetch('http://localhost:8080/api/usuarios', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(userPayload),
-        });
-
-        if (!response.ok) {
-          let errorMessage = `Error ${response.status}: ${response.statusText}`;
-          try {
-            const errorText = await response.text();
-            if (errorText) {
-              try {
-                const errorJson = JSON.parse(errorText);
-                errorMessage = errorJson.message || errorJson.error || errorText;
-              } catch {
-                errorMessage = `${errorMessage} - ${errorText}`;
-              }
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                let data;
+                if (result.success && Array.isArray(result.data)) {
+                    data = result.data;
+                } else if (Array.isArray(result)) {
+                    data = result;
+                } else {
+                    data = [];
+                }
+                
+                const normalizedData = data.map(normalizeUsuario);
+                setUsuarios(normalizedData);
+                
+            } catch (error) {
+                console.error("Error cargando usuarios:", error);
+                showNotification("Error al cargar los usuarios: " + error.message, 'error');
+                
+                // Datos de fallback
+                const fallbackData = [
+                    {
+                        numEmpleado: 1,
+                        nombre: 'Armando',
+                        apellidoPaterno: 'Becerra',
+                        apellidoMaterno: 'Campos',
+                        correo: 'armando.becerra@beyco.com',
+                        contrasena: 'Ingeniería2C',
+                        idRol: 2,
+                        rol: 'Instructor',
+                        activo: true,
+                        preguntaRecuperacion: '¿Cuál es tu color favorito?',
+                        respuestaRecuperacion: 'Azul',
+                        fechaIngreso: '2023-01-15',
+                        firma: 'firma_armando.png'
+                    }
+                ].map(normalizeUsuario);
+                setUsuarios(fallbackData);
+            } finally {
+                setLoading(false);
             }
-          } catch (textError) {
-            console.error('Error al leer respuesta de error:', textError);
-          }
-          throw new Error(errorMessage);
-        }
-
-        const savedUser = await response.json();
-
-        if (signatureFile) {
-          const formData = new FormData();
-          formData.append('firmaFile', signatureFile);
-          const firmaResponse = await fetch(`http://localhost:8080/api/usuarios/${savedUser.numEmpleado}/firma`, {
-            method: 'POST',
-            body: formData,
-          });
-          if (!firmaResponse.ok) {
-            const firmaError = await firmaResponse.text();
-            console.warn("Firma no subida:", firmaError);
-          } else {
-            const firmaData = await firmaResponse.json();
-            savedUser.firma = firmaData.filePath;
-          }
-        }
-
-        setUsuarios(prev => [...prev, savedUser]);
-        showNotification("Usuario creado exitosamente", 'success');
-        
-        // Resetear solo después de éxito
-        setIsAdding(false);
-        setNewUser(initialNewUserState);
-        setSignatureFile(null);
-      } catch (error) {
-        console.error("Error al crear usuario:", error);
-        showNotification("Error al crear usuario: " + error.message, 'error');
-      }
-    } else if (isEditing) {
-      if (!editingUser?.numEmpleado) {
-        showNotification("ID de usuario inválido. No se puede actualizar.", 'error');
-        return;
-      }
-
-      try {
-        // Validaciones para edición
-        if (!editingUser.nombre || !editingUser.correo || !editingUser.idRol) {
-          showNotification("Por favor, completa los campos obligatorios: Nombre, Correo y Rol", 'warning');
-          return;
-        }
-
-        // Enviar todos los datos incluyendo estado activo
-        const updateData = { 
-          ...editingUser,
-          activo: editingUser.activo !== undefined ? editingUser.activo : true
         };
+        loadUsuarios();
+    }, []);
 
-        const response = await fetch(`http://localhost:8080/api/usuarios/${editingUser.numEmpleado}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updateData),
-        });
-
-        if (!response.ok) {
-          let errorMessage = `Error ${response.status}: ${response.statusText}`;
-          try {
-            const errorText = await response.text();
-            if (errorText) {
-              try {
-                const errorJson = JSON.parse(errorText);
-                errorMessage = errorJson.message || errorJson.error || errorText;
-              } catch {
-                errorMessage = `${errorMessage} - ${errorText}`;
-              }
-            }
-          } catch (textError) {
-            console.error('Error al leer respuesta de error:', textError);
-          }
-          throw new Error(errorMessage);
-        }
-
-        let updatedUser = await response.json();
-
-        if (signatureFile) {
-          const formData = new FormData();
-          formData.append('firmaFile', signatureFile);
-          const firmaResponse = await fetch(`http://localhost:8080/api/usuarios/${editingUser.numEmpleado}/firma`, {
-            method: 'POST',
-            body: formData,
-          });
-          if (!firmaResponse.ok) {
-            const firmaError = await firmaResponse.text();
-            console.warn("Firma no subida:", firmaError);
-          } else {
-            const firmaData = await firmaResponse.json();
-            updatedUser = { ...updatedUser, firma: firmaData.filePath };
-          }
-        }
-
-        setUsuarios(usuarios.map(u => u.numEmpleado === updatedUser.numEmpleado ? updatedUser : u));
-        showNotification("Usuario actualizado exitosamente", 'success');
+    const handleSelectUsuario = (usuario) => {
+        if (isAdding) return;
         
-        // Resetear solo después de éxito
+        setSelectedUsuario(usuario);
         setIsEditing(false);
-        setEditingUser(null);
-        setSelectedUser(null);
-        setSignatureFile(null);
-      } catch (error) {
-        console.error("Error al actualizar el usuario:", error);
-        showNotification("Error al actualizar usuario: " + error.message, 'error');
-      }
-    }
-  };
+        setUsuarioData({
+            nombre: usuario.nombre || '',
+            apellidoPaterno: usuario.apellidoPaterno || '',
+            apellidoMaterno: usuario.apellidoMaterno || '',
+            correo: usuario.correo || '',
+            contrasena: '',
+            rol: usuario.rol || '',
+            preguntaRecuperacion: usuario.preguntaRecuperacion || '',
+            respuestaRecuperacion: usuario.respuestaRecuperacion || '',
+            fechaIngreso: usuario.fechaIngreso || '',
+            firma: usuario.firma || ''
+        });
+        setFormErrors({});
+    };
 
-  // CORRECCIÓN: Manejador de cambios unificado para todos los inputs
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    // Si el input es un checkbox, el valor que nos interesa es `checked`
-    const finalValue = type === 'checkbox' ? checked : value;
-
-    if (isAdding) {
-      setNewUser(prev => ({ 
-        ...prev, 
-        // Convertir idRol a número, mantener los demás valores como están
-        [name]: name === 'idRol' && finalValue !== '' ? Number(finalValue) : finalValue 
-      }));
-    } else if (isEditing) {
-      setEditingUser(prev => ({ 
-        ...prev, 
-        [name]: name === 'idRol' && finalValue !== '' ? Number(finalValue) : finalValue 
-      }));
-    }
-  };
-  
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSignatureFile(e.target.files[0]);
-      showNotification('Archivo seleccionado: ' + e.target.files[0].name, 'success');
-    }
-  };
-
-  const handleFirmaClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const getFileName = (filePath) => {
-    if (!filePath) return '';
-    return filePath.split(/[\\/]/).pop() || filePath;
-  };
-
-  // Función para formatear fecha
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    // Asegurarse de que la fecha se interprete correctamente como UTC para evitar problemas de zona horaria
-    const date = new Date(dateString + 'T00:00:00');
-    return date.toLocaleDateString('es-ES', { timeZone: 'UTC' });
-  };
-
-  return (
-    <div className={styles.pageContainer}>
-      {/* Sistema de Notificaciones Personalizadas */}
-      {notification.show && (
-        <div className={`${styles.notification} ${styles[`notification${notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}`]}`}>
-          <div className={styles.notificationContent}>
-            <span className={styles.notificationIcon}>
-              {notification.type === 'success' && '✓'}
-              {notification.type === 'error' && '✕'}
-              {notification.type === 'warning' && '⚠'}
-            </span>
-            <span className={styles.notificationMessage}>
-              {notification.message}
-            </span>
-            <button 
-              className={styles.notificationClose}
-              onClick={closeNotification}
-              type="button"
-              aria-label="Cerrar notificación"
-            >
-              ×
-            </button>
-          </div>
-          <div className={styles.notificationProgress}></div>
-        </div>
-      )}
-
-      <header className={styles.header}>
-        <div className={styles.titleSection}><h1>Usuarios</h1></div>
-        <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
-      </header>
-      <main className={styles.mainContent}>
-        <div className={styles.tableContainer}>
-          {loading ? <p>Cargando...</p> : (
-            <table className={styles.userTable}>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>A. Paterno</th>
-                  <th>A. Materno</th>
-                  <th>Correo</th>
-                  <th>Contraseña</th>
-                  <th>Rol</th>
-                  <th>Estado</th>
-                  <th>Pregunta</th>
-                  <th>Respuesta</th>
-                  <th>Fecha Ingreso</th>
-                  <th>Firma</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isAdding && (
-                  <EditRow 
-                    user={newUser} 
-                    onChange={handleInputChange}
-                    onFirmaClick={handleFirmaClick}
-                    signatureFileName={signatureFile?.name}
-                  />
-                )}
-                {usuarios.map(usuario => (
-                  isEditing && editingUser?.numEmpleado === usuario.numEmpleado 
-                    ? <EditRow 
-                        key={usuario.numEmpleado} 
-                        user={editingUser} 
-                        onChange={handleInputChange}
-                        onFirmaClick={handleFirmaClick}
-                        signatureFileName={signatureFile?.name || getFileName(editingUser?.firma)}
-                      />
-                    : (
-                      <tr 
-                        key={usuario.numEmpleado} 
-                        onClick={() => handleSelectUser(usuario)}
-                        className={selectedUser?.numEmpleado === usuario.numEmpleado ? styles.selectedRow : ''}
-                      >
-                        <td>{usuario.nombre}</td>
-                        <td>{usuario.apellidoPaterno}</td>
-                        <td>{usuario.apellidoMaterno}</td>
-                        <td>{usuario.correo}</td>
-                        <td>********</td>
-                        <td>{getRolText(usuario.idRol)}</td>
-                        <td>{getActivoStatus(usuario.activo)}</td>
-                        <td>********</td>
-                        <td>********</td>
-                        <td>{formatDate(usuario.fechaIngreso)}</td>
-                        <td>{usuario.firma && usuario.firma !== 'default_firma.png' ? '✔️' : '____'}</td>
-                      </tr>
-                    )
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          onChange={handleFileChange} 
-          style={{ display: 'none' }} 
-          accept="image/*" 
-        />
+    const handleAgregarClick = () => {
+        const newUser = {
+            numEmpleado: 'new-user-' + Date.now(),
+            nombre: '',
+            apellidoPaterno: '',
+            apellidoMaterno: '',
+            correo: '',
+            contrasena: '',
+            rol: '',
+            idRol: 4,
+            activo: true,
+            preguntaRecuperacion: '',
+            respuestaRecuperacion: '',
+            fechaIngreso: new Date().toISOString().split('T')[0],
+            firma: ''
+        };
         
-        {/* Modal para cambiar contraseña */}
-        {isChangingPassword && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-              <h3>Cambiar Contraseña para {selectedUser?.nombre}</h3>
-              <div className={styles.passwordForm}>
-                <div className={styles.formGroup}>
-                  <label>Nueva Contraseña:</label>
-                  <input
-                    type="password"
-                    name="nuevaContrasena"
-                    value={passwordData.nuevaContrasena}
-                    onChange={handlePasswordChange}
-                    placeholder="Ingresa la nueva contraseña"
-                    className={styles.passwordInput}
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Confirmar Contraseña:</label>
-                  <input
-                    type="password"
-                    name="confirmarContrasena"
-                    value={passwordData.confirmarContrasena}
-                    onChange={handlePasswordChange}
-                    placeholder="Confirma la nueva contraseña"
-                    className={styles.passwordInput}
-                  />
-                </div>
-                <div className={styles.modalButtons}>
-                  <button onClick={handleGuardarContrasena} className={styles.btnGuardar}>
-                    Guardar Contraseña
-                  </button>
-                  <button onClick={handleCancelarContrasena} className={styles.btnAtras}>
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        setSelectedUsuario(newUser);
+        setIsAdding(true);
+        setIsEditing(true);
+        setUsuarioData({
+            nombre: '',
+            apellidoPaterno: '',
+            apellidoMaterno: '',
+            correo: '',
+            contrasena: '',
+            rol: '',
+            preguntaRecuperacion: '',
+            respuestaRecuperacion: '',
+            fechaIngreso: new Date().toISOString().split('T')[0],
+            firma: ''
+        });
+        setFormErrors({});
+        
+        // Scroll a la parte superior de la tabla para ver la nueva fila
+        setTimeout(() => {
+            const tableContainer = document.querySelector(`.${styles.tableContainer}`);
+            if (tableContainer) {
+                tableContainer.scrollTop = 0;
+            }
+        }, 100);
+    };
 
-        {/* Modal de confirmación para eliminar */}
-        <ConfirmModal
-          isOpen={showDeleteModal}
-          onClose={() => {
-            setShowDeleteModal(false);
-            setUserToDelete(null);
-          }}
-          onConfirm={confirmEliminar}
-          title="Confirmar Eliminación"
-          message={`¿Estás seguro de que quieres eliminar a ${userToDelete?.nombre}?`}
-        />
+    const handleModificarClick = () => {
+        if (!selectedUsuario) {
+            showNotification("Selecciona un usuario para modificar.", 'warning');
+            return;
+        }
+        setIsEditing(true);
+        setIsAdding(false);
+        setFormErrors({});
+    };
 
-        <footer className={styles.footer}>
-          <div className={styles.actionButtons}>
-            <button onClick={handleAgregarClick} className={styles.btn} disabled={isAdding || isEditing || isChangingPassword}>Agregar</button>
-            <button onClick={handleModificarClick} className={styles.btn} disabled={!selectedUser || isAdding || isEditing || isChangingPassword}>Modificar</button>
-            <button onClick={handleCambiarContrasenaClick} className={styles.btn} disabled={!selectedUser || isAdding || isEditing || isChangingPassword}>Cambiar Contraseña</button>
-            <button onClick={handleEliminarClick} className={styles.btn} disabled={!selectedUser || isAdding || isEditing || isChangingPassword}>Eliminar</button>
-            <button onClick={handleGuardarClick} className={styles.btnGuardar} disabled={(!isAdding && !isEditing) || isChangingPassword}>Guardar</button>
-            {(isAdding || isEditing) && (
-              <button onClick={handleCancelarClick} className={styles.btnCancelar}>Cancelar</button>
+    const handleCancelarClick = () => {
+        if (isEditing || isAdding) {
+            showConfirmation(
+                "Confirmar Cancelación",
+                "¿Estás seguro de que quieres cancelar? Perderás todos los cambios no guardados.",
+                () => {
+                    setIsEditing(false);
+                    setIsAdding(false);
+                    setSelectedUsuario(null);
+                    setUsuarioData({});
+                    setFormErrors({});
+                    closeConfirmation();
+                    showNotification("Edición cancelada", 'info');
+                }
+            );
+        } else {
+            setSelectedUsuario(null);
+            setUsuarioData({});
+            setFormErrors({});
+            showNotification("Selección limpiada", 'info');
+        }
+    };
+
+    const validateForm = () => {
+        const errors = {};
+        
+        if (!usuarioData.nombre?.trim()) {
+            errors.nombre = "El nombre es obligatorio";
+        }
+        
+        if (!usuarioData.apellidoPaterno?.trim()) {
+            errors.apellidoPaterno = "El apellido paterno es obligatorio";
+        }
+        
+        if (!usuarioData.correo?.trim()) {
+            errors.correo = "El correo electrónico es obligatorio";
+        } else if (!/\S+@\S+\.\S+/.test(usuarioData.correo)) {
+            errors.correo = "El formato del correo electrónico no es válido";
+        }
+        
+        if (!usuarioData.rol) {
+            errors.rol = "El rol es obligatorio";
+        }
+        
+        if (isAdding && !usuarioData.contrasena?.trim()) {
+            errors.contrasena = "La contraseña es obligatoria para nuevos usuarios";
+        }
+        
+        if (!usuarioData.fechaIngreso) {
+            errors.fechaIngreso = "La fecha de ingreso es obligatoria";
+        }
+        
+        if (!usuarioData.preguntaRecuperacion?.trim()) {
+            errors.preguntaRecuperacion = "La pregunta de seguridad es obligatoria";
+        }
+        
+        if (!usuarioData.respuestaRecuperacion?.trim()) {
+            errors.respuestaRecuperacion = "La respuesta de seguridad es obligatoria";
+        }
+        
+        setFormErrors(errors);
+        
+        if (Object.keys(errors).length > 0) {
+            const firstError = Object.values(errors)[0];
+            showNotification(firstError, 'error');
+            return false;
+        }
+        
+        return true;
+    };
+
+    const mapRolNameToId = (rolName) => {
+        switch (rolName) {
+            case 'Administrador': return 1;
+            case 'Instructor': return 2;
+            case 'Secretaria': return 3;
+            default: return 4;
+        }
+    };
+
+    const executeSave = async () => {
+        if (!validateForm()) {
+            closeConfirmation();
+            return;
+        }
+
+        try {
+            const usuarioTemporal = isTemporaryUser(selectedUsuario);
+            
+            const dataToSend = {
+                nombre: usuarioData.nombre.trim(),
+                apellidoPaterno: usuarioData.apellidoPaterno.trim(),
+                apellidoMaterno: usuarioData.apellidoMaterno?.trim() || '',
+                correo: usuarioData.correo.trim(),
+                idRol: mapRolNameToId(usuarioData.rol),
+                activo: selectedUsuario?.activo !== undefined ? selectedUsuario.activo : true,
+                fechaIngreso: usuarioData.fechaIngreso,
+                preguntaRecuperacion: usuarioData.preguntaRecuperacion?.trim() || '',
+                respuestaRecuperacion: usuarioData.respuestaRecuperacion?.trim() || '',
+                firma: usuarioData.firma?.trim() || ''
+            };
+
+            if (usuarioData.contrasena?.trim()) {
+                dataToSend.contrasena = usuarioData.contrasena.trim();
+            }
+
+            let url = 'http://localhost:8080/api/usuarios';
+            let method = isAdding || usuarioTemporal ? 'POST' : 'PUT';
+            
+            if (!isAdding && !usuarioTemporal) {
+                dataToSend.numEmpleado = selectedUsuario.numEmpleado;
+            }
+
+            const response = await fetch(url, {
+                method: method,
+                headers: { 
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            });
+            
+            if (response.ok) {
+                showNotification(
+                    `Usuario ${isAdding ? 'creado' : 'actualizado'} correctamente`, 
+                    'success'
+                );
+                
+                // Recargar datos
+                const reloadResponse = await fetch('http://localhost:8080/api/usuarios');
+                if (reloadResponse.ok) {
+                    const result = await reloadResponse.json();
+                    let data = [];
+                    if (result.success && Array.isArray(result.data)) {
+                        data = result.data;
+                    } else if (Array.isArray(result)) {
+                        data = result;
+                    }
+                    const normalizedData = data.map(normalizeUsuario);
+                    setUsuarios(normalizedData);
+                }
+                
+            } else {
+                throw new Error(`Error ${response.status}`);
+            }
+            
+            setIsEditing(false);
+            setIsAdding(false);
+            setSelectedUsuario(null);
+            setFormErrors({});
+            
+        } catch (error) {
+            console.error('Error al guardar:', error);
+            showNotification("Error al guardar el usuario: " + error.message, 'error');
+        } finally {
+            closeConfirmation();
+        }
+    };
+
+    const handleGuardarClick = () => {
+        if (validateForm()) {
+            showConfirmation(
+                "Confirmar Guardado",
+                `¿Estás seguro de que quieres ${isAdding ? 'crear este nuevo' : 'guardar los cambios en este'} usuario?`,
+                executeSave
+            );
+        }
+    };
+
+    const handleToggleStatus = async () => {
+        if (!selectedUsuario) {
+            showNotification("Selecciona un usuario para cambiar su estado.", 'warning');
+            return;
+        }
+
+        try {
+            const nuevoEstado = !selectedUsuario.activo;
+            
+            // Actualizar localmente primero
+            setUsuarios(prev => prev.map(u => 
+                u.numEmpleado === selectedUsuario.numEmpleado 
+                ? { ...u, activo: nuevoEstado }
+                : u
+            ));
+            setSelectedUsuario(prev => ({ ...prev, activo: nuevoEstado }));
+            
+            const newStatus = nuevoEstado ? 'activado' : 'desactivado';
+            showNotification(`Usuario ${newStatus} correctamente.`, 'success');
+            
+        } catch (error) {
+            console.error('Error cambiando estado:', error);
+            showNotification('Error al cambiar estado del usuario: ' + error.message, 'error');
+        }
+    };
+
+    const handleCambiarContraseña = () => {
+        if (!selectedUsuario) {
+            showNotification("Selecciona un usuario para cambiar la contraseña.", 'warning');
+            return;
+        }
+        setIsEditing(true);
+        setUsuarioData(prev => ({ ...prev, contrasena: '' }));
+        showNotification("Modo de cambio de contraseña activado. Completa la nueva contraseña y guarda.", 'info');
+    };
+
+    const handleAddSignature = () => {
+        if (!selectedUsuario) {
+            showNotification("Selecciona un usuario para agregar firma.", 'warning');
+            return;
+        }
+        
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*,.pdf';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                setUsuarioData(prev => ({ ...prev, firma: file.name }));
+                showNotification(`Firma ${file.name} agregada para ${selectedUsuario.nombre}.`, 'success');
+            }
+        };
+        input.click();
+    };
+
+    const showConfirmation = (title, message, onConfirm) => {
+        setConfirmation({ isOpen: true, title, message, onConfirm });
+    };
+
+    const closeConfirmation = () => {
+        setConfirmation({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setUsuarioData(prev => ({ ...prev, [name]: value }));
+        if (formErrors[name]) {
+            setFormErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
+
+    const filteredUsuarios = useMemo(() => 
+        showInactive ? usuarios : usuarios.filter(usuario => usuario.activo),
+        [usuarios, showInactive]
+    );
+
+    const usuariosActivos = usuarios.filter(u => u.activo).length;
+    const usuariosInactivos = usuarios.filter(u => !u.activo).length;
+
+    return (
+        <div className={styles.pageContainer}>
+            {notification.show && (
+                <NotificationToast 
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={closeNotification}
+                />
             )}
-          </div>
-          <button onClick={() => router.back()} className={styles.btnAtras}>Atrás</button>
-        </footer>
-      </main>
-    </div>
-  );
+
+            <ConfirmModal
+                isOpen={confirmation.isOpen}
+                onClose={closeConfirmation}
+                onConfirm={confirmation.onConfirm}
+                title={confirmation.title}
+                message={confirmation.message}
+            />
+
+            <header className={styles.header}>
+                <div className={styles.titleSection}>
+                    <div className={styles.headerTop}>
+                        <h1>Usuarios</h1>
+                    </div>
+                    <div className={`${styles.modoInfo} ${usuarios.some(u => isTemporaryUser(u)) ? styles.warning : ''}`}>
+                        {usuarios.some(u => isTemporaryUser(u)) 
+                            ? '' 
+                            : 'Bienvenido al panel de administración de usuarios'
+                        }
+                    </div>
+                </div>
+            </header>
+
+            <main className={styles.mainContent}>
+                <div className={styles.statsSection}>
+                    <div className={styles.statsHeader}>
+                        <h2>Todos {usuarios.length}</h2>
+                        <div className={styles.statsDetails}>
+                            <span className={styles.statActive}>Activos: {usuariosActivos}</span>
+                            <span className={styles.statInactive}>Inactivos: {usuariosInactivos}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className={styles.filterInfo}>
+                    {showInactive ? (
+                        <span>Mostrando todos los usuarios (activos e inactivos)</span>
+                    ) : (
+                        <span>Mostrando solo usuarios activos</span>
+                    )}
+                </div>
+
+                <div className={styles.tableContainer}>
+                    {loading ? (
+                        <p className={styles.loading}>Cargando usuarios...</p>
+                    ) : (
+                        <table className={styles.usuariosTable}>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>A. Paterno</th>
+                                    <th>A. Materno</th>
+                                    <th>Correo</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Ingreso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {/* ✅ NUEVO: Mostrar fila de agregar cuando esté en modo agregar */}
+                                {isAdding && (
+                                    <tr className={`${styles.selectedRow} ${styles.editingRow}`}>
+                                        <td>
+                                            <div>
+                                                <input
+                                                    type="text"
+                                                    name="nombre"
+                                                    value={usuarioData.nombre || ''}
+                                                    onChange={handleInputChange}
+                                                    className={`${styles.editInput} ${formErrors.nombre ? styles.inputError : ''}`}
+                                                    placeholder="Nombre"
+                                                />
+                                                {formErrors.nombre && <span className={styles.errorText}>{formErrors.nombre}</span>}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <input
+                                                    type="text"
+                                                    name="apellidoPaterno"
+                                                    value={usuarioData.apellidoPaterno || ''}
+                                                    onChange={handleInputChange}
+                                                    className={`${styles.editInput} ${formErrors.apellidoPaterno ? styles.inputError : ''}`}
+                                                    placeholder="Apellido Paterno"
+                                                />
+                                                {formErrors.apellidoPaterno && <span className={styles.errorText}>{formErrors.apellidoPaterno}</span>}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <input
+                                                    type="text"
+                                                    name="apellidoMaterno"
+                                                    value={usuarioData.apellidoMaterno || ''}
+                                                    onChange={handleInputChange}
+                                                    className={styles.editInput}
+                                                    placeholder="Apellido Materno"
+                                                />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <input
+                                                    type="email"
+                                                    name="correo"
+                                                    value={usuarioData.correo || ''}
+                                                    onChange={handleInputChange}
+                                                    className={`${styles.editInput} ${formErrors.correo ? styles.inputError : ''}`}
+                                                    placeholder="correo@ejemplo.com"
+                                                />
+                                                {formErrors.correo && <span className={styles.errorText}>{formErrors.correo}</span>}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <select
+                                                    name="rol"
+                                                    value={usuarioData.rol || ''}
+                                                    onChange={handleInputChange}
+                                                    className={`${styles.editSelect} ${formErrors.rol ? styles.inputError : ''}`}
+                                                >
+                                                    <option value="">Seleccionar rol</option>
+                                                    <option value="Administrador">Administrador</option>
+                                                    <option value="Instructor">Instructor</option>
+                                                    <option value="Secretaria">Secretaria</option>
+                                                </select>
+                                                {formErrors.rol && <span className={styles.errorText}>{formErrors.rol}</span>}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span className={`${styles.estado} ${styles.activo}`}>
+                                                ☑ Activo
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <input
+                                                    type="date"
+                                                    name="fechaIngreso"
+                                                    value={usuarioData.fechaIngreso || ''}
+                                                    onChange={handleInputChange}
+                                                    className={`${styles.editInput} ${formErrors.fechaIngreso ? styles.inputError : ''}`}
+                                                />
+                                                {formErrors.fechaIngreso && <span className={styles.errorText}>{formErrors.fechaIngreso}</span>}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                                
+                                {/* Usuarios existentes */}
+                                {filteredUsuarios.map(usuario => (
+                                    <tr 
+                                        key={usuario.numEmpleado}
+                                        onClick={() => handleSelectUsuario(usuario)}
+                                        className={`${selectedUsuario?.numEmpleado === usuario.numEmpleado ? styles.selectedRow : ''} ${!usuario.activo ? styles.inactiveRow : ''} ${isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? styles.editingRow : ''}`}
+                                    >
+                                        {/* Nombre */}
+                                        <td>
+                                            {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        name="nombre"
+                                                        value={usuarioData.nombre || ''}
+                                                        onChange={handleInputChange}
+                                                        className={`${styles.editInput} ${formErrors.nombre ? styles.inputError : ''}`}
+                                                        placeholder="Nombre"
+                                                    />
+                                                    {formErrors.nombre && <span className={styles.errorText}>{formErrors.nombre}</span>}
+                                                </div>
+                                            ) : (
+                                                usuario.nombre
+                                            )}
+                                        </td>
+
+                                        {/* Apellido Paterno */}
+                                        <td>
+                                            {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        name="apellidoPaterno"
+                                                        value={usuarioData.apellidoPaterno || ''}
+                                                        onChange={handleInputChange}
+                                                        className={`${styles.editInput} ${formErrors.apellidoPaterno ? styles.inputError : ''}`}
+                                                        placeholder="Apellido Paterno"
+                                                    />
+                                                    {formErrors.apellidoPaterno && <span className={styles.errorText}>{formErrors.apellidoPaterno}</span>}
+                                                </div>
+                                            ) : (
+                                                usuario.apellidoPaterno
+                                            )}
+                                        </td>
+
+                                        {/* Apellido Materno */}
+                                        <td>
+                                            {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        name="apellidoMaterno"
+                                                        value={usuarioData.apellidoMaterno || ''}
+                                                        onChange={handleInputChange}
+                                                        className={styles.editInput}
+                                                        placeholder="Apellido Materno"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                usuario.apellidoMaterno
+                                            )}
+                                        </td>
+
+                                        {/* Correo */}
+                                        <td>
+                                            {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
+                                                <div>
+                                                    <input
+                                                        type="email"
+                                                        name="correo"
+                                                        value={usuarioData.correo || ''}
+                                                        onChange={handleInputChange}
+                                                        className={`${styles.editInput} ${formErrors.correo ? styles.inputError : ''}`}
+                                                        placeholder="correo@ejemplo.com"
+                                                    />
+                                                    {formErrors.correo && <span className={styles.errorText}>{formErrors.correo}</span>}
+                                                </div>
+                                            ) : (
+                                                usuario.correo
+                                            )}
+                                        </td>
+
+                                        {/* Rol */}
+                                        <td>
+                                            {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
+                                                <div>
+                                                    <select
+                                                        name="rol"
+                                                        value={usuarioData.rol || ''}
+                                                        onChange={handleInputChange}
+                                                        className={`${styles.editSelect} ${formErrors.rol ? styles.inputError : ''}`}
+                                                    >
+                                                        <option value="">Seleccionar rol</option>
+                                                        <option value="Administrador">Administrador</option>
+                                                        <option value="Instructor">Instructor</option>
+                                                        <option value="Secretaria">Secretaria</option>
+                                                    </select>
+                                                    {formErrors.rol && <span className={styles.errorText}>{formErrors.rol}</span>}
+                                                </div>
+                                            ) : (
+                                                <span className={`${styles.badge} ${styles[usuario.rol?.toLowerCase()] || styles.badgeDefault}`}>
+                                                    {usuario.rol || 'Sin rol'}
+                                                </span>
+                                            )}
+                                        </td>
+
+                                        {/* Estado */}
+                                        <td>
+                                            <span className={`${styles.estado} ${usuario.activo ? styles.activo : styles.inactivo}`}>
+                                                {usuario.activo ? '☑ Activo' : '☐ Inactivo'}
+                                            </span>
+                                        </td>
+
+                                        {/* Fecha Ingreso */}
+                                        <td>
+                                            {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
+                                                <div>
+                                                    <input
+                                                        type="date"
+                                                        name="fechaIngreso"
+                                                        value={usuarioData.fechaIngreso || ''}
+                                                        onChange={handleInputChange}
+                                                        className={`${styles.editInput} ${formErrors.fechaIngreso ? styles.inputError : ''}`}
+                                                    />
+                                                    {formErrors.fechaIngreso && <span className={styles.errorText}>{formErrors.fechaIngreso}</span>}
+                                                </div>
+                                            ) : (
+                                                usuario.fechaIngreso ? new Date(usuario.fechaIngreso).toLocaleDateString('es-ES') : '-'
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+
+                {/* ✅ CORREGIDO: Campos adicionales para edición - DENTRO del componente */}
+                {(isEditing || isAdding) && selectedUsuario && (
+                    <div className={styles.additionalFields}>
+                        <h3>Información Adicional</h3>
+                        <div className={styles.formGrid}>
+                            {/* Contraseña */}
+                            <div className={styles.formGroup}>
+                                <label>Contraseña {isAdding ? '(Obligatoria)' : '(Opcional - dejar vacío para no cambiar)'}</label>
+                                <input
+                                    type="password"
+                                    name="contrasena"
+                                    value={usuarioData.contrasena || ''}
+                                    onChange={handleInputChange}
+                                    className={`${styles.editInput} ${formErrors.contrasena ? styles.inputError : ''}`}
+                                    placeholder="Nueva contraseña"
+                                />
+                                {formErrors.contrasena && <span className={styles.errorText}>{formErrors.contrasena}</span>}
+                            </div>
+
+                            {/* Pregunta de Seguridad */}
+                            <div className={styles.formGroup}>
+                                <label>Pregunta de Seguridad</label>
+                                <input
+                                    type="text"
+                                    name="preguntaRecuperacion"
+                                    value={usuarioData.preguntaRecuperacion || ''}
+                                    onChange={handleInputChange}
+                                    className={`${styles.editInput} ${formErrors.preguntaRecuperacion ? styles.inputError : ''}`}
+                                    placeholder="Ej: ¿Cuál es tu color favorito?"
+                                />
+                                {formErrors.preguntaRecuperacion && <span className={styles.errorText}>{formErrors.preguntaRecuperacion}</span>}
+                            </div>
+
+                            {/* Respuesta de Seguridad */}
+                            <div className={styles.formGroup}>
+                                <label>Respuesta de Seguridad</label>
+                                <input
+                                    type="text"
+                                    name="respuestaRecuperacion"
+                                    value={usuarioData.respuestaRecuperacion || ''}
+                                    onChange={handleInputChange}
+                                    className={`${styles.editInput} ${formErrors.respuestaRecuperacion ? styles.inputError : ''}`}
+                                    placeholder="Respuesta a la pregunta"
+                                />
+                                {formErrors.respuestaRecuperacion && <span className={styles.errorText}>{formErrors.respuestaRecuperacion}</span>}
+                            </div>
+
+                            {/* Firma */}
+                            <div className={styles.formGroup}>
+                                <label>Firma Digital</label>
+                                <div className={styles.signatureSection}>
+                                    <button 
+                                        type="button" 
+                                        onClick={handleAddSignature}
+                                        className={styles.btnFirma}
+                                    >
+                                        📎 Agregar Firma
+                                    </button>
+                                    {usuarioData.firma && (
+                                        <span className={styles.fileName}>{usuarioData.firma}</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <footer className={styles.footer}>
+                    <div className={styles.actionButtons}>
+                        <button onClick={handleAgregarClick} className={styles.btnAgregar}>
+                            Agregar
+                        </button>
+                        <button onClick={handleModificarClick} className={styles.btnModificar}>
+                            Modificar
+                        </button>
+                        <button 
+                            onClick={handleToggleStatus} 
+                            className={selectedUsuario?.activo ? styles.btnDesactivar : styles.btnActivar}
+                            disabled={!selectedUsuario}
+                        >
+                            {selectedUsuario?.activo ? 'Desactivar' : 'Activar'}
+                        </button>
+                        <button 
+                            onClick={() => setShowInactive(!showInactive)} 
+                            className={styles.btnOcultar}
+                        >
+                            {showInactive ? 'Ocultar Inactivos' : 'Mostrar Inactivos'}
+                        </button>
+                        <button 
+                            onClick={handleGuardarClick} 
+                            className={styles.btnGuardar}
+                            disabled={!isEditing && !isAdding}
+                        >
+                            Guardar
+                        </button>
+                        <button 
+                            onClick={handleCancelarClick} 
+                            className={styles.btnCancelar}
+                        >
+                            {isEditing || isAdding ? 'Cancelar' : 'Limpiar'}
+                        </button>
+                    </div>
+                </footer>
+            </main>
+
+            <button onClick={handleAtrasClick} className={styles.btnAtras}>
+                ← Atrás 
+            </button>
+        </div>
+    );
 }

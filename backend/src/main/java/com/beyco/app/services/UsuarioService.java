@@ -117,7 +117,7 @@ public class UsuarioService {
 
     public List<Usuario> listarUsuarios() {
         List<Usuario> usuarios = new ArrayList<>();
-        String sql = "SELECT * FROM usuarios WHERE Activo = 1";
+        String sql = "SELECT * FROM usuarios";
         try (Connection connection = dataSource.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {

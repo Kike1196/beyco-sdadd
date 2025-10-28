@@ -1,0 +1,795 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.modalContent {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 2.5rem 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.modalHeader h2 {
+    margin: 0;
+    color: #001f3f;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #6c757d;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+    background-color: #f8f9fa;
+    color: #001f3f;
+}
+
+.modalBody {
+    padding: 1.5rem 2.5rem;
+}
+
+.modalFooter {
+    padding: 1.5rem 2.5rem;
+    border-top: 1px solid #e9ecef;
+    text-align: center;
+}
+
+/* Selector de curso */
+.selectorSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.selectorGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.selectorGroup label {
+    font-weight: 600;
+    color: #000000;
+    font-size: 1rem;
+}
+
+.selector {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: white;
+    color: #000000;
+}
+
+.selector:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.sinCursos {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    margin: 0.5rem 0;
+}
+
+/* Información del curso */
+.cursoInfo {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.cursoInfo h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+    color: #ffffff;
+}
+
+.cursoDetalles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.cursoDetalles p {
+    margin: 0.25rem 0;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #000000;
+}
+
+/* Opciones de agregar */
+.opcionesAgregar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.btnOpcion {
+    background: white;
+    border: 2px solid #e9ecef;
+    color: #000000;
+    padding: 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.btnOpcion:hover {
+    border-color: #001f3f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Formulario nuevo alumno */
+.formSection {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.formSection h3 {
+    margin: 0 0 1.5rem 0;
+    color: #000000;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formGroup label {
+    font-weight: 600;
+    color: #000000;
+    font-size: 0.9rem;
+}
+
+.inputField {
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    color: #000000;
+    background: white;
+}
+
+.inputField:focus {
+    outline: none;
+    border-color: #001f3f;
+    box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
+}
+
+/* Búsqueda de alumnos */
+.busquedaSection {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.busquedaSection h3 {
+    margin: 0 0 1.5rem 0;
+    color: #000000;
+}
+
+.busquedaSection h4 {
+    margin: 0 0 1rem 0;
+    color: #000000;
+}
+
+.busquedaInput {
+    margin-bottom: 1rem;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #000000;
+    background: white;
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: #001f3f;
+}
+
+.resultadosBusqueda {
+    margin-bottom: 1rem;
+}
+
+.listaAlumnos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.alumnoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.alumnoItem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.alumnoInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.alumnoInfo strong {
+    color: #000000;
+    font-size: 1rem;
+}
+
+.alumnoInfo span {
+    color: #000000;
+    font-size: 0.85rem;
+}
+
+/* Tabla de alumnos */
+.tableSection {
+    margin-bottom: 2rem;
+}
+
+.tableHeader {
+    margin-bottom: 1rem;
+}
+
+.tableHeader h3 {
+    color: #000000;
+    margin: 0;
+}
+
+.tableContainer {
+    overflow-x: auto;
+}
+
+.alumnosTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.alumnosTable th {
+    background: #f8f9fa;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #000000;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.alumnosTable td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    color: #000000;
+}
+
+.alumnosTable tr:hover {
+    background: #f8f9fa;
+}
+
+.curpCell {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+}
+
+.noData {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 2rem;
+}
+
+/* Botones */
+.btnGuardar, .btnInscribir, .btnVolver, .btnCancelar {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.btnGuardar {
+    background: #001f3f;
+    color: white;
+}
+
+.btnGuardar:hover:not(:disabled) {
+    background: #003366;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 31, 63, 0.3);
+}
+
+.btnInscribir {
+    background: #28a745;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+.btnInscribir:hover:not(:disabled) {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.btnVolver {
+    background: #6c757d;
+    color: white;
+}
+
+.btnVolver:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btnCancelar {
+    background: #6c757d;
+    color: white;
+    margin-left: 1rem;
+}
+
+.btnCancelar:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btnGuardar:disabled, .btnInscribir:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Form Actions */
+.formActions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+}
+
+/* Estados de búsqueda */
+.buscando {
+    color: #007bff;
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
+.noResultados {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 2rem;
+}
+
+/* Estilo para input de CURP */
+.curpInput {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #000000;
+}
+
+/* Notificaciones */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 1001;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification.success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.notification.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.notification.warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.notification.info {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+.notificationIcon {
+    font-weight: bold;
+}
+
+.notificationMessage {
+    flex: 1;
+}
+
+.notificationClose {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notificationProgress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: currentColor;
+    opacity: 0.3;
+    animation: progress 5s linear forwards;
+}
+
+@keyframes progress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* Loading */
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #000000;
+    font-style: italic;
+}
+
+/* Modal de confirmación - POSICIONAMIENTO CORREGIDO */
+.confirmModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+    padding: 20px;
+}
+
+.confirmModal {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: confirmModalAppear 0.3s ease-out;
+    border: 1px solid #e9ecef;
+}
+
+@keyframes confirmModalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.confirmModal h3 {
+    margin: 0 0 1rem 0;
+    color: #dc3545;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.confirmModal p {
+    margin: 0 0 2rem 0;
+    color: #000000;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.modalButtons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Botones del modal */
+.btnEliminar {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.btnEliminar:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.btnWarning {
+    background: #ffc107;
+    color: #000;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.btnWarning:hover {
+    background: #e0a800;
+    transform: translateY(-1px);
+}
+
+.btnCancelar {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.btnCancelar:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+/* Botones de acción en la tabla */
+.acciones {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btnEliminarCurso, .btnEliminarDefinitivo {
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 80px;
+    justify-content: center;
+}
+
+.btnEliminarCurso {
+    background: #ffc107;
+    color: #000;
+}
+
+.btnEliminarCurso:hover:not(:disabled) {
+    background: #e0a800;
+    transform: translateY(-1px);
+}
+
+.btnEliminarDefinitivo {
+    background: #dc3545;
+    color: white;
+}
+
+.btnEliminarDefinitivo:hover:not(:disabled) {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.btnEliminarCurso:disabled, .btnEliminarDefinitivo:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modalContent {
+        margin: 10px;
+        max-height: 95vh;
+    }
+    
+    .modalHeader,
+    .modalBody,
+    .modalFooter {
+        padding: 1.5rem;
+    }
+    
+    .opcionesAgregar {
+        grid-template-columns: 1fr;
+    }
+    
+    .cursoDetalles {
+        grid-template-columns: 1fr;
+    }
+    
+    .alumnoItem {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+    
+    .formActions {
+        flex-direction: column;
+    }
+    
+    .btnCancelar {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+    
+    .modalButtons {
+        flex-direction: column;
+    }
+    
+    .acciones {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .btnEliminarCurso, .btnEliminarDefinitivo {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modalHeader h2 {
+        font-size: 1.5rem;
+    }
+    
+    .modalBody {
+        padding: 1rem;
+    }
+    
+    .formSection,
+    .busquedaSection {
+        padding: 1.5rem;
+    }
+    
+    .notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}

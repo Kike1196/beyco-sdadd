@@ -34,4 +34,5 @@ export const testConnection = async () => {
     console.error('Error de conexión:', error);
     return false;
   }
+  
 };

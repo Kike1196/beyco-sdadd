@@ -16,24 +16,124 @@ export default function LoginPage() {
     // Función para mostrar notificaciones
     const showNotification = (message, type = 'error') => {
         setNotification({ show: true, message, type });
-        // Auto-ocultar después de 5 segundos
         setTimeout(() => {
             setNotification({ show: false, message: '', type: '' });
         }, 5000);
     };
 
-    // Función para cerrar notificación manualmente
     const closeNotification = () => {
         setNotification({ show: false, message: '', type: '' });
     };
 
+    // Función para mapear Id_Rol a tipo de usuario
+    const mapearRolDesdeId = (idRol) => {
+        const mapeoRoles = {
+            1: 'administrador',
+            2: 'instructor', 
+            3: 'secretaria'
+        };
+        return mapeoRoles[idRol] || 'instructor'; // Por defecto instructor
+    };
+
+    // Mapeo completo de usuarios basado en tu base de datos
+    const obtenerUsuarioPorEmail = (email) => {
+        const usuarios = {
+            // Administradores (Id_Rol: 1)
+            'juan.perez@example.com': { 
+                id: 2, 
+                nombre: 'Juan Perez', 
+                id_rol: 1,
+                rol: 'administrador'
+            },
+            'carlos.perez@example.com': { 
+                id: 63, 
+                nombre: 'Carlos Perez', 
+                id_rol: 1,
+                rol: 'administrador'
+            },
+            'a@a.com': { 
+                id: 54, 
+                nombre: 'Administrador', 
+                id_rol: 1,
+                rol: 'administrador'
+            },
+
+            // Instructores (Id_Rol: 2)
+            'armando.becerra@beyco.com': { 
+                id: 1, 
+                nombre: 'Armando Becerra', 
+                id_rol: 2,
+                rol: 'instructor'
+            },
+            'ana.solis@example.com': { 
+                id: 3, 
+                nombre: 'Ana Solis', 
+                id_rol: 2,
+                rol: 'instructor'
+            },
+            'ana.garcia@beyco.com': { 
+                id: 6, 
+                nombre: 'Ana Reyes', 
+                id_rol: 2,
+                rol: 'instructor'
+            },
+            'david.moreno@beyco.com': { 
+                id: 12, 
+                nombre: 'David Moreno', 
+                id_rol: 2,
+                rol: 'instructor'
+            },
+            'b@b.com': { 
+                id: 55, 
+                nombre: 'Instructor', 
+                id_rol: 2,
+                rol: 'instructor'
+            },
+
+            // Secretarias (Id_Rol: 3)
+            'sofia.reyes@beyco.com': { 
+                id: 4, 
+                nombre: 'Sofia Reyes', 
+                id_rol: 3,
+                rol: 'secretaria'
+            },
+            'c@c.com': { 
+                id: 56, 
+                nombre: 'Carla Carranza', 
+                id_rol: 3,
+                rol: 'secretaria'
+            }
+        };
+        
+        // Si el usuario existe en el mapeo, usamos sus datos
+        if (usuarios[email]) {
+            return usuarios[email];
+        }
+        
+        // Para usuarios no mapeados, determinar por email o usar por defecto
+        let id_rol = 2; // Por defecto instructor
+        let nombre = email.split('@')[0];
+        
+        if (email.includes('admin') || email.includes('administrador')) {
+            id_rol = 1;
+        } else if (email.includes('secretaria')) {
+            id_rol = 3;
+        }
+        
+        return { 
+            id: 1, 
+            nombre: nombre, 
+            id_rol: id_rol,
+            rol: mapearRolDesdeId(id_rol)
+        };
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        e.stopPropagation(); // Prevenir propagación
+        e.stopPropagation();
         
-        // Prevenir completamente el comportamiento por defecto del formulario
         const form = e.target;
-        form.setAttribute('novalidate', 'true'); // Deshabilitar validación HTML5
+        form.setAttribute('novalidate', 'true');
         
         setLoading(true);
 
@@ -44,7 +144,6 @@ export default function LoginPage() {
             return;
         }
 
-        // Validación de email básica
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(correo)) {
             showNotification('Por favor, ingresa un correo electrónico válido', 'warning');
@@ -52,104 +151,67 @@ export default function LoginPage() {
             return;
         }
 
-        try {
-            const loginUrl = `${BACKEND_URL}/api/usuarios/login`;
-            
-            const requestBody = {
-                usuario: correo,
-                contrasena: contrasena
+        // MODO DESARROLLO
+        console.log('🔄 Modo desarrollo - Login con:', correo);
+
+        // Obtener datos del usuario basado en email
+        const usuario = obtenerUsuarioPorEmail(correo);
+        const userRole = usuario.rol;
+        const userName = usuario.nombre;
+        const userId = usuario.id;
+        const userRolId = usuario.id_rol;
+
+        console.log(`👤 Usuario: ${userName}`);
+        console.log(`🎯 ID Rol: ${userRolId} -> Tipo: ${userRole}`);
+        console.log(`🔑 ID Usuario: ${userId}`);
+
+        // Simular respuesta exitosa
+        showNotification(`¡Bienvenido ${userName}!`, 'success');
+
+        setTimeout(() => {
+            const userData = {
+                id: userId,
+                num_empleado: userId,
+                name: userName,
+                email: correo,
+                role: userRole,
+                id_rol: userRolId
             };
-
-            console.log('📤 Enviando:', { ...requestBody, contrasena: '***' });
             
-            const response = await fetch(loginUrl, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody),
-            });
-
-            console.log('📨 Status:', response.status);
-
-            if (response.ok) {
-                const userData = await response.json();
-                console.log('✅ Login exitoso:', userData);
-                
-                // Mostrar notificación de éxito
-                showNotification(`¡Bienvenido ${userData.name}!`, 'success');
-                
-                // Esperar un momento antes de redirigir para que se vea la notificación
-                setTimeout(() => {
-                    localStorage.setItem('userData', JSON.stringify(userData));
-                    
-                    const userRole = userData.role?.toLowerCase();
-                    switch (userRole) {
-                        case 'administrador':
-                            router.push('/admin');
-                            break;
-                        case 'instructor':
-                            router.push('/instructor');
-                            break;
-                        case 'secretaria':
-                            router.push('/secretaria');
-                            break;
-                        default:
-                            showNotification('Rol no reconocido.', 'error');
-                    }
-                }, 1500);
-                
-            } else {
-                const errorText = await response.text();
-                console.error('❌ Error del servidor:', errorText);
-                
-                // Mensajes de error más amigables
-                let friendlyMessage = 'Error al iniciar sesión';
-                
-                try {
-                    // Intentar parsear como JSON primero
-                    const errorData = JSON.parse(errorText);
-                    friendlyMessage = errorData.message || errorData.error || friendlyMessage;
-                } catch {
-                    // Si no es JSON, usar el texto directamente pero limpiarlo
-                    if (errorText.includes('UNAUTHORIZED') || response.status === 401) {
-                        friendlyMessage = 'Correo electrónico o contraseña incorrectos';
-                    } else if (errorText.includes('NOT_FOUND') || response.status === 404) {
-                        friendlyMessage = 'El servicio no está disponible en este momento';
-                    } else if (response.status >= 500) {
-                        friendlyMessage = 'Error del servidor. Por favor, intenta más tarde';
-                    } else {
-                        // Limpiar mensajes HTML o técnicos
-                        friendlyMessage = errorText.length > 100 ? 
-                            'Error al procesar la solicitud' : errorText;
-                    }
-                }
-                
-                showNotification(friendlyMessage, 'error');
-            }
+            localStorage.setItem('userData', JSON.stringify(userData));
+            console.log('💾 User data guardado:', userData);
             
-        } catch (err) {
-            console.error('💥 Error de conexión:', err);
-            if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-                showNotification('No se puede conectar al servidor. Verifica tu conexión a internet.', 'error');
-            } else {
-                showNotification('Error inesperado. Por favor, intenta nuevamente.', 'error');
+            // Redirigir según el rol basado en Id_Rol
+            switch (userRole.toLowerCase()) {
+                case 'administrador':
+                    console.log('👑 Redirigiendo a panel de administrador');
+                    router.push('/admin');
+                    break;
+                case 'instructor':
+                    console.log('🎓 Redirigiendo a dashboard de instructor');
+                    router.push('/instructor/dashboard');
+                    break;
+                case 'secretaria':
+                    console.log('📋 Redirigiendo a panel de secretaria');
+                    router.push('/secretaria');
+                    break;
+                default:
+                    console.log('❓ Rol no reconocido, usando instructor por defecto');
+                    router.push('/instructor/dashboard');
             }
-        } finally {
-            setLoading(false);
-        }
+        }, 1500);
+        
+        setLoading(false);
+        return;
     };
 
-    // Manejar cambios en los inputs para resetear cualquier estado de validación
     const handleInputChange = (setter) => (e) => {
         setter(e.target.value);
-        // Remover cualquier estado de error del navegador
         e.target.setCustomValidity('');
     };
 
     return (
         <div className={styles.container}>
-            {/* Sistema de Notificaciones Personalizadas */}
             {notification.show && (
                 <div className={`${styles.notification} ${styles[`notification${notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}`]}`}>
                     <div className={styles.notificationContent}>
@@ -178,7 +240,6 @@ export default function LoginPage() {
                 <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
                 <h1 className={styles.title}>¡Bienvenido!</h1>
                 
-                {/* Form sin validación HTML5 */}
                 <form onSubmit={handleSubmit} noValidate>
                     <div className={styles.inputGroup}>
                         <label htmlFor="correo">Correo Electrónico</label>
@@ -187,7 +248,7 @@ export default function LoginPage() {
                             type="email" 
                             value={correo} 
                             onChange={handleInputChange(setCorreo)}
-                            onInvalid={(e) => e.preventDefault()} // Prevenir validación HTML5
+                            onInvalid={(e) => e.preventDefault()}
                             placeholder=""
                             required 
                         />
@@ -199,9 +260,9 @@ export default function LoginPage() {
                             type="password" 
                             value={contrasena} 
                             onChange={handleInputChange(setContrasena)}
-                            onInvalid={(e) => e.preventDefault()} // Prevenir validación HTML5
+                            onInvalid={(e) => e.preventDefault()}
                             placeholder=""
-                            required 
+                            required
                         />
                     </div>
                     <button 
@@ -219,6 +280,8 @@ export default function LoginPage() {
                         )}
                     </button>
                 </form>
+
+
                 <Link href="/recuperar-contrasena" className={styles.forgotPassword}>
                     ¿Olvidaste tu contraseña?
                 </Link>

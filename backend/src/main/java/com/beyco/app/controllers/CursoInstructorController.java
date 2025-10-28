@@ -8,11 +8,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/cursos")
-@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.0.55:3000", "http://172.19.128.1:3000", "http://10.0.43.165:3000", "http://10.0.46.106:3000", "http://10.0.47.154:3000", "http://10.0.43.69:3000", "http://10.0.47.108:3000", " http://10.0.45.30:3000"})
-public class CursoController {
+@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.0.55:3000", "http://172.19.128.1:3000", "http://10.0.43.165:3000", "http://10.0.46.106:3000",
+                        "http://10.0.47.154:3000", "http://10.0.43.69:3000", "http://10.0.47.108:3000", "http://10.0.45.30:3000", "http://10.0.43.190:3000"})
+public class CursoInstructorController {
 
     @Autowired
     private CursoService cursoService;
@@ -25,14 +27,16 @@ public class CursoController {
     public List<Curso> getAllCursos() {
         return cursoService.listarTodosLosCursos();
     }
-
     /**
      * Endpoint para OBTENER los cursos asignados a un instructor específico.
      * Se accede vía GET a /api/cursos/instructor/{instructorId}
      */
     @GetMapping("/instructor/{instructorId}")
     public List<Curso> getCursosByInstructor(@PathVariable int instructorId) {
-        return cursoService.listarCursosPorInstructor(instructorId);
+        return cursoService.listarTodosLosCursos()
+                .stream()
+                .filter(c -> c.getInstructorId() == instructorId)
+                .collect(Collectors.toList());
     }
 
     /**

@@ -47,5 +47,23 @@ public class Usuario {
     public void setPreguntaRecuperacion(String preguntaRecuperacion) { this.preguntaRecuperacion = preguntaRecuperacion; }
     public void setRespuestaRecuperacion(String respuestaRecuperacion) { this.respuestaRecuperacion = respuestaRecuperacion; }
     public void setFirma(String firma) { this.firma = firma; }
+
+    // En Usuario.java
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "numEmpleado=" + numEmpleado +
+                ", nombre='" + nombre + '\'' +
+                ", apellidoPaterno='" + apellidoPaterno + '\'' +
+                ", apellidoMaterno='" + apellidoMaterno + '\'' +
+                ", correo='" + correo + '\'' +
+                ", idRol=" + idRol +
+                ", activo=" + activo +
+                ", fechaIngreso=" + fechaIngreso +
+                ", preguntaRecuperacion='" + preguntaRecuperacion + '\'' +
+                ", respuestaRecuperacion='" + respuestaRecuperacion + '\'' +
+                ", firma='" + firma + '\'' +
+                '}';
+    }
 }
 

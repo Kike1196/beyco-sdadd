@@ -1,6 +1,5 @@
 package com.beyco.app.controllers;
 
-import com.beyco.app.models.CatalogoCurso;
 import com.beyco.app.models.Curso;
 import com.beyco.app.services.CursoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,22 +10,29 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/cursos")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api/instructores") 
+@CrossOrigin(origins = {"http://localhost:3000", "http://172.19.128.1:3000",
+                        "http://10.0.43.190:3000"}) 
 public class CursoController {
 
     @Autowired
     private CursoService cursoService;
 
-    @Autowired
-    private com.beyco.app.services.CatalogoCursoService catalogoCursoService;
+    // Se ha eliminado la inyección de CatalogoCursoService porque no se usa para las operaciones principales de este controlador.
 
-    @GetMapping("/cursos")
-    public List<CatalogoCurso> getAllCursos() {
-        // Cambia a esto cuando la BD esté lista:
-        return catalogoCursoService.listarTodosLosCursos();
-        // return catalogoCursoService.obtenerCursosEjemplo();
+    // --- CAMBIO #1: La ruta ahora es solo @GetMapping ---
+    // La URL para obtener los cursos será http://localhost:8080/api/cursos
+    @GetMapping
+    // --- CAMBIO #2: El método ahora devuelve List<Curso> ---
+    // Esto coincide con los datos que tu frontend espera para la tabla.
+    public List<Curso> getAllCursos() {
+        // --- CAMBIO #3: Se usa el servicio correcto ---
+        // Llamamos a cursoService para obtener los cursos asignados.
+        // Asegúrate de que tu `CursoService` tenga un método que devuelva la lista de cursos.
+        // Por ejemplo: `listarCursos()` o `findAll()`.
+        return cursoService.listarTodosLosCursos();
     }
+
     @PostMapping
     public ResponseEntity<String> createCurso(@RequestBody Curso curso) {
         try {
@@ -68,7 +74,9 @@ public class CursoController {
             System.out.println("Eliminando curso ID: " + id);
             boolean exito = cursoService.eliminarCurso(id);
             if (exito) {
-                return ResponseEntity.noContent().build();
+                // Se devuelve un cuerpo en el 204 para mayor claridad, aunque no es estándar.
+                // Podrías usar return ResponseEntity.noContent().build(); también.
+                return ResponseEntity.ok("Curso eliminado exitosamente");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Curso no encontrado");
             }

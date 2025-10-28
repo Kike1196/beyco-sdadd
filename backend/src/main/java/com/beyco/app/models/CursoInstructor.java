@@ -1,9 +1,8 @@
 package com.beyco.app.models;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Curso {
+public class CursoInstructor {
     private int id;
     private String nombre;
     private String stps;
@@ -12,20 +11,13 @@ public class Curso {
     private String empresa;
     private String instructor;
     private String lugar;
-    private int empresaId;
-    private int instructorId;
-    private BigDecimal precio;
 
-    private BigDecimal costo;
-    private String status;
+    // Constructores, getters y setters
+    public CursoInstructor() {}
 
-    // Constructor vacío (IMPORTANTE)
-    public Curso() {
-    }
-
-    // Constructor con parámetros
-    public Curso(int id, String nombre, String stps, int horas, LocalDate fechaIngreso, 
-                 String empresa, String instructor, String lugar, BigDecimal precio) {
+    public CursoInstructor(int id, String nombre, String stps, int horas, 
+                          LocalDate fechaIngreso, String empresa, 
+                          String instructor, String lugar) {
         this.id = id;
         this.nombre = nombre;
         this.stps = stps;
@@ -34,10 +26,9 @@ public class Curso {
         this.empresa = empresa;
         this.instructor = instructor;
         this.lugar = lugar;
-        this.precio = precio;
     }
 
-    // Getters y setters (todos deben estar)
+    // Getters y setters...
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getNombre() { return nombre; }
@@ -54,16 +45,4 @@ public class Curso {
     public void setInstructor(String instructor) { this.instructor = instructor; }
     public String getLugar() { return lugar; }
     public void setLugar(String lugar) { this.lugar = lugar; }
-    public int getEmpresaId() { return empresaId; }
-    public void setEmpresaId(int empresaId) { this.empresaId = empresaId; }
-    public int getInstructorId() { return instructorId; }
-    public void setInstructorId(int instructorId) { this.instructorId = instructorId; }
-    public BigDecimal getPrecio() { return precio; }
-    public void setPrecio(BigDecimal precio) { this.precio = precio; }
-
-    public BigDecimal getCosto() { return costo; }
-    public void setCosto(BigDecimal costo) { this.costo = costo; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
 }

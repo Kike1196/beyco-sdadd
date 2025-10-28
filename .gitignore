@@ -22,3 +22,4 @@ backend/.mvn/
 # Otros
 .DS_Store
 Thumbs.db
+node_modules

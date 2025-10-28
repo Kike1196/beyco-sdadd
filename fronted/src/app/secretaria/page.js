@@ -1,24 +1,78 @@
 'use client';
 
-import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './SecretariaDashboard.module.css';
+import InscribirAlumnos from './inscribirAlumnos/page';
 
 export default function SecretariaDashboard() {
+    const [activeModal, setActiveModal] = useState(null);
+    const router = useRouter();
+
+    const handleLogout = () => {
+        // Limpiar datos de sesión
+        localStorage.removeItem('userData');
+        // Redirigir al login
+        router.push('/');
+    };
+
     return (
-        <div className={styles.container}>
+        <div className={styles.dashboardContainer}>
+            {/* Header */}
             <header className={styles.header}>
-                <img src="/logo.jpg" alt="BEYCO Logo" className={styles.logo} />
+                <div className={styles.titleSection}>
+                    <h1>BEYCO Consultores</h1>
+                    <p>Sistema de Gestión de Cursos</p>
+                </div>
+                <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
             </header>
-            <main className={styles.mainContent}>
-                <h1>Menú Principal</h1>
-                <nav className={styles.navigation}>
-                    <Link href="/secretaria/documentos" className={styles.navButton}>Documentos</Link>
-                    <Link href="/secretaria/recibos" className={styles.navButton}>Recibos</Link>
-                    <Link href="/secretaria/evaluaciones" className={styles.navButton}>Evaluaciones</Link>
-                    <Link href="/secretaria/dc3" className={styles.navButton}>DC-3</Link>
-                    <Link href="/secretaria/diplomas" className={styles.navButton}>Diplomas</Link>
-                </nav>
-            </main>
+
+            {/* Menú de opciones */}
+            <div className={styles.menuGrid}>
+                <button 
+                    className={styles.menuCard}
+                    onClick={() => setActiveModal('inscribir')}
+                >
+                    <div className={styles.cardIcon}>📋</div>
+                    <h2>Inscribir alumnos</h2>
+                    <p>Gestionar inscripciones a cursos</p>
+                </button>
+
+                <button className={styles.menuCard}>
+                    <div className={styles.cardIcon}>📄</div>
+                    <h2>Documentos</h2>
+                    <p>Generar y gestionar documentos</p>
+                </button>
+
+                <button className={styles.menuCard}>
+                    <div className={styles.cardIcon}>🧾</div>
+                    <h2>Recibos</h2>
+                    <p>Administrar recibos de pago</p>
+                </button>
+
+                <button className={styles.menuCard}>
+                    <div className={styles.cardIcon}>📊</div>
+                    <h2>Evaluaciones</h2>
+                    <p>Gestionar evaluaciones de alumnos</p>
+                </button>
+            </div>
+
+            {/* Modal de inscripción de alumnos */}
+            {activeModal === 'inscribir' && (
+                <InscribirAlumnos 
+                    onClose={() => setActiveModal(null)} 
+                />
+            )}
+            
+            {/* Footer */}
+            <footer className={styles.footer}>
+                <button 
+                    onClick={handleLogout} 
+                    className={styles.logoutButton}
+                >
+                    🚪 Cerrar sesión
+                </button>
+            </footer>
         </div>
     );
 }

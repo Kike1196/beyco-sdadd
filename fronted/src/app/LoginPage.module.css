@@ -134,7 +134,7 @@
 .notification {
     position: fixed;
     top: 20px;
-    right: 20px;
+    left: 800px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -173,7 +173,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 100%;
 }
 
 .notificationSuccess .notificationIcon {

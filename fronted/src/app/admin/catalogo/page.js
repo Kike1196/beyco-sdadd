@@ -110,17 +110,17 @@ const EditRow = ({ curso, onChange, formErrors, isEditing }) => {
             <td>
                 <input 
                     type="number" 
-                    name="costo" 
-                    value={curso.costo || ''} 
+                    name="precio" 
+                    value={curso.precio || ''} 
                     onChange={onChange} 
                     placeholder="Precio" 
                     min="0" 
                     step="0.01"
                     max="999999.99"
-                    className={formErrors.costo ? styles.inputError : ''}
+                    className={formErrors.precio ? styles.inputError : ''}
                     required
                 />
-                {formErrors.costo && <div className={styles.errorText}>{formErrors.costo}</div>}
+                {formErrors.precio && <div className={styles.errorText}>{formErrors.precio}</div>}
             </td>
             <td>
                 <select 
@@ -171,7 +171,7 @@ export default function CatalogoPage() {
                 setLoading(true);
                 console.log("🔍 Cargando cursos desde API...");
                 
-                const response = await fetch('http://localhost:8080/api/catalogo/cursos');
+                const response = await fetch('http://localhost:8080/api/catalogo_cursos');
                 console.log("📡 Response status:", response.status);
                 
                 if (!response.ok) throw new Error(`Error ${response.status} cargando cursos`);
@@ -197,7 +197,7 @@ export default function CatalogoPage() {
             nombre: curso.nombre || '',
             stps: curso.stps || '',
             horas: curso.horas || '',
-            costo: curso.costo || '',
+            precio: curso.precio || '',
             examenPractico: curso.examenPractico || false
         };
         setCursoData(cursoDataToSet);
@@ -213,7 +213,7 @@ export default function CatalogoPage() {
             nombre: '',
             stps: '',
             horas: 8,
-            costo: 0,
+            precio: 0,
             examenPractico: false
         });
         setOriginalCursoData({});
@@ -296,10 +296,10 @@ export default function CatalogoPage() {
             errors.horas = "Las horas deben ser un número positivo.";
         }
         
-        if (!cursoData.costo || parseFloat(cursoData.costo) < 0) {
-            errors.costo = "El precio debe ser un número positivo.";
-        } else if (parseFloat(cursoData.costo) > 999999.99) {
-            errors.costo = "El precio no puede ser mayor a 999,999.99";
+        if (!cursoData.precio || parseFloat(cursoData.precio) < 0) {
+            errors.precio = "El precio debe ser un número positivo.";
+        } else if (parseFloat(cursoData.precio) > 999999.99) {
+            errors.precio = "El precio no puede ser mayor a 999,999.99";
         }
         
         console.log("📋 Errores de validación:", errors);
@@ -310,14 +310,14 @@ export default function CatalogoPage() {
     const executeSave = async () => {
         const method = isAdding ? 'POST' : 'PUT';
         const url = isAdding ? 
-            'http://localhost:8080/api/catalogo/cursos' : 
-            `http://localhost:8080/api/catalogo/cursos/${selectedCurso.id}`;
+            'http://localhost:8080/api/catalogo_cursos' : 
+            `http://localhost:8080/api/catalogo_cursos/${selectedCurso.id}`;
         
         try {
             const cursoToSend = {
                 ...cursoData,
                 horas: parseInt(cursoData.horas),
-                costo: parseFloat(cursoData.costo),
+                precio: parseFloat(cursoData.precio),
                 examenPractico: cursoData.examenPractico === 'true' || cursoData.examenPractico === true
             };
 
@@ -328,7 +328,7 @@ export default function CatalogoPage() {
                     nombre: cursoData.nombre !== originalCursoData.nombre,
                     stps: cursoData.stps !== originalCursoData.stps,
                     horas: cursoData.horas !== originalCursoData.horas,
-                    costo: cursoData.costo !== originalCursoData.costo,
+                    precio: cursoData.precio !== originalCursoData.precio,
                     examenPractico: cursoData.examenPractico !== originalCursoData.examenPractico
                 }
             });
@@ -367,7 +367,7 @@ export default function CatalogoPage() {
             
             // Recargar la lista de cursos
             console.log("🔄 Recargando lista de cursos...");
-            const cursosRes = await fetch('http://localhost:8080/api/catalogo/cursos');
+            const cursosRes = await fetch('http://localhost:8080/api/catalogo_cursos');
             const data = await cursosRes.json();
             setCursos(data);
             
@@ -398,7 +398,7 @@ export default function CatalogoPage() {
         if (!selectedCurso) return;
         
         try {
-            const url = `http://localhost:8080/api/catalogo/cursos/${selectedCurso.id}`;
+            const url = `http://localhost:8080/api/catalogo_cursos/${selectedCurso.id}`;
             console.log("🗑️ Eliminando curso:", url);
             
             const response = await fetch(url, { method: 'DELETE' });
@@ -416,7 +416,7 @@ export default function CatalogoPage() {
                 if (errorText.includes('foreign key constraint') || errorText.includes('Cannot delete or update a parent row')) {
                     showNotification("No se puede eliminar el curso porque está siendo usado en cursos asignados. Se ha desactivado en su lugar.", 'warning');
                     // Recargar la lista para reflejar el cambio de estatus
-                    const cursosRes = await fetch('http://localhost:8080/api/catalogo/cursos');
+                    const cursosRes = await fetch('http://localhost:8080/api/catalogo_cursos');
                     const data = await cursosRes.json();
                     setCursos(data);
                     setSelectedCurso(null);
@@ -464,26 +464,9 @@ export default function CatalogoPage() {
         }
     };
 
-    const handleSearch = async () => {
-        try {
-            setLoading(true);
-            let url = 'http://localhost:8080/api/catalogo/cursos';
-            
-            if (searchTerm.trim()) {
-                url = `http://localhost:8080/api/catalogo/cursos/buscar?busqueda=${encodeURIComponent(searchTerm)}`;
-            }
-
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error ${response.status} en búsqueda`);
-            
-            const data = await response.json();
-            setCursos(data);
-        } catch (error) {
-            console.error("❌ Error en búsqueda:", error);
-            showNotification("Error al buscar cursos: " + error.message, 'error');
-        } finally {
-            setLoading(false);
-        }
+    const handleSearch = () => {
+        // No se necesita llamar a la API. El filtrado es 100% local.
+        // `useMemo` ya se encarga de recalcular `filteredCursos` cuando `searchTerm` cambia.
     };
 
     const handleClearSearch = () => {
@@ -599,7 +582,7 @@ export default function CatalogoPage() {
                                                 <td className={styles.nombreCurso}>{curso.nombre}</td>
                                                 <td className={styles.claveStps}>{curso.stps}</td>
                                                 <td className={styles.horas}>{curso.horas} hrs</td>
-                                                <td className={styles.precio}>${curso.costo.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
+                                                <td className={styles.precio}>${curso.precio.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
                                                 <td>
                                                     <span className={`${styles.examenBadge} ${curso.examenPractico ? styles.examenSi : styles.examenNo}`}>
                                                         {curso.examenPractico ? 'Si' : 'No'}

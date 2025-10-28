@@ -7,6 +7,13 @@ import styles from './AdminDashboard.module.css';
 export default function AdminDashboard() {
     const router = useRouter();
 
+    const handleLogout = () => {
+        // Opcional: Limpiar datos de sesión
+        localStorage.removeItem('userData');
+        // Redirigir al login
+        router.push('/');
+    };
+
     return (
         <div className={styles.dashboardContainer}>
             <header className={styles.header}>
@@ -36,8 +43,9 @@ export default function AdminDashboard() {
                 </Link>
             </nav>
 
-            <button onClick={() => router.back()} className={styles.backButton}>
-                Atrás
+            {/* Cambiar el botón Atrás por Cerrar Sesión */}
+            <button onClick={handleLogout} className={styles.logoutButton}>
+                🚪 Cerrar sesión
             </button>
         </div>
     );

@@ -1,379 +1,562 @@
-/* Usuarios.module.css */
-
 .pageContainer {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
-  padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
 }
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #001f3f;
-  padding: 15px 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 25px;
+    background-color: #001f3f;
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 8px 8px 0 0;
 }
 
 .titleSection h1 {
-  color: #ffffff;
-  margin: 0;
-  font-size: 2.2rem;
-  font-weight: 700;
-  size-adjust: 0.5;
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+    color: white;
 }
 
-.logo {
-  height: 100px;
-  width: auto;
+/* ✅ CORREGIDO: Header sin botón Atrás */
+.headerTop {
+    display: flex;
+    align-items: center;
 }
 
 .mainContent {
-  background: white;
-  border-radius: 12px;
-  padding: 25px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background-color: white;
+    padding: 0;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
+/* Estadísticas */
+.statsSection {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.statsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.statsHeader h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #001f3f;
+}
+
+.statsDetails {
+    display: flex;
+    gap: 1rem;
+}
+
+.statActive {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.statInactive {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.warningMessage {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* Información de filtro */
+.filterInfo {
+    padding: 1rem 2rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 500;
+    color: #495057;
+}
+
+/* Tabla */
 .tableContainer {
-  overflow-x: auto;
-  margin-bottom: 25px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+    overflow-x: auto;
+    max-height: 60vh;
+    overflow-y: auto;
+    color: black;
 }
 
-.userTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-  color: black;
+.usuariosTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
 }
 
-.userTable th {
-  background: #001f3f;
-  color: white;
-  padding: 15px 12px;
-  text-align: left;
-  font-weight: 600;
-  border-right: 1px solid #001f3f;
-  position: sticky;
-  top: 0;
+.usuariosTable th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
-.userTable th:last-child {
-  border-right: none;
+.usuariosTable td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+    white-space: nowrap;
 }
 
-.userTable td {
-  padding: 12px;
-  border-bottom: 1px solid #000000;
-  border-right: 1px solid #000000;
+.usuariosTable tbody tr {
+    transition: background-color 0.2s ease;
+    cursor: pointer;
 }
 
-.userTable td:last-child {
-  border-right: none;
-}
-
-.userTable tbody tr {
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.userTable tbody tr:hover {
-  background: #f7fafc;
+.usuariosTable tbody tr:hover {
+    background-color: #f8f9fa;
 }
 
 .selectedRow {
-  background: #ebf8ff !important;
-  border-left: 4px solid #4299e1;
+    background-color: #e3f2fd !important;
+    border-left: 3px solid #007bff;
 }
 
-/* Estilos para filas en edición/agregar */
-.newRow {
-  background: #f0fff4 !important;
+.inactiveRow {
+    background-color: #f8f9fa;
+    color: #6c757d;
 }
 
-.newRow td {
-  padding: 8px 12px;
+.editingRow {
+    background-color: #fff3cd !important;
 }
 
-.newRow input,
-.newRow select {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  background: white;
-  transition: all 0.2s ease;
+/* Campos de edición */
+.editInput, .editSelect {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    background: white;
+    min-width: 120px;
+    color: #000000 !important;
+    font-weight: 500;
 }
 
-.newRow input:focus,
-.newRow select:focus {
-  outline: none;
-  border-color: #4a6fa5;
-  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+.editInput::placeholder {
+    color: #6c757d !important;
+    font-weight: normal;
 }
 
-.newRow input[type="email"] {
-  min-width: 180px;
+.editInput:focus, .editSelect:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    color: #000000 !important;
 }
 
-/* Estilos específicos para campos de contraseña */
-.passwordInput {
-  font-family: monospace;
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  background: white;
-  transition: all 0.2s ease;
+.inputError {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
 }
 
-.passwordInput:focus {
-  outline: none;
-  border-color: #4a6fa5;
-  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+.errorText {
+    color: #dc3545 !important;
+    font-size: 12px;
+    display: block;
+    margin-top: 4px;
+    font-weight: 600;
 }
 
-.rolSelect {
-  min-width: 140px;
+/* Badges de rol */
+.badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
-/* Estilos para el estado activo/inactivo */
-.activoLabel {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: #f8f9fa;
-  transition: all 0.2s ease;
+.badge.administrador {
+    background-color: #e3f2fd;
+    color: #1976d2;
 }
 
-.activoLabel:hover {
-  background: #e9ecef;
+.badge.instructor {
+    background-color: #e8f5e8;
+    color: #388e3c;
 }
 
-.activoCheckbox {
-  margin: 0;
-  transform: scale(1.1);
-  cursor: pointer;
+.badge.secretaria {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
 }
 
-.activoText {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #2d3748;
-  min-width: 60px;
+.badgeDefault {
+    background-color: #f5f5f5;
+    color: #666;
 }
 
-.activoCheckbox:checked + .activoText {
-  color: #059669;
+/* Estados */
+.estado {
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
 }
 
-.activoCheckbox:not(:checked) + .activoText {
-  color: #dc2626;
+.estado.activo {
+    color: #28a745;
+    background-color: #f0fdf4;
+    border: 1px solid #28a745;
 }
 
-/* Botón de firma */
-.firmaButton {
-  background: #6b7280;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
+.estado.inactivo {
+    color: #dc3545;
+    background-color: #fef2f2;
+    border: 1px solid #dc3545;
 }
 
-.firmaButton:hover {
-  background: #4b5563;
-  transform: translateY(-1px);
+/* Firma */
+.firmaStatus {
+    font-weight: bold;
+    font-size: 1.1rem;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+}
+
+.btnFirma {
+    background: none;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    font-weight: 600 !important;
+    color: #000000 !important;
+}
+
+.btnFirma:hover {
+    background-color: #007bff;
+    color: white !important;
 }
 
 .fileName {
-  margin-left: 8px;
-  font-size: 0.8rem;
-  color: #6b7280;
-  font-style: italic;
+    color: #000000 !important;
+    font-weight: 600 !important;
+    word-break: break-all;
+    font-size: 0.9rem;
+    display: block;
+    margin-top: 4px;
+    background: #e9ecef;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
 }
 
-/* Footer y botones de acción */
+/* Footer con botones */
 .footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 2px solid #e2e8f0;
+    padding: 1.5rem 2rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
 }
 
 .actionButtons {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
-.btn {
-  background: #4a6fa5;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  min-width: 120px;
+.btnAgregar, .btnCambiarContraseña, .btnModificar, .btnActivar, 
+.btnDesactivar, .btnOcultar, .btnGuardar, .btnCancelar, .btnEliminar {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    min-width: 140px;
 }
 
-.btn:hover:not(:disabled) {
-  background: #3a5a8a;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3);
+.btnAgregar {
+    background-color: #28a745;
+    color: white;
 }
 
-.btn:disabled {
-  background: #cbd5e0;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-  opacity: 0.6;
+.btnAgregar:hover {
+    background-color: #218838;
+}
+
+.btnCambiarContraseña {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.btnCambiarContraseña:hover {
+    background-color: #138496;
+}
+
+.btnModificar {
+    background-color: #007bff;
+    color: white;
+}
+
+.btnModificar:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.btnModificar:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btnActivar {
+    background-color: #28a745;
+    color: white;
+}
+
+.btnActivar:hover:not(:disabled) {
+    background-color: #218838;
+}
+
+.btnActivar:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btnDesactivar {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btnDesactivar:hover:not(:disabled) {
+    background-color: #e0a800;
+}
+
+.btnDesactivar:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btnOcultar {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btnOcultar:hover {
+    background-color: #5a6268;
 }
 
 .btnGuardar {
-  background: #059669;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  min-width: 120px;
+    background-color: #001f3f;
+    color: white;
 }
 
 .btnGuardar:hover:not(:disabled) {
-  background: #047857;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    background-color: #003366;
+}
+
+.btnGuardar:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .btnCancelar {
-  background: #d97706;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  min-width: 120px;
+    background-color: #6c757d;
+    color: white;
 }
 
-.btnCancelar:hover {
-  background: #b45309;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+.btnCancelar:hover:not(:disabled) {
+    background-color: #5a6268;
 }
 
+.btnCancelar:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btnEliminar {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btnEliminar:hover:not(:disabled) {
+    background-color: #c82333;
+}
+
+.btnEliminar:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ✅ CORREGIDO: Estilos para el botón Atrás fijo */
 .btnAtras {
-  background: #6b7280;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  min-width: 100px;
+    background-color: #001f3f;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    min-width: 160px;
+    text-align: center;
 }
 
 .btnAtras:hover {
-  background: #4b5563;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+    background-color: #003366;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* Modal para cambiar contraseña */
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+.btnAtras:active {
+    transform: translateY(0);
 }
 
-.modal {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  min-width: 400px;
-  max-width: 500px;
-  width: 90%;
+/* Estados de carga */
+.loading {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+    font-size: 1.1rem;
 }
 
-.modal h3 {
-  margin: 0 0 20px 0;
-  color: #2d3748;
-  font-size: 1.4rem;
-  font-weight: 600;
+/* Modo info */
+.modoInfo {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: inline-block;
 }
 
-.passwordForm {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.modoInfo.warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+/* --- CAMPOS ADICIONALES PARA EDICIÓN --- */
+.additionalFields {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.additionalFields,
+.additionalFields *:not(input):not(select):not(button) {
+    color: #000000 !important;
+    font-weight: 600 !important;
+}
+
+.additionalFields h3 {
+    margin: 0 0 1rem 0;
+    color: #000000 !important;
+    font-size: 1.2rem;
+    font-weight: 700 !important;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
 }
 
 .formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
 }
 
 .formGroup label {
-  font-weight: 600;
-  color: #4a5568;
-  font-size: 0.95rem;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem;
+    color: #000000 !important;
+    font-size: 0.95rem;
 }
 
-/* Modal de Confirmación para Eliminar */
+.signatureSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Inputs con texto negro */
+.editInput, .editSelect {
+    color: #000000 !important;
+    font-weight: 500;
+}
+
+/* --- ESTILOS PARA MODAL DE CONFIRMACIÓN --- */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+  
 .confirmModal {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  min-width: 400px;
-  max-width: 500px;
-  width: 90%;
-  text-align: center;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    min-width: 400px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    color: #212529;
 }
-
+  
 .confirmModal h3 {
-  margin: 0 0 15px 0;
-  color: #2d3748;
-  font-size: 1.4rem;
-  font-weight: 600;
+    margin: 0 0 15px 0;
+    font-size: 1.4rem;
+    font-weight: 600;
 }
-
+  
 .confirmModal p {
-  margin: 0 0 25px 0;
-  color: #4a5568;
-  font-size: 1rem;
-  line-height: 1.5;
+    margin: 0 0 25px 0;
+    font-size: 1rem;
+    line-height: 1.5;
 }
 
 .modalButtons {
@@ -382,346 +565,233 @@
     gap: 15px;
 }
 
-/* Botón de eliminar específico */
-.btnEliminar {
-  background: #dc2626;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  min-width: 100px;
-}
-
-.btnEliminar:hover {
-  background: #b91c1c;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-}
-
-/* Estilos para campo de fecha */
-.dateInput {
-  padding: 8px 10px;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  background: white;
-  transition: all 0.2s ease;
-  width: 100%;
-}
-
-.dateInput:focus {
-  outline: none;
-  border-color: #4a6fa5;
-  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
-}
-
-/* Sistema de Notificaciones */
+/* --- ESTILOS PARA NOTIFICACIONES --- */
 .notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  min-width: 320px;
-  max-width: 450px;
-  z-index: 10000;
-  animation: slideIn 0.3s ease-out;
-  border-left: 5px solid;
-  overflow: hidden;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    min-width: 320px;
+    max-width: 450px;
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+    border-left: 5px solid;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 18px;
+    gap: 14px;
 }
 
-.notificationSuccess {
-  border-left-color: #10b981;
-}
-
-.notificationError {
-  border-left-color: #ef4444;
-}
-
-.notificationWarning {
-  border-left-color: #f59e0b;
-}
-
-.notificationContent {
-  display: flex;
-  align-items: center;
-  padding: 18px;
-  gap: 14px;
-}
+.notification.success { border-left-color: #10b981; }
+.notification.error { border-left-color: #ef4444; }
+.notification.warning { border-left-color: #f59e0b; }
+.notification.info { border-left-color: #3b82f6; }
 
 .notificationIcon {
-  font-size: 22px;
-  font-weight: bold;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  flex-shrink: 0;
+    font-size: 22px;
+    font-weight: bold;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: white;
 }
 
-.notificationSuccess .notificationIcon {
-  background: #10b981;
-  color: white;
-}
-
-.notificationError .notificationIcon {
-  background: #ef4444;
-  color: white;
-}
-
-.notificationWarning .notificationIcon {
-  background: #f59e0b;
-  color: white;
-}
+.notification.success .notificationIcon { background: #10b981; }
+.notification.error .notificationIcon { background: #ef4444; }
+.notification.warning .notificationIcon { background: #f59e0b; }
+.notification.info .notificationIcon { background: #3b82f6; }
 
 .notificationMessage {
-  flex: 1;
-  color: #374151;
-  font-weight: 500;
-  font-size: 0.95rem;
-  line-height: 1.4;
+    flex: 1;
+    color: #374151;
+    font-weight: 500;
+    font-size: 0.95rem;
+    line-height: 1.4;
 }
 
 .notificationClose {
-  background: none;
-  border: none;
-  font-size: 22px;
-  color: #9ca3af;
-  cursor: pointer;
-  padding: 4px;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .notificationClose:hover {
-  background: #f3f4f6;
-  color: #374151;
+    color: #374151;
 }
 
 .notificationProgress {
-  height: 4px;
-  background: currentColor;
-  width: 100%;
-  animation: progress 5s linear forwards;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    animation: progress 5s linear forwards;
 }
 
-.notificationSuccess .notificationProgress {
-  background: #10b981;
-}
-
-.notificationError .notificationProgress {
-  background: #ef4444;
-}
-
-.notificationWarning .notificationProgress {
-  background: #f59e0b;
-}
+.notification.success .notificationProgress { background: #10b981; }
+.notification.error .notificationProgress { background: #ef4444; }
+.notification.warning .notificationProgress { background: #f59e0b; }
+.notification.info .notificationProgress { background: #3b82f6; }
 
 @keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes progress {
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0%;
-  }
+    from { width: 100%; }
+    to { width: 0%; }
 }
 
-/* Estados de carga y mensajes */
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: #6b7280;
-  font-size: 1.1rem;
-}
-
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .userTable {
-    font-size: 0.9rem;
-  }
-  
-  .userTable th,
-  .userTable td {
-    padding: 10px 8px;
-  }
-}
-
+/* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
-  .pageContainer {
-    padding: 10px;
-  }
-  
-  .header {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .titleSection h1 {
-    font-size: 1.8rem;
-  }
-  
-  .mainContent {
-    padding: 15px;
-  }
-  
-  .footer {
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .actionButtons {
-    justify-content: center;
-  }
-  
-  .btn,
-  .btnGuardar,
-  .btnCancelar,
-  .btnAtras {
-    min-width: 100px;
-    padding: 10px 16px;
-    font-size: 0.9rem;
-  }
-  
-  .notification {
-    left: 10px;
-    right: 10px;
-    min-width: auto;
-    max-width: none;
-  }
-  
-  .modal,
-  .confirmModal {
-    min-width: 300px;
-    margin: 20px;
-  }
-  
-  .modalButtons {
-    flex-direction: column;
-  }
+    .pageContainer {
+        padding: 1rem;
+    }
+    
+    .header {
+        padding: 1rem;
+    }
+    
+    .titleSection h1 {
+        font-size: 1.5rem;
+    }
+    
+    .statsHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .statsDetails {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .filterInfo {
+        padding: 0.75rem 1rem;
+    }
+    
+    .footer {
+        padding: 1rem;
+    }
+    
+    .actionButtons {
+        flex-direction: column;
+    }
+    
+    .btnAgregar, .btnCambiarContraseña, .btnModificar, .btnActivar, 
+    .btnDesactivar, .btnOcultar, .btnGuardar, .btnCancelar, .btnEliminar {
+        width: 100%;
+    }
+    
+    .usuariosTable th,
+    .usuariosTable td {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .confirmModal {
+        min-width: 300px;
+        margin: 20px;
+    }
+
+    /* Campos adicionales responsive */
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+    
+    .additionalFields {
+        padding: 1rem;
+    }
+    
+    .formGroup label {
+        font-size: 0.9rem;
+    }
+
+    /* ✅ CORREGIDO: Botón Atrás responsive */
+    .btnAtras {
+        bottom: 20px;
+        right: 20px;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+        min-width: 140px;
+    }
 }
 
 @media (max-width: 480px) {
-  .userTable {
-    font-size: 0.8rem;
-  }
-  
-  .userTable th,
-  .userTable td {
-    padding: 8px 6px;
-  }
-  
-  .newRow input,
-  .newRow select,
-  .passwordInput,
-  .dateInput {
-    padding: 6px 8px;
-    font-size: 0.8rem;
-  }
-  
-  .actionButtons {
-    gap: 8px;
-  }
-  
-  .btn,
-  .btnGuardar,
-  .btnCancelar,
-  .btnAtras,
-  .btnEliminar {
-    min-width: 80px;
-    padding: 8px 12px;
-    font-size: 0.8rem;
-  }
+    .btnAtras {
+        bottom: 15px;
+        right: 15px;
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        min-width: 120px;
+    }
 }
 
-/* Mejoras visuales para inputs en modo edición */
-.newRow input::placeholder {
-  color: #9ca3af;
-  font-size: 0.85rem;
-}
-
-.newRow input:not(:placeholder-shown) {
-  background: #fafafa;
-  border-color: #9ae6b4;
-}
-
-/* Efectos de transición suaves */
-.userTable tbody tr,
-.btn,
-.notification {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Scrollbar personalizado para la tabla */
+/* Scroll personalizado */
 .tableContainer::-webkit-scrollbar {
-  height: 8px;
+    height: 8px;
 }
 
 .tableContainer::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+    background: #f1f1f1;
+    border-radius: 4px;
 }
 
 .tableContainer::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+    background: #c1c1c1;
+    border-radius: 4px;
 }
 
 .tableContainer::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+    background: #a8a8a8;
 }
 
-/* Estilos para mejorar la legibilidad de la tabla con muchas columnas */
-.userTable th:nth-child(1),
-.userTable td:nth-child(1) {
-  min-width: 120px;
+/* Efectos de transición para filas */
+.usuariosTable tbody tr {
+    transition: background-color 0.2s ease;
 }
 
-.userTable th:nth-child(4),
-.userTable td:nth-child(4) {
-  min-width: 200px;
+.usuariosTable tbody tr:hover {
+    background-color: #f8f9fa;
 }
 
-.userTable th:nth-child(6),
-.userTable td:nth-child(6) {
-  min-width: 120px;
+/* Mejoras visuales para inputs y selects */
+.editInput::placeholder {
+    color: #6c757d;
+    opacity: 0.7;
 }
 
-.userTable th:nth-child(7),
-.userTable td:nth-child(7) {
-  min-width: 80px;
+.editSelect:invalid {
+    color: #6c757d;
 }
 
-.userTable th:nth-child(10),
-.userTable td:nth-child(10) {
-  min-width: 120px;
+.editSelect option {
+    color: #333;
 }
 
-.userTable th:nth-child(11),
-.userTable td:nth-child(11) {
-  min-width: 100px;
+/* Estados de focus mejorados */
+.editInput:focus,
+.editSelect:focus,
+.btnFirma:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+/* Estilos para el botón de firma cuando hay error */
+.btnFirma.inputError {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 2px rgba(220,53,69,0.25);
 }

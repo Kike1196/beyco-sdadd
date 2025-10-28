@@ -1,27 +1,29 @@
-// src/main/java/com/beyco/app/models/Empresa.java
+// src/main/java/com/beyco/app/models/EmpresaDTO.java
 package com.beyco.app.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Empresa {
+public class EmpresaDTO {
     @JsonProperty("id")
     private int id;
+    
     @JsonProperty("nombre")
     private String nombre;
 
-    // Constructor vacío necesario para Jackson
-    public Empresa() {}
+    // Constructor vacío (obligatorio para Jackson)
+    public EmpresaDTO() {}
 
-    // Constructor con parámetros
-    public Empresa(int id, String nombre) {
+    // Constructor
+    public EmpresaDTO(int id, String nombre) {
         this.id = id;
         this.nombre = nombre;
     }
 
-    // Getters y Setters
+    // Getters
     public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
     public String getNombre() { return nombre; }
+
+    // Setters
+    public void setId(int id) { this.id = id; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 }
