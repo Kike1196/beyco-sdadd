@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/usuarios")
+@RequestMapping("/api/instructores")
 @CrossOrigin(origins = {"http://localhost:3000", "http://192.168.0.55:3000", 
                        "http://10.0.46.106:3000", "http://10.0.47.108:3000", 
                        "http://10.0.45.30:3000", "http://10.0.43.190:3000"})
@@ -18,7 +18,7 @@ public class InstructorController {
     @Autowired
     private InstructorService instructorService;
 
-    @GetMapping("/instructores")
+    @GetMapping
     public ResponseEntity<List<Instructor>> getAllInstructores() {
         try {
             List<Instructor> instructores = instructorService.listarTodosLosInstructores();

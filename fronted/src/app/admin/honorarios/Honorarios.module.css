@@ -1,0 +1,376 @@
+/* app/admin/honorarios/Honorarios.module.css */
+.container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.backButton {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #000000;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.backButton:hover {
+    background: white;
+    transform: translateY(-2px);
+    color: #000000;
+}
+
+.header h1 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.searchPanel {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.searchPanel h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #000000;
+    font-weight: 600;
+}
+
+.selectContainer {
+    margin-bottom: 20px;
+}
+
+.instructorSelect {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #000000;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.instructorSelect:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.instructorSelect:disabled {
+    background: #f8f9fa;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.instructorInfo {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.instructorInfo h3 {
+    margin: 0 0 10px 0;
+    color: #000000;
+    font-size: 1.1rem;
+}
+
+.instructorInfo p {
+    margin: 5px 0;
+    color: #000000;
+    font-size: 0.9rem;
+}
+
+.instructorInfo strong {
+    color: #000000;
+}
+
+.detailsPanel {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.instructorHeader {
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+}
+
+.instructorHeader h2 {
+    margin: 0 0 10px 0;
+    color: #000000;
+    font-weight: 700;
+}
+
+.instructorHeader p {
+    margin: 0;
+    color: #000000;
+    opacity: 0.8;
+}
+
+.periodoConfig {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border: 1px solid #e9ecef;
+}
+
+.periodoConfig h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #000000;
+    font-weight: 600;
+}
+
+.periodoOptions {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.periodoOptions label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #000000;
+    font-weight: 500;
+}
+
+.fechasInput {
+    display: flex;
+    gap: 20px;
+}
+
+.fechasInput div {
+    flex: 1;
+}
+
+.fechasInput label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #000000;
+}
+
+.fechasInput input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    color: #000000;
+    font-weight: 500;
+}
+
+.fechasInput input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.cursosList h3 {
+    margin-bottom: 15px;
+    color: #000000;
+    font-weight: 600;
+}
+
+.cursosTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    background: white;
+}
+
+.cursosTable th,
+.cursosTable td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+    color: #000000;
+}
+
+.cursosTable th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #000000;
+}
+
+.cursosTable td {
+    font-weight: 500;
+}
+
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status.pendiente {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status.pagado {
+    background: #d1edff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
+
+.status.cancelado {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.resumenPanel {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    border: 1px solid #e9ecef;
+}
+
+.totalSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.totalSection h3 {
+    margin: 0;
+    color: #000000;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.generateButton {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.generateButton:hover:not(:disabled) {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.generateButton:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.placeholder {
+    text-align: center;
+    padding: 60px 20px;
+    color: #000000;
+    opacity: 0.6;
+    font-size: 1.1rem;
+}
+
+.noData {
+    text-align: center;
+    padding: 40px 20px;
+    color: #000000;
+    opacity: 0.6;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+    
+    .searchPanel {
+        order: 2;
+    }
+    
+    .detailsPanel {
+        order: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .fechasInput {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .totalSection {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .periodoOptions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .cursosTable {
+        font-size: 0.9rem;
+    }
+    
+    .cursosTable th,
+    .cursosTable td {
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .searchPanel,
+    .detailsPanel {
+        padding: 20px;
+    }
+    
+    .instructorSelect {
+        padding: 10px;
+    }
+}

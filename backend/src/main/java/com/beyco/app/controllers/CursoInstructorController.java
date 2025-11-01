@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/cursos")
+@RequestMapping("/api/instructor-cursos")
 @CrossOrigin(origins = {"http://localhost:3000", "http://192.168.0.55:3000", "http://172.19.128.1:3000", "http://10.0.43.165:3000", "http://10.0.46.106:3000",
                         "http://10.0.47.154:3000", "http://10.0.43.69:3000", "http://10.0.47.108:3000", "http://10.0.45.30:3000", "http://10.0.43.190:3000"})
 public class CursoInstructorController {

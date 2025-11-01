@@ -15,6 +15,7 @@ public class Curso {
     private int empresaId;
     private int instructorId;
     private BigDecimal precio;
+    private boolean examenPractico;
 
     private BigDecimal costo;
     private String status;
@@ -60,6 +61,8 @@ public class Curso {
     public void setInstructorId(int instructorId) { this.instructorId = instructorId; }
     public BigDecimal getPrecio() { return precio; }
     public void setPrecio(BigDecimal precio) { this.precio = precio; }
+    public boolean getExamenPractico() { return examenPractico; }
+    public void setExamenPractico(boolean examenPractico) { this.examenPractico = examenPractico; }
 
     public BigDecimal getCosto() { return costo; }
     public void setCosto(BigDecimal costo) { this.costo = costo; }

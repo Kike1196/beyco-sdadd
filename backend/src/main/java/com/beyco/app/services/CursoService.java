@@ -3,8 +3,7 @@ package com.beyco.app.services;
 import com.beyco.app.models.Curso;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import javax.sql.DataSource; // Correcto
-
+import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
@@ -16,7 +15,6 @@ import java.util.Map;
 @Service
 public class CursoService {
 
-    // Correcto: Se inyecta DataSource
     private final DataSource dataSource;
 
     @Autowired
@@ -24,18 +22,21 @@ public class CursoService {
         this.dataSource = dataSource;
     }
 
+    /**
+     * Este método se queda como está. Es útil para un panel de administrador.
+     */
     public List<Curso> listarTodosLosCursos() {
         List<Curso> cursosAsignados = new ArrayList<>();
         String sql = "SELECT " +
                     "c.Id_Curso, c.Nombre_curso, c.Clave_STPS, c.Fecha_Imparticion, c.Lugar, " +
                     "c.Empresa_Id, c.Instructor_Id, " +
-                    "cat.Precio, cat.Horas, " + // ← Campos del catálogo
+                    "cat.Precio, cat.Horas, cat.Examen_practico, " +
                     "e.nombre AS nombre_empresa, " +
                     "u.Nombre AS nombre_instructor " +
                     "FROM cursos c " +
                     "JOIN empresas e ON c.Empresa_Id = e.id " +
                     "JOIN usuarios u ON c.Instructor_Id = u.Num_Empleado " +
-                    "LEFT JOIN catalogo_cursos cat ON c.Clave_STPS = cat.Clave_STPS"; // ← JOIN con catálogo
+                    "LEFT JOIN catalogo_cursos cat ON c.Clave_STPS = cat.Clave_STPS";
         
         try (Connection connection = dataSource.getConnection();
             Statement stmt = connection.createStatement();
@@ -52,7 +53,6 @@ public class CursoService {
                 curso.setNombre(rs.getString("Nombre_curso"));
                 curso.setStps(rs.getString("Clave_STPS"));
                 
-                // Usar las horas del catálogo, si no existen usar 8 por defecto
                 int horas = rs.getInt("Horas");
                 curso.setHoras(horas > 0 ? horas : 8);
                 
@@ -63,12 +63,12 @@ public class CursoService {
                 curso.setEmpresaId(rs.getInt("Empresa_Id"));
                 curso.setInstructorId(rs.getInt("Instructor_Id"));
                 
-                // Precio del catálogo
                 BigDecimal precio = rs.getBigDecimal("Precio");
                 curso.setPrecio(precio != null ? precio : BigDecimal.ZERO);
-                
-                // Costo puede ser cero o calcularse si es necesario
                 curso.setCosto(BigDecimal.ZERO);
+                
+                // Dato clave para el frontend
+                curso.setExamenPractico(rs.getBoolean("Examen_practico")); 
                 
                 cursosAsignados.add(curso);
             }
@@ -78,10 +78,10 @@ public class CursoService {
         }
         return cursosAsignados;
     }
+
     public boolean crearCurso(Curso curso) {
         String sql = "INSERT INTO cursos (Nombre_curso, Fecha_Imparticion, Lugar, Empresa_Id, Instructor_Id, Clave_STPS) VALUES (?, ?, ?, ?, ?, ?)";
         
-        // Correcto: Se obtiene la conexión del DataSource dentro del 'try'
         try (Connection connection = dataSource.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
@@ -112,7 +112,6 @@ public class CursoService {
     public boolean actualizarCurso(Curso curso) {
         String sql = "UPDATE cursos SET Nombre_curso = ?, Fecha_Imparticion = ?, Lugar = ?, Empresa_Id = ?, Instructor_Id = ?, Clave_STPS = ? WHERE Id_Curso = ?";
         
-        // Correcto: Se obtiene la conexión del DataSource dentro del 'try'
         try (Connection connection = dataSource.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
@@ -134,7 +133,6 @@ public class CursoService {
     public boolean eliminarCurso(int idCurso) {
         String sql = "DELETE FROM cursos WHERE Id_Curso = ?";
 
-        // Correcto: Se obtiene la conexión del DataSource dentro del 'try'
         try (Connection connection = dataSource.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
             
@@ -150,12 +148,12 @@ public class CursoService {
         List<Curso> cursos = new ArrayList<>();
         String sql = "SELECT c.Id_Curso, c.Nombre_curso, c.Clave_STPS, c.Fecha_Imparticion, c.Lugar, " +
                     "c.Empresa_Id, c.Instructor_Id, " +
-                    "cat.Precio, cat.Horas, " + // ← Campos del catálogo
+                    "cat.Precio, cat.Horas, cat.Examen_practico, " +
                     "e.nombre AS nombre_empresa, u.Nombre AS nombre_instructor " +
                     "FROM cursos c " +
                     "JOIN empresas e ON c.Empresa_Id = e.id " +
                     "JOIN usuarios u ON c.Instructor_Id = u.Num_Empleado " +
-                    "LEFT JOIN catalogo_cursos cat ON c.Clave_STPS = cat.Clave_STPS " + // ← JOIN con catálogo
+                    "LEFT JOIN catalogo_cursos cat ON c.Clave_STPS = cat.Clave_STPS " +
                     "WHERE YEAR(c.Fecha_Imparticion) = ?";
         
         try (Connection connection = dataSource.getConnection();
@@ -188,6 +186,8 @@ public class CursoService {
                     curso.setPrecio(precio != null ? precio : BigDecimal.ZERO);
                     curso.setCosto(BigDecimal.ZERO);
                     
+                    curso.setExamenPractico(rs.getBoolean("Examen_practico")); 
+                    
                     cursos.add(curso);
                 }
             }
@@ -206,15 +206,15 @@ public class CursoService {
         
         String sql = "SELECT c.Id_Curso, c.Nombre_curso, c.Clave_STPS, c.Fecha_Imparticion, c.Lugar, " +
                     "c.Empresa_Id, c.Instructor_Id, " +
-                    "cat.Precio, cat.Horas, " + // ← Campos del catálogo
+                    "cat.Precio, cat.Horas, cat.Examen_practico, " +
                     "e.nombre AS nombre_empresa, u.Nombre AS nombre_instructor " +
                     "FROM cursos c " +
                     "JOIN empresas e ON c.Empresa_Id = e.id " +
                     "JOIN usuarios u ON c.Instructor_Id = u.Num_Empleado " +
-                    "LEFT JOIN catalogo_cursos cat ON c.Clave_STPS = cat.Clave_STPS " + // ← JOIN con catálogo
+                    "LEFT JOIN catalogo_cursos cat ON c.Clave_STPS = cat.Clave_STPS " +
                     "WHERE c.Fecha_Imparticion " + 
                     (estado.equalsIgnoreCase("finalizado") ? " < CURDATE()" : " >= CURDATE()");
-        
+     
         try (Connection connection = dataSource.getConnection();
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql)) {
@@ -243,6 +243,8 @@ public class CursoService {
                 BigDecimal precio = rs.getBigDecimal("Precio");
                 curso.setPrecio(precio != null ? precio : BigDecimal.ZERO);
                 curso.setCosto(BigDecimal.ZERO);
+                
+                curso.setExamenPractico(rs.getBoolean("Examen_practico")); 
                 
                 cursos.add(curso);
             }
@@ -285,53 +287,64 @@ public class CursoService {
     }
 
     /**
-     * Obtiene cursos asignados a un instructor específico
+     * Obtiene cursos asignados a un instructor específico.
+     * Esta es la consulta que debe usar el Dashboard del Instructor.
      */
     public List<Curso> listarCursosPorInstructor(int instructorId) {
         List<Curso> cursos = new ArrayList<>();
         
-        String sql = "SELECT Id_Curso, Nombre_curso, Clave_STPS, Fecha_Imparticion, Lugar " +
-                    "FROM cursos WHERE Instructor_Id = ?";
-        
-        System.out.println("🔍 Buscando cursos para instructor: " + instructorId);
-        System.out.println("📋 SQL: " + sql);
+        String sql = "SELECT " +
+                    "c.Id_Curso, c.Nombre_curso, c.Clave_STPS, c.Fecha_Imparticion, c.Lugar, " +
+                    "c.Empresa_Id, c.Instructor_Id, " +
+                    "cat.Precio, cat.Horas, cat.Examen_practico, " +
+                    "e.nombre AS nombre_empresa, " +
+                    "u.Nombre AS nombre_instructor " +
+                    "FROM cursos c " +
+                    "JOIN empresas e ON c.Empresa_Id = e.id " +
+                    "JOIN usuarios u ON c.Instructor_Id = u.Num_Empleado " +
+                    "LEFT JOIN catalogo_cursos cat ON c.Clave_STPS = cat.Clave_STPS " +
+                    "WHERE c.Instructor_Id = ? " +
+                    "ORDER BY c.Fecha_Imparticion DESC";
         
         try (Connection connection = dataSource.getConnection();
             PreparedStatement pstmt = connection.prepareStatement(sql)) {
             
             pstmt.setInt(1, instructorId);
-            
             try (ResultSet rs = pstmt.executeQuery()) {
-                int count = 0;
                 while (rs.next()) {
+                    LocalDate fecha = null;
+                    if (rs.getDate("Fecha_Imparticion") != null) {
+                        fecha = rs.getDate("Fecha_Imparticion").toLocalDate();
+                    }
+                    
                     Curso curso = new Curso();
                     curso.setId(rs.getInt("Id_Curso"));
                     curso.setNombre(rs.getString("Nombre_curso"));
                     curso.setStps(rs.getString("Clave_STPS"));
+                    
+                    int horas = rs.getInt("Horas");
+                    curso.setHoras(horas > 0 ? horas : 8);
+                    
+                    curso.setFechaIngreso(fecha);
+                    curso.setEmpresa(rs.getString("nombre_empresa"));
+                    curso.setInstructor(rs.getString("nombre_instructor"));
                     curso.setLugar(rs.getString("Lugar"));
+                    curso.setEmpresaId(rs.getInt("Empresa_Id"));
+                    curso.setInstructorId(rs.getInt("Instructor_Id"));
                     
-                    // Fecha
-                    if (rs.getDate("Fecha_Imparticion") != null) {
-                        curso.setFechaIngreso(rs.getDate("Fecha_Imparticion").toLocalDate());
-                    }
+                    BigDecimal precio = rs.getBigDecimal("Precio");
+                    curso.setPrecio(precio != null ? precio : BigDecimal.ZERO);
+                    curso.setCosto(BigDecimal.ZERO);
                     
-                    // Valores por defecto
-                    curso.setHoras(8);
-                    curso.setPrecio(BigDecimal.ZERO);
-                    curso.setEmpresa("Empresa por asignar");
-                    curso.setInstructor("Instructor " + instructorId);
+                    curso.setExamenPractico(rs.getBoolean("Examen_practico"));
                     
                     cursos.add(curso);
-                    count++;
-                    System.out.println("📚 Curso " + count + ": " + curso.getNombre());
                 }
-                
-                System.out.println("✅ Total cursos encontrados: " + cursos.size());
             }
-            
         } catch (SQLException e) {
             System.err.println("❌ Error SQL: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Error al listar cursos por instructor: " + e.getMessage());
         }
         
         return cursos;
