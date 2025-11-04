@@ -194,7 +194,8 @@ export default function UsuariosPage() {
     }, []);
 
     const handleSelectUsuario = (usuario) => {
-        if (isAdding) return;
+        // Prevenir selección si estamos en modo edición o agregando
+        if (isAdding || isEditing) return;
         
         setSelectedUsuario(usuario);
         setIsEditing(false);
@@ -503,6 +504,8 @@ export default function UsuariosPage() {
         if (formErrors[name]) {
             setFormErrors(prev => ({ ...prev, [name]: '' }));
         }
+        // Prevenir la propagación del evento
+        e.stopPropagation();
     };
 
     const filteredUsuarios = useMemo(() => 
@@ -585,7 +588,7 @@ export default function UsuariosPage() {
                                 {isAdding && (
                                     <tr className={`${styles.selectedRow} ${styles.editingRow}`}>
                                         <td>
-                                            <div>
+                                            <div onClick={(e) => e.stopPropagation()}>
                                                 <input
                                                     type="text"
                                                     name="nombre"
@@ -593,12 +596,13 @@ export default function UsuariosPage() {
                                                     onChange={handleInputChange}
                                                     className={`${styles.editInput} ${formErrors.nombre ? styles.inputError : ''}`}
                                                     placeholder="Nombre"
+                                                    onClick={(e) => e.stopPropagation()}
                                                 />
                                                 {formErrors.nombre && <span className={styles.errorText}>{formErrors.nombre}</span>}
                                             </div>
                                         </td>
                                         <td>
-                                            <div>
+                                            <div onClick={(e) => e.stopPropagation()}>
                                                 <input
                                                     type="text"
                                                     name="apellidoPaterno"
@@ -606,12 +610,13 @@ export default function UsuariosPage() {
                                                     onChange={handleInputChange}
                                                     className={`${styles.editInput} ${formErrors.apellidoPaterno ? styles.inputError : ''}`}
                                                     placeholder="Apellido Paterno"
+                                                    onClick={(e) => e.stopPropagation()}
                                                 />
                                                 {formErrors.apellidoPaterno && <span className={styles.errorText}>{formErrors.apellidoPaterno}</span>}
                                             </div>
                                         </td>
                                         <td>
-                                            <div>
+                                            <div onClick={(e) => e.stopPropagation()}>
                                                 <input
                                                     type="text"
                                                     name="apellidoMaterno"
@@ -619,11 +624,12 @@ export default function UsuariosPage() {
                                                     onChange={handleInputChange}
                                                     className={styles.editInput}
                                                     placeholder="Apellido Materno"
+                                                    onClick={(e) => e.stopPropagation()}
                                                 />
                                             </div>
                                         </td>
                                         <td>
-                                            <div>
+                                            <div onClick={(e) => e.stopPropagation()}>
                                                 <input
                                                     type="email"
                                                     name="correo"
@@ -631,17 +637,19 @@ export default function UsuariosPage() {
                                                     onChange={handleInputChange}
                                                     className={`${styles.editInput} ${formErrors.correo ? styles.inputError : ''}`}
                                                     placeholder="correo@ejemplo.com"
+                                                    onClick={(e) => e.stopPropagation()}
                                                 />
                                                 {formErrors.correo && <span className={styles.errorText}>{formErrors.correo}</span>}
                                             </div>
                                         </td>
                                         <td>
-                                            <div>
+                                            <div onClick={(e) => e.stopPropagation()}>
                                                 <select
                                                     name="rol"
                                                     value={usuarioData.rol || ''}
                                                     onChange={handleInputChange}
                                                     className={`${styles.editSelect} ${formErrors.rol ? styles.inputError : ''}`}
+                                                    onClick={(e) => e.stopPropagation()}
                                                 >
                                                     <option value="">Seleccionar rol</option>
                                                     <option value="Administrador">Administrador</option>
@@ -657,13 +665,14 @@ export default function UsuariosPage() {
                                             </span>
                                         </td>
                                         <td>
-                                            <div>
+                                            <div onClick={(e) => e.stopPropagation()}>
                                                 <input
                                                     type="date"
                                                     name="fechaIngreso"
                                                     value={usuarioData.fechaIngreso || ''}
                                                     onChange={handleInputChange}
                                                     className={`${styles.editInput} ${formErrors.fechaIngreso ? styles.inputError : ''}`}
+                                                    onClick={(e) => e.stopPropagation()}
                                                 />
                                                 {formErrors.fechaIngreso && <span className={styles.errorText}>{formErrors.fechaIngreso}</span>}
                                             </div>
@@ -681,7 +690,7 @@ export default function UsuariosPage() {
                                         {/* Nombre */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
-                                                <div>
+                                                <div onClick={(e) => e.stopPropagation()}>
                                                     <input
                                                         type="text"
                                                         name="nombre"
@@ -689,6 +698,7 @@ export default function UsuariosPage() {
                                                         onChange={handleInputChange}
                                                         className={`${styles.editInput} ${formErrors.nombre ? styles.inputError : ''}`}
                                                         placeholder="Nombre"
+                                                        onClick={(e) => e.stopPropagation()}
                                                     />
                                                     {formErrors.nombre && <span className={styles.errorText}>{formErrors.nombre}</span>}
                                                 </div>
@@ -700,7 +710,7 @@ export default function UsuariosPage() {
                                         {/* Apellido Paterno */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
-                                                <div>
+                                                <div onClick={(e) => e.stopPropagation()}>
                                                     <input
                                                         type="text"
                                                         name="apellidoPaterno"
@@ -708,6 +718,7 @@ export default function UsuariosPage() {
                                                         onChange={handleInputChange}
                                                         className={`${styles.editInput} ${formErrors.apellidoPaterno ? styles.inputError : ''}`}
                                                         placeholder="Apellido Paterno"
+                                                        onClick={(e) => e.stopPropagation()}
                                                     />
                                                     {formErrors.apellidoPaterno && <span className={styles.errorText}>{formErrors.apellidoPaterno}</span>}
                                                 </div>
@@ -719,7 +730,7 @@ export default function UsuariosPage() {
                                         {/* Apellido Materno */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
-                                                <div>
+                                                <div onClick={(e) => e.stopPropagation()}>
                                                     <input
                                                         type="text"
                                                         name="apellidoMaterno"
@@ -727,6 +738,7 @@ export default function UsuariosPage() {
                                                         onChange={handleInputChange}
                                                         className={styles.editInput}
                                                         placeholder="Apellido Materno"
+                                                        onClick={(e) => e.stopPropagation()}
                                                     />
                                                 </div>
                                             ) : (
@@ -737,7 +749,7 @@ export default function UsuariosPage() {
                                         {/* Correo */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
-                                                <div>
+                                                <div onClick={(e) => e.stopPropagation()}>
                                                     <input
                                                         type="email"
                                                         name="correo"
@@ -745,6 +757,7 @@ export default function UsuariosPage() {
                                                         onChange={handleInputChange}
                                                         className={`${styles.editInput} ${formErrors.correo ? styles.inputError : ''}`}
                                                         placeholder="correo@ejemplo.com"
+                                                        onClick={(e) => e.stopPropagation()}
                                                     />
                                                     {formErrors.correo && <span className={styles.errorText}>{formErrors.correo}</span>}
                                                 </div>
@@ -756,12 +769,13 @@ export default function UsuariosPage() {
                                         {/* Rol */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
-                                                <div>
+                                                <div onClick={(e) => e.stopPropagation()}>
                                                     <select
                                                         name="rol"
                                                         value={usuarioData.rol || ''}
                                                         onChange={handleInputChange}
                                                         className={`${styles.editSelect} ${formErrors.rol ? styles.inputError : ''}`}
+                                                        onClick={(e) => e.stopPropagation()}
                                                     >
                                                         <option value="">Seleccionar rol</option>
                                                         <option value="Administrador">Administrador</option>
@@ -787,13 +801,14 @@ export default function UsuariosPage() {
                                         {/* Fecha Ingreso */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
-                                                <div>
+                                                <div onClick={(e) => e.stopPropagation()}>
                                                     <input
                                                         type="date"
                                                         name="fechaIngreso"
                                                         value={usuarioData.fechaIngreso || ''}
                                                         onChange={handleInputChange}
                                                         className={`${styles.editInput} ${formErrors.fechaIngreso ? styles.inputError : ''}`}
+                                                        onClick={(e) => e.stopPropagation()}
                                                     />
                                                     {formErrors.fechaIngreso && <span className={styles.errorText}>{formErrors.fechaIngreso}</span>}
                                                 </div>
@@ -823,6 +838,7 @@ export default function UsuariosPage() {
                                     onChange={handleInputChange}
                                     className={`${styles.editInput} ${formErrors.contrasena ? styles.inputError : ''}`}
                                     placeholder="Nueva contraseña"
+                                    onClick={(e) => e.stopPropagation()}
                                 />
                                 {formErrors.contrasena && <span className={styles.errorText}>{formErrors.contrasena}</span>}
                             </div>
@@ -837,6 +853,7 @@ export default function UsuariosPage() {
                                     onChange={handleInputChange}
                                     className={`${styles.editInput} ${formErrors.preguntaRecuperacion ? styles.inputError : ''}`}
                                     placeholder="Ej: ¿Cuál es tu color favorito?"
+                                    onClick={(e) => e.stopPropagation()}
                                 />
                                 {formErrors.preguntaRecuperacion && <span className={styles.errorText}>{formErrors.preguntaRecuperacion}</span>}
                             </div>
@@ -851,6 +868,7 @@ export default function UsuariosPage() {
                                     onChange={handleInputChange}
                                     className={`${styles.editInput} ${formErrors.respuestaRecuperacion ? styles.inputError : ''}`}
                                     placeholder="Respuesta a la pregunta"
+                                    onClick={(e) => e.stopPropagation()}
                                 />
                                 {formErrors.respuestaRecuperacion && <span className={styles.errorText}>{formErrors.respuestaRecuperacion}</span>}
                             </div>
@@ -861,7 +879,10 @@ export default function UsuariosPage() {
                                 <div className={styles.signatureSection}>
                                     <button 
                                         type="button" 
-                                        onClick={handleAddSignature}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleAddSignature();
+                                        }}
                                         className={styles.btnFirma}
                                     >
                                         📎 Agregar Firma

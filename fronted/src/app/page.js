@@ -1,3 +1,4 @@
+// app/page.js - LOGIN CON DISEÑO PROFESIONAL
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -211,81 +212,104 @@ export default function LoginPage() {
     };
 
     return (
-        <div className={styles.container}>
-            {notification.show && (
-                <div className={`${styles.notification} ${styles[`notification${notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}`]}`}>
-                    <div className={styles.notificationContent}>
-                        <span className={styles.notificationIcon}>
-                            {notification.type === 'success' && '✓'}
-                            {notification.type === 'error' && '✕'}
-                            {notification.type === 'warning' && '⚠'}
-                        </span>
-                        <span className={styles.notificationMessage}>
-                            {notification.message}
-                        </span>
-                        <button 
-                            className={styles.notificationClose}
-                            onClick={closeNotification}
-                            type="button"
-                            aria-label="Cerrar notificación"
-                        >
-                            ×
-                        </button>
+        <div className={styles.pageContainer}>
+            {/* Header con azul oscuro - igual que las otras páginas */}
+            <header className={styles.header}>
+                <div className={styles.logoSection}>
+                    <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
+                    <div className={styles.logoText}>
+                        <span className={styles.logoTitle}></span>
+                        <span className={styles.logoSubtitle}></span>
                     </div>
-                    <div className={styles.notificationProgress}></div>
                 </div>
-            )}
+            </header>
 
-            <div className={styles.loginBox}>
-                <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
-                <h1 className={styles.title}>¡Bienvenido!</h1>
-                
-                <form onSubmit={handleSubmit} noValidate>
-                    <div className={styles.inputGroup}>
-                        <label htmlFor="correo">Correo Electrónico</label>
-                        <input 
-                            id="correo" 
-                            type="email" 
-                            value={correo} 
-                            onChange={handleInputChange(setCorreo)}
-                            onInvalid={(e) => e.preventDefault()}
-                            placeholder=""
-                            required 
-                        />
-                    </div>
-                    <div className={styles.inputGroup}>
-                        <label htmlFor="contrasena">Contraseña</label>
-                        <input 
-                            id="contrasena" 
-                            type="password" 
-                            value={contrasena} 
-                            onChange={handleInputChange(setContrasena)}
-                            onInvalid={(e) => e.preventDefault()}
-                            placeholder=""
-                            required
-                        />
-                    </div>
-                    <button 
-                        type="submit" 
-                        className={styles.loginButton}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <span className={styles.loadingText}>
-                                <span className={styles.spinner}></span>
-                                Iniciando sesión...
+            <main className={styles.mainContent}>
+                {notification.show && (
+                    <div className={`${styles.notification} ${styles[`notification${notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}`]}`}>
+                        <div className={styles.notificationContent}>
+                            <span className={styles.notificationIcon}>
+                                {notification.type === 'success' && '✓'}
+                                {notification.type === 'error' && '✕'}
+                                {notification.type === 'warning' && '⚠'}
                             </span>
-                        ) : (
-                            'Iniciar sesión'
-                        )}
-                    </button>
-                </form>
+                            <span className={styles.notificationMessage}>
+                                {notification.message}
+                            </span>
+                            <button 
+                                className={styles.notificationClose}
+                                onClick={closeNotification}
+                                type="button"
+                                aria-label="Cerrar notificación"
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className={styles.notificationProgress}></div>
+                    </div>
+                )}
 
+                <div className={styles.loginContainer}>
+                    <div className={styles.loginCard}>
+                        <div className={styles.loginHeader}>
+                            <h1 className={styles.loginTitle}>Iniciar Sesión</h1>
+                            <p className={styles.loginSubtitle}>Ingresa tus credenciales para acceder al sistema</p>
+                        </div>
 
-                <Link href="/recuperar-contrasena" className={styles.forgotPassword}>
-                    ¿Olvidaste tu contraseña?
-                </Link>
-            </div>
+                        <form onSubmit={handleSubmit} className={styles.loginForm}>
+                            <div className={styles.inputGroup}>
+                                <label htmlFor="correo" className={styles.inputLabel}>Correo Electrónico</label>
+                                <input 
+                                    id="correo" 
+                                    type="email" 
+                                    value={correo} 
+                                    onChange={handleInputChange(setCorreo)}
+                                    onInvalid={(e) => e.preventDefault()}
+                                    placeholder="usuario@ejemplo.com"
+                                    className={styles.formInput}
+                                    required 
+                                />
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                                <label htmlFor="contrasena" className={styles.inputLabel}>Contraseña</label>
+                                <input 
+                                    id="contrasena" 
+                                    type="password" 
+                                    value={contrasena} 
+                                    onChange={handleInputChange(setContrasena)}
+                                    onInvalid={(e) => e.preventDefault()}
+                                    placeholder="••••••••"
+                                    className={styles.formInput}
+                                    required
+                                />
+                            </div>
+
+                            <button 
+                                type="submit" 
+                                className={styles.loginButton}
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <span className={styles.loadingText}>
+                                        <span className={styles.spinner}></span>
+                                        Iniciando sesión...
+                                    </span>
+                                ) : (
+                                    'Iniciar Sesión'
+                                )}
+                            </button>
+                        </form>
+
+                        <div className={styles.loginFooter}>
+                            <Link href="/recuperar-contrasena" className={styles.forgotPassword}>
+                                ¿Olvidaste tu contraseña?
+                            </Link>
+                        </div>
+
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }

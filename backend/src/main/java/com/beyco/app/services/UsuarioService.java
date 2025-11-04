@@ -12,7 +12,6 @@ import java.util.List;
 @Service
 public class UsuarioService {
 
-    // --- CAMBIO: Se inyecta DataSource en lugar de Connection ---
     private final DataSource dataSource;
     private final PasswordEncoder passwordEncoder;
 
@@ -44,7 +43,7 @@ public class UsuarioService {
     // --- MÉTODOS PARA RECUPERACIÓN DE CONTRASEÑA ---
 
     public String getPreguntaSeguridadPorCorreo(String correo) {
-        String sql = "SELECT Pregunta_recuperacion FROM usuarios WHERE Correo = ?";
+        String sql = "SELECT Pregunta_recuperacion FROM usuarios WHERE Correo = ? AND Activo = 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
             
@@ -61,7 +60,7 @@ public class UsuarioService {
     }
 
     public boolean verificarRespuestaSeguridad(String correo, String respuesta) {
-        String sql = "SELECT 1 FROM usuarios WHERE Correo = ? AND Respuesta_recuperacion = ?";
+        String sql = "SELECT 1 FROM usuarios WHERE Correo = ? AND Respuesta_recuperacion = ? AND Activo = 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
             
@@ -78,7 +77,7 @@ public class UsuarioService {
 
     public boolean actualizarContrasena(String correo, String nuevaContrasena) {
         String contrasenaHasheada = passwordEncoder.encode(nuevaContrasena);
-        String sql = "UPDATE usuarios SET Contrasena = ? WHERE Correo = ?";
+        String sql = "UPDATE usuarios SET Contrasena = ? WHERE Correo = ? AND Activo = 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
             
@@ -176,7 +175,6 @@ public class UsuarioService {
     }
 
     public boolean actualizarUsuario(Usuario usuario) {
-        // Lógica para actualizar con o sin contraseña
         boolean tieneNuevaContrasena = usuario.getContrasena() != null && !usuario.getContrasena().isEmpty();
         StringBuilder sqlBuilder = new StringBuilder("UPDATE usuarios SET Nombre = ?, Apellido_paterno = ?, Apellido_materno = ?, ");
         sqlBuilder.append("Correo = ?, Id_Rol = ?, Activo = ?, Fecha_Ingreso = ?, ");
@@ -216,7 +214,6 @@ public class UsuarioService {
     }
 
     public boolean eliminarUsuario(int numEmpleado) throws SQLException {
-        // Implementamos el "soft delete" que discutimos
         String sql = "UPDATE usuarios SET Activo = 0 WHERE Num_Empleado = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -243,7 +240,26 @@ public class UsuarioService {
         }
     }
     
-    // Método de ayuda para no repetir código
+    // BUSCAR USUARIO POR CORREO
+    public Usuario buscarUsuarioPorCorreo(String correo) {
+        String sql = "SELECT * FROM usuarios WHERE Correo = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            
+            pstmt.setString(1, correo);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToUsuario(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al buscar usuario por correo", e);
+        }
+        return null;
+    }
+
+    // Método de ayuda para mapear ResultSet a Usuario
     private Usuario mapRowToUsuario(ResultSet rs) throws SQLException {
         Usuario usuario = new Usuario();
         usuario.setNumEmpleado(rs.getInt("Num_Empleado"));
@@ -259,25 +275,5 @@ public class UsuarioService {
         usuario.setRespuestaRecuperacion(rs.getString("Respuesta_recuperacion"));
         usuario.setFirma(rs.getString("Firma"));
         return usuario;
-    }
-
-    // --- PEGA EL MÉTODO COMPLETO AQUÍ ---
-    public Usuario buscarUsuarioPorCorreo(String correo) {
-        String sql = "SELECT * FROM usuarios WHERE Correo = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            
-            pstmt.setString(1, correo);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    // Reutilizamos el método de mapeo que ya tienes
-                    return mapRowToUsuario(rs); 
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error al buscar usuario por correo", e);
-        }
-        return null; // Retorna null si no se encuentra el usuario
     }
 }

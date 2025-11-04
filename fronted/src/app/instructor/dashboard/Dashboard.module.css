@@ -1,427 +1,459 @@
-.container {
-    background-color: #f9fafb;
+/* app/instructor/InstructorDashboard.module.css */
+.pageContainer {
+    background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
     min-height: 100vh;
+    padding: 0;
     font-family: 'Inter', sans-serif;
 }
 
+/* Header */
 .header {
-    background-color: #181143;
-    padding: 1.25rem 2.5rem;
-    border-bottom: 1px solid #e5e7eb;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: rgba(0, 31, 63, 0.95);
+    color: white;
+    padding: 1.5rem 2.5rem;
+    border-bottom: 3px solid #28a745;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.titleSection h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
     color: white;
 }
 
-.userInfo h1 {
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: 700;
+.titleSection p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1rem;
+    color: #e0e0e0;
 }
 
-.userInfo p {
-    margin: 0.25rem 0 0 0;
-    opacity: 0.9;
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .logo {
-    text-align: right;
+    height: 80px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.logo h2 {
-    margin: 0;
-    font-size: 2rem;
-    font-weight: 700;
-}
-
-.logo span {
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-.tabs {
-    background: white;
-    padding: 0 2.5rem;
-    border-bottom: 1px solid #e5e7eb;
+.logoText {
     display: flex;
-    gap: 0;
-    color: black;
+    flex-direction: column;
 }
 
-.tabs button {
-    padding: 1rem 2rem;
-    border: none;
-    background: none;
-    cursor: pointer;
+.logoTitle {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.logoSubtitle {
     font-size: 1rem;
+    color: #28a745;
     font-weight: 600;
-    color: #6b7280;
-    border-bottom: 3px solid transparent;
-    transition: all 0.3s ease;
-}
-
-.tabs button:hover {
-    color: #181143;
-    background-color: #f9fafb;
-}
-
-.tabs button.active {
-    color: #181143;
-    border-bottom-color: #181143;
-    background-color: #f8f9fa;
-}
-
-.btnCerrarSesion {
-    margin-left: auto;
-    background-color: #dc3545 !important;
-    color: white !important;
-    border-radius: 6px;
-    margin: 0.5rem;
-    padding: 0.75rem 1.5rem !important;
-}
-
-.btnCerrarSesion:hover {
-    background-color: #c82333 !important;
 }
 
 .mainContent {
-    max-width: 1200px;
-    margin: 0 auto;
+    background: #f8f9fa;
     padding: 2rem;
-    color: black;
+    min-height: calc(100vh - 120px);
 }
 
-.welcome {
-    text-align: center;
-    margin-bottom: 3rem;
+/* Sección de bienvenida */
+.welcomeSection {
+    margin-bottom: 2rem;
 }
 
-.welcome h2 {
-    font-size: 2.25rem;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 0.5rem;
+.welcomeCard {
+    background: linear-gradient(135deg, #001f3f 0%, #00264d 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
 }
 
-.welcome h3 {
-    font-size: 1.25rem;
-    font-weight: 400;
-    color: #6b7280;
+.welcomeIcon {
+    font-size: 3rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
 }
 
-/* Estadísticas */
-.estadisticasGrid, .resumenHonorarios {
+.welcomeText h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+}
+
+.welcomeText p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+    color: #e0e0e0;
+}
+
+/* Navegación principal */
+.navigationGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
-.tarjetaEstadistica {
+.navCard {
     background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.tarjetaEstadistica h3 {
-    font-size: 0.9rem;
-    color: #6b7280;
-    margin: 0 0 0.5rem 0;
-    font-weight: 600;
-}
-
-.tarjetaEstadistica .numero {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #181143;
-}
-
-/* Tablas */
-.tableContainer {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    margin-bottom: 2rem;
-}
-
-.tableHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.tableHeader h3 {
-    margin: 0;
-    color: #111827;
-    font-size: 1.25rem;
-}
-
-.cursosTable {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.cursosTable th,
-.cursosTable td {
-    padding: 1rem 1.5rem;
-    text-align: left;
-    border-bottom: 1px solid #f3f4f6;
-    color: black;
-}
-
-.cursosTable thead {
-    background-color: #f9fafb;
-}
-
-.cursosTable th {
-    font-size: 0.875rem;
-    font-weight: 600;
+    border-radius: 12px;
+    padding: 2rem;
+    text-decoration: none;
     color: #000000;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    cursor: pointer;
 }
 
-.cursosTable tbody tr:last-child td {
-    border-bottom: none;
-    color: black;
+.navCard:hover {
+    border-color: #001f3f;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.15);
+    text-decoration: none;
+    color: #000000;
 }
 
-/* Status */
-.status {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.8rem;
-    font-weight: 600;
+.cardIcon {
+    font-size: 2.5rem;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 12px;
+    flex-shrink: 0;
 }
 
-.activo {
-    background-color: #dcfce7;
-    color: #166534;
+.cardContent {
+    flex: 1;
 }
 
-.programado {
-    background-color: #dbeafe;
-    color: #1e40af;
+.cardContent h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #001f3f;
 }
 
-.finalizado {
-    background-color: #f3f4f6;
-    color: #4b5563;
+.cardContent p {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.4;
 }
 
-.pagado {
-    background-color: #dcfce7;
-    color: #166534;
+.cardArrow {
+    font-size: 1.5rem;
+    color: #001f3f;
+    font-weight: bold;
+    transition: transform 0.3s ease;
 }
 
-/* Selectores */
-.selectorSection {
+.navCard:hover .cardArrow {
+    transform: translateX(5px);
+}
+
+/* Sección de estadísticas */
+.statsSection {
     margin-bottom: 2rem;
 }
 
-.selectorSection label {
-    display: block;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 0.5rem;
+.statsSection h3 {
+    margin: 0 0 1.5rem 0;
+    color: #001f3f;
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
-.selector {
-    width: 100%;
-    max-width: 400px;
-    padding: 0.75rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 6px;
-    font-size: 1rem;
-    background-color: white;
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
 }
 
-.selector:focus {
-    outline: none;
-    border-color: #181143;
-}
-
-/* Botones */
-.btnGuardar, .btnInscribir {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
+.statCard {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     transition: all 0.3s ease;
 }
 
-.btnGuardar {
-    background: #181143;
-    color: white;
+.statCard:hover {
+    border-color: #001f3f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 31, 63, 0.15);
 }
 
-.btnGuardar:hover:not(:disabled) {
-    background: #0f0a2d;
+.statIcon {
+    font-size: 2rem;
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 10px;
+    flex-shrink: 0;
 }
 
-.btnGuardar:disabled {
-    background: #6b7280;
-    cursor: not-allowed;
+.statInfo {
+    display: flex;
+    flex-direction: column;
 }
 
-.btnInscribir {
-    background: #28a745;
-    color: white;
-    padding: 0.5rem 1rem;
+.statNumber {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #001f3f;
+    line-height: 1;
+}
+
+.statLabel {
     font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+    margin-top: 0.25rem;
 }
 
-.btnInscribir:hover:not(:disabled) {
-    background: #218838;
+/* Sección de próximos cursos - MEJORADA */
+.upcomingSection {
+    margin-bottom: 2rem;
 }
 
-.btnInscribir:disabled {
-    background: #6b7280;
-    cursor: not-allowed;
+.sectionHeader {
+    margin-bottom: 1.5rem;
 }
 
-/* Evidencia */
-.uploadSection {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-}
-
-.uploadArea {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.fileInput {
-    width: 100%;
-    margin: 1rem 0;
-    padding: 1rem;
-    border: 2px dashed #d1d5db;
-    border-radius: 6px;
-    background: #f9fafb;
-}
-
-.fileList {
-    margin: 1rem 0;
-}
-
-.fileItem {
-    padding: 0.5rem;
-    background: #f3f4f6;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.archivosSubidos {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.archivosGrid {
-    display: grid;
+.sectionHeader h3 {
+    margin: 0 0 0.5rem 0;
+    color: #001f3f;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
 }
 
-.archivoItem {
-    padding: 1rem;
-    background: #f9fafb;
-    border-radius: 6px;
-    border: 1px solid #e5e7eb;
-}
-
-.archivoItem span {
-    font-weight: 600;
-    display: block;
-}
-
-.archivoItem small {
-    color: #6b7280;
-}
-
-/* Evaluaciones */
-.calificacionInput {
-    width: 80px;
-    padding: 0.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 0.9rem;
-}
-
-.observacionesInput {
-    width: 200px;
-    padding: 0.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 0.9rem;
-}
-
-.promedio {
-    font-weight: 600;
-    color: #181143;
+.sectionHeader p {
+    margin: 0;
+    color: #666;
     font-size: 1rem;
 }
 
-.resultado {
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.8rem;
+.upcomingGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.cursoCard {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cursoCard:hover {
+    border-color: #001f3f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 31, 63, 0.15);
+}
+
+.cursoHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.cursoTitulo {
+    margin: 0;
+    color: #001f3f;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    flex: 1;
+}
+
+.cursoEstado {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
-.apto {
-    background-color: #dcfce7;
-    color: #166534;
+.estadoConfirmado {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
-.noApto {
-    background-color: #f8d7da;
-    color: #721c24;
+.estadoProgramado {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #c3dafe;
 }
 
-/* Notas importantes para evaluaciones */
-.notasImportantes {
-    background: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: 6px;
-    padding: 1rem;
-    margin: 1rem 1.5rem;
-    font-size: 0.9rem;
+.estadoPendiente {
+    background-color: #fff3cd;
     color: #856404;
+    border: 1px solid #ffeaa7;
 }
 
-.notasImportantes p {
-    margin: 0.25rem 0;
+.cursoInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-/* Ajustes para la tabla de evaluaciones */
-.vistaEvaluaciones .cursosTable th,
-.vistaEvaluaciones .cursosTable td {
-    padding: 0.75rem 1rem;
-    font-size: 0.9rem;
+.infoRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
 }
 
-.asistencia {
+.infoIcon {
+    font-size: 1.1rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.infoContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex: 1;
+}
+
+.infoContent strong {
+    color: #001f3f;
+    font-size: 0.95rem;
     font-weight: 600;
-    color: #059669;
 }
 
-.curpCell {
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
+.infoContent span {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+.cursoActions {
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.btnPreparar {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    text-decoration: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+}
+
+.btnPreparar:hover {
+    background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    text-decoration: none;
+    color: white;
+}
+
+/* Estado cuando no hay cursos */
+.noCursos {
+    background: white;
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px dashed #e9ecef;
+}
+
+.noCursosIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.noCursos h4 {
+    margin: 0 0 0.5rem 0;
+    color: #001f3f;
+    font-size: 1.3rem;
+}
+
+.noCursos p {
+    margin: 0;
+    color: #666;
+    font-size: 1rem;
+}
+
+/* Sección de acciones */
+.actionsSection {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.logoutButton {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logoutButton:hover {
+    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+.logoutIcon {
+    font-size: 1.2rem;
 }
 
 /* Notificaciones */
@@ -511,75 +543,6 @@
     to { width: 0%; }
 }
 
-/* Modal */
-.modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 20px;
-    backdrop-filter: blur(5px);
-}
-
-.confirmModal {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    max-width: 400px;
-    width: 90%;
-    text-align: center;
-}
-
-.confirmModal h3 {
-    margin: 0 0 1rem 0;
-    color: #000000;
-}
-
-.confirmModal p {
-    margin: 0 0 2rem 0;
-    color: #000000;
-}
-
-.modalButtons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.btnEliminar {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btnEliminar:hover {
-    background: #c82333;
-}
-
-.btnCancelar {
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btnCancelar:hover {
-    background: #5a6268;
-}
-
 /* Loading */
 .loading {
     display: flex;
@@ -587,11 +550,12 @@
     align-items: center;
     justify-content: center;
     height: 50vh;
+    color: white;
 }
 
 .spinner {
     border: 4px solid #f3f4f6;
-    border-left: 4px solid #181143;
+    border-left: 4px solid #ffffff;
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -605,385 +569,190 @@
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+    .navigationGrid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
 @media (max-width: 768px) {
+    .pageContainer {
+        padding: 0;
+    }
+    
     .header {
         flex-direction: column;
         text-align: center;
         gap: 1rem;
-    }
-    
-    .tabs {
-        flex-wrap: wrap;
-        padding: 0 1rem;
-    }
-    
-    .tabs button {
-        flex: 1;
-        min-width: 120px;
-    }
-    
-    .uploadSection {
-        grid-template-columns: 1fr;
-    }
-    
-    .tableHeader {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
+        padding: 1rem;
     }
     
     .mainContent {
         padding: 1rem;
     }
     
-    /* Ajustes responsive para evaluaciones */
-    .vistaEvaluaciones .cursosTable {
-        font-size: 0.8rem;
+    .welcomeCard {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
     }
     
-    .calificacionInput {
-        width: 60px;
-        font-size: 0.8rem;
+    .welcomeIcon {
+        font-size: 2.5rem;
+        padding: 0.75rem;
     }
     
-    .observacionesInput {
-        width: 120px;
-        font-size: 0.8rem;
+    .welcomeText h2 {
+        font-size: 1.5rem;
     }
     
-    .notasImportantes {
-        margin: 1rem;
-        font-size: 0.8rem;
-    }
-
-    /* Estilos adicionales para el sistema de calificaciones */
-    .accionesHeader {
-        display: flex;
-        align-items: center;
+    .navigationGrid {
+        grid-template-columns: 1fr;
         gap: 1rem;
     }
-
-    .contadorCambios {
-        color: #dc3545;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .filaConCambios {
-        background-color: #fff3cd !important;
-        border-left: 4px solid #ffc107;
-    }
-
-    .indicatorCambios {
-        color: #dc3545;
-        font-weight: bold;
-        margin-left: 4px;
-    }
-
-    /* Mejoras para los inputs de calificación */
-    .calificacionInput:focus {
-        border-color: #181143;
-        box-shadow: 0 0 0 2px rgba(24, 17, 67, 0.1);
-        outline: none;
-    }
-
-    .calificacionInput:invalid {
-        border-color: #dc3545;
-    }
-
-    .observacionesInput:focus {
-        border-color: #181143;
-        box-shadow: 0 0 0 2px rgba(24, 17, 67, 0.1);
-        outline: none;
-    }
-
-    /* Estados de los botones */
-    .btnInscribir:disabled {
-        background-color: #6c757d;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-
-    .btnGuardar:disabled {
-        background-color: #6c757d;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-
-    /* Mejoras visuales para la tabla de evaluaciones */
-    .vistaEvaluaciones .cursosTable tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-
-    .vistaEvaluaciones .cursosTable tbody tr.filaConCambios:hover {
-        background-color: #ffeaa7;
-    }
-
-    /* Estilos específicos para el formulario de calificaciones */
-    .formularioHeader {
-        text-align: center;
-        margin-bottom: 2rem;
+    
+    .navCard {
         padding: 1.5rem;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    
+    .cardIcon {
+        font-size: 2rem;
+        padding: 0.75rem;
+    }
+    
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .statCard {
+        padding: 1.25rem;
+    }
+    
+    .statIcon {
+        font-size: 1.5rem;
+        padding: 0.5rem;
+    }
+    
+    .statNumber {
+        font-size: 1.5rem;
+    }
+    
+    /* Responsive para próximos cursos */
+    .upcomingGrid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .cursoCard {
+        padding: 1.25rem;
+    }
+    
+    .cursoHeader {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .cursoTitulo {
+        font-size: 1.1rem;
+    }
+    
+    .cursoEstado {
+        align-self: flex-start;
+    }
+    
+    .infoRow {
+        gap: 0.5rem;
+    }
+    
+    .infoContent strong {
+        font-size: 0.9rem;
+    }
+    
+    .infoContent span {
+        font-size: 0.85rem;
+    }
+    
+    .btnPreparar {
+        width: 100%;
+        justify-content: center;
+    }
+}
 
-    .formularioHeader h2 {
+@media (max-width: 480px) {
+    .titleSection h1 {
         font-size: 1.8rem;
-        font-weight: 700;
-        color: #181143;
-        margin-bottom: 0.5rem;
     }
-
-    .empresaInfo h3 {
-        font-size: 1.4rem;
-        font-weight: 600;
-        color: #333;
-        margin: 0;
+    
+    .logo {
+        height: 60px;
     }
-
-    /* Estilos para la tabla de evaluaciones */
-    .vistaEvaluaciones .cursosTable th {
-        background-color: #181143;
-        color: white;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        padding: 0.75rem 0.5rem;
-        text-align: center;
+    
+    .logoTitle {
+        font-size: 1.5rem;
     }
-
-    .vistaEvaluaciones .cursosTable td {
-        padding: 0.75rem 0.5rem;
-        text-align: center;
-        vertical-align: middle;
+    
+    .welcomeCard {
+        padding: 1.25rem;
     }
-
-    /* Botón de guardar individual */
-    .btnGuardarIndividual {
-        background: #28a745;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        font-weight: 600;
-        font-size: 0.8rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
+    
+    .welcomeText h2 {
+        font-size: 1.3rem;
     }
-
-    .btnGuardarIndividual:hover:not(:disabled) {
-        background: #218838;
-        transform: translateY(-1px);
-    }
-
-    .btnGuardarIndividual:disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-
-    /* Inputs de calificación */
-    .calificacionInput {
-        width: 70px;
-        padding: 0.5rem;
-        border: 1px solid #d1d5db;
-        border-radius: 4px;
-        text-align: center;
-        font-size: 0.9rem;
-        margin: 0 auto;
-        display: block;
-    }
-
-    .observacionesInput {
-        width: 180px;
-        padding: 0.5rem;
-        border: 1px solid #d1d5db;
-        border-radius: 4px;
-        font-size: 0.9rem;
-    }
-
-    /* Promedio y resultado */
-    .promedio {
-        font-weight: 700;
-        color: #181143;
+    
+    .welcomeText p {
         font-size: 1rem;
     }
-
-    .resultado {
-        padding: 0.3rem 0.8rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-transform: uppercase;
+    
+    .navCard {
+        padding: 1.25rem;
+        gap: 1rem;
     }
-
-    .apto {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
+    
+    .cardContent h3 {
+        font-size: 1.1rem;
     }
-
-    .noApto {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-
-    /* Notas importantes */
-    .notasImportantes {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 6px;
-        padding: 1rem;
-        margin: 1rem 1.5rem;
-        font-size: 0.85rem;
-        color: #856404;
-        line-height: 1.4;
-    }
-
-    .notasImportantes p {
-        margin: 0.2rem 0;
-        font-weight: 500;
-    }
-
-    /* Indicadores de cambios */
-    .filaConCambios {
-        background-color: #fff3cd !important;
-        border-left: 4px solid #ffc107;
-    }
-
-    .indicatorCambios {
-        color: #dc3545;
-        font-weight: bold;
-        margin-left: 4px;
-    }
-
-    .contadorCambios {
-        color: #dc3545;
-        font-weight: 600;
+    
+    .cardContent p {
         font-size: 0.9rem;
     }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .formularioHeader h2 {
-            font-size: 1.4rem;
-        }
-        
-        .empresaInfo h3 {
-            font-size: 1.2rem;
-        }
-        
-        .vistaEvaluaciones .cursosTable {
-            font-size: 0.7rem;
-        }
-        
-        .calificacionInput {
-            width: 60px;
-            font-size: 0.8rem;
-        }
-        
-        .observacionesInput {
-            width: 120px;
-            font-size: 0.8rem;
-        }
-        
-        .btnGuardarIndividual {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.7rem;
-        }
+    
+    .statsGrid {
+        grid-template-columns: 1fr;
     }
-    /* Estilos mejorados para inputs de calificación */
-.calificacionInput {
-    width: 70px;
-    padding: 0.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 0.9rem;
-    margin: 0 auto;
-    display: block;
-    transition: all 0.3s ease;
-}
-
-.calificacionInput:focus {
-    border-color: #181143;
-    box-shadow: 0 0 0 2px rgba(24, 17, 67, 0.1);
-    outline: none;
-}
-
-.calificacionInput:invalid {
-    border-color: #dc3545;
-    background-color: #f8d7da;
-}
-
-.calificacionInput:out-of-range {
-    border-color: #dc3545;
-    background-color: #f8d7da;
-}
-
-.observacionesInput {
-    width: 180px;
-    padding: 0.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.observacionesInput:focus {
-    border-color: #181143;
-    box-shadow: 0 0 0 2px rgba(24, 17, 67, 0.1);
-    outline: none;
-}
-
-/* Mejoras para el estado de las calificaciones guardadas */
-.filaCalificada {
-    background-color: #f8f9fa !important;
-}
-
-.filaCalificada td {
-    opacity: 0.9;
-}
-
-/* Tooltip para botones deshabilitados */
-.btnGuardarIndividual:disabled {
-    position: relative;
-}
-
-.btnGuardarIndividual:disabled:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    color: white;
-    padding: 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    z-index: 1000;
-}
-
-/* Indicadores de validación */
-.input-error {
-    border-color: #dc3545 !important;
-    background-color: #f8d7da !important;
-}
-
-.input-warning {
-    border-color: #ffc107 !important;
-    background-color: #fff3cd !important;
-}
-
-/* Mensajes de validación */
-.validation-message {
-    font-size: 0.7rem;
-    color: #dc3545;
-    margin-top: 0.25rem;
-    display: block;
-}
+    
+    .statsSection h3 {
+        font-size: 1.3rem;
+    }
+    
+    /* Responsive para próximos cursos en móviles pequeños */
+    .sectionHeader h3 {
+        font-size: 1.3rem;
+    }
+    
+    .cursoCard {
+        padding: 1rem;
+    }
+    
+    .cursoTitulo {
+        font-size: 1rem;
+    }
+    
+    .noCursos {
+        padding: 2rem;
+    }
+    
+    .noCursosIcon {
+        font-size: 2.5rem;
+    }
+    
+    .noCursos h4 {
+        font-size: 1.1rem;
+    }
+    
+    .logoutButton {
+        padding: 0.875rem 1.75rem;
+        font-size: 0.95rem;
+    }
 }

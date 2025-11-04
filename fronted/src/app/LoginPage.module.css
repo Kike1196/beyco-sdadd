@@ -1,112 +1,171 @@
-.container {
+/* app/LoginPage.module.css */
+.pageContainer {
+    background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+    min-height: 100vh;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header con azul oscuro */
+.header {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, hsl(223, 70%, 77%) 0%, #0d05a7 100%);
-    padding: 20px;
-    position: relative;
+    background: rgba(0, 31, 63, 0.95);
+    color: white;
+    padding: 1.5rem 2.5rem;
+    border-bottom: 3px solid #28a745;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.loginBox {
-    padding: 60px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
-    color: #333;
-    position: relative;
-    z-index: 1;
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .logo {
-    width: 200px;
-    margin-bottom: 25px;
+    height: 100px;
     border-radius: 8px;
-    border-color: #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Usa una clase en lugar del selector h1 directo */
-.title {
-    color: #003366;
-    margin-bottom: 30px;
-    font-size: 28px;
+.logoText {
+    display: flex;
+    flex-direction: column;
+}
+
+.logoTitle {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.logoSubtitle {
+    font-size: 1.2rem;
+    color: #28a745;
     font-weight: 600;
+}
+
+.mainContent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 120px);
+    padding: 2rem;
+}
+
+/* Tarjeta de login */
+.loginContainer {
+    width: 100%;
+    max-width: 450px;
+}
+
+.loginCard {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.3);
+    padding: 3rem;
+    border: 2px solid #e9ecef;
+}
+
+.loginHeader {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.loginTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #001f3f;
+    margin: 0 0 0.5rem 0;
+}
+
+.loginSubtitle {
+    color: #666;
+    font-size: 1rem;
+    margin: 0;
+    opacity: 0.8;
+}
+
+/* Formulario */
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .inputGroup {
-    text-align: left;
-    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
 }
 
-.inputGroup label {
-    display: block;
-    margin-bottom: 8px;
+.inputLabel {
     font-weight: 600;
-    color: #003366;
-    font-size: 14px;
+    color: #001f3f;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
 }
 
-.inputGroup input {
-    width: 100%;
-    padding: 14px;
-    border: 2px solid #e1e5e9;
+.formInput {
+    padding: 1rem;
+    border: 2px solid #e9ecef;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 1rem;
+    color: #000000;
+    background: white;
     transition: all 0.3s ease;
-    box-sizing: border-box;
+    font-family: inherit;
 }
 
-.inputGroup input:focus {
+.formInput:focus {
     outline: none;
-    border-color: #003366;
-    box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+    border-color: #001f3f;
+    box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
 }
 
-.inputGroup input::placeholder {
-    color: #a0a4a8;
+.formInput::placeholder {
+    color: #999;
 }
 
+/* Botón de login */
 .loginButton {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #003366, #004080);
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
     border: none;
+    padding: 1.25rem 2rem;
     border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
     cursor: pointer;
-    margin-bottom: 25px;
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    margin-top: 0.5rem;
 }
 
 .loginButton:hover:not(:disabled) {
-    background: linear-gradient(135deg, #004080, #00509e);
+    background: linear-gradient(135deg, #218838 0%, #1e9c7a 100%);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 51, 102, 0.3);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
 }
 
 .loginButton:disabled {
-    background: #a0a4a8;
+    background: #6c757d;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
 }
 
 .loadingText {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 0.75rem;
 }
 
 .spinner {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border: 2px solid transparent;
     border-top: 2px solid white;
     border-radius: 50%;
@@ -118,27 +177,70 @@
     100% { transform: rotate(360deg); }
 }
 
+/* Footer del login */
+.loginFooter {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
 .forgotPassword {
-    color: #003366;
+    color: #001f3f;
     text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
 }
 
 .forgotPassword:hover {
-    color: #004080;
+    color: #28a745;
     text-decoration: underline;
+}
+
+/* Información de desarrollo */
+.devInfo {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.devTitle {
+    font-weight: 600;
+    color: #001f3f;
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.devCredentials {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.credentialItem {
+    font-size: 0.8rem;
+    color: #666;
+    text-align: center;
+}
+
+.credentialItem strong {
+    color: #001f3f;
 }
 
 /* Sistema de Notificaciones */
 .notification {
-    position: fixed;
-    top: 20px;
-    left: 800px;
+    position: fixed;            /* Fijo en la pantalla */
+    top: 150px;                  /* Separación desde la parte superior */
+    left: 50%;                  /* Punto medio horizontal */
+    transform: translateX(-50%); /* Centrado horizontal */
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    min-width: 300px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    min-width: 350px;
     max-width: 400px;
     z-index: 1000;
     animation: slideIn 0.3s ease-out;
@@ -147,77 +249,79 @@
 }
 
 .notificationSuccess {
-    border-left-color: #10b981;
+    border-left-color: #28a745;
 }
 
 .notificationError {
-    border-left-color: #ef4444;
+    border-left-color: #dc3545;
 }
 
 .notificationWarning {
-    border-left-color: #f59e0b;
+    border-left-color: #ffc107;
 }
 
 .notificationContent {
     display: flex;
     align-items: center;
-    padding: 16px;
-    gap: 12px;
+    padding: 1.25rem;
+    gap: 1rem;
 }
 
 .notificationIcon {
-    font-size: 20px;
+    font-size: 1.25rem;
     font-weight: bold;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 100%;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .notificationSuccess .notificationIcon {
-    background: #10b981;
+    background: #28a745;
     color: white;
 }
 
 .notificationError .notificationIcon {
-    background: #ef4444;
+    background: #dc3545;
     color: white;
 }
 
 .notificationWarning .notificationIcon {
-    background: #f59e0b;
-    color: white;
+    background: #ffc107;
+    color: #000000;
 }
 
 .notificationMessage {
     flex: 1;
-    color: #374151;
+    color: #000000;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 0.95rem;
     line-height: 1.4;
 }
 
 .notificationClose {
     background: none;
     border: none;
-    font-size: 20px;
-    color: #9ca3af;
+    font-size: 1.5rem;
+    color: #6c757d;
     cursor: pointer;
     padding: 0;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 4px;
     transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .notificationClose:hover {
-    background: #f3f4f6;
-    color: #374151;
+    background: #f8f9fa;
+    color: #000000;
 }
 
 .notificationProgress {
@@ -228,15 +332,15 @@
 }
 
 .notificationSuccess .notificationProgress {
-    background: #10b981;
+    background: #28a745;
 }
 
 .notificationError .notificationProgress {
-    background: #ef4444;
+    background: #dc3545;
 }
 
 .notificationWarning .notificationProgress {
-    background: #f59e0b;
+    background: #ffc107;
 }
 
 @keyframes slideIn {
@@ -260,31 +364,74 @@
 }
 
 /* Responsive */
-@media (max-width: 480px) {
-    .loginBox {
-        padding: 30px 20px;
-        margin: 20px;
+@media (max-width: 768px) {
+    .pageContainer {
+        padding: 0;
+    }
+    
+    .header {
+        padding: 1rem;
+    }
+    
+    .logo {
+        height: 100px;
+    }
+    
+    .logoTitle {
+        font-size: 2rem;
+    }
+    
+    .logoSubtitle {
+        font-size: 1rem;
+    }
+    
+    .mainContent {
+        padding: 1rem;
+    }
+    
+    .loginCard {
+        padding: 2rem;
+    }
+    
+    .loginTitle {
+        font-size: 1.75rem;
     }
     
     .notification {
-        left: 20px;
-        right: 20px;
+        right: 1rem;
+        left: 1rem;
         min-width: auto;
+        top: 100px;
     }
+}
 
-    /* Asegurar que no haya estilos de validación del navegador */
-    .inputGroup input:invalid {
-        box-shadow: none;
-        border-color: #e1e5e9;
+@media (max-width: 480px) {
+    .loginCard {
+        padding: 1.5rem;
     }
-
-    .inputGroup input:focus:invalid {
-        box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
-        border-color: #003366;
+    
+    .loginTitle {
+        font-size: 1.5rem;
     }
-
-    /* Remover cualquier indicador de validación nativo */
-    .inputGroup input::-webkit-validation-bubble-message {
-        display: none;
+    
+    .loginSubtitle {
+        font-size: 0.9rem;
+    }
+    
+    .formInput {
+        padding: 0.875rem;
+    }
+    
+    .loginButton {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .devInfo {
+        padding: 1rem;
+    }
+    
+    .credentialItem {
+        font-size: 0.75rem;
     }
 }

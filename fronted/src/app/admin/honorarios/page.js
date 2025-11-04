@@ -14,17 +14,47 @@ export default function HonorariosPage() {
     const [fechaFin, setFechaFin] = useState('');
     const [cargando, setCargando] = useState(false);
 
-    // Cargar instructores al iniciar
+    // Cargar instructores al iniciar y establecer fechas por defecto
     useEffect(() => {
         cargarInstructores();
-        // Establecer fechas por defecto (últimos 15 días)
-        const hoy = new Date();
-        const hace15Dias = new Date();
-        hace15Dias.setDate(hoy.getDate() - 15);
-        
-        setFechaInicio(hace15Dias.toISOString().split('T')[0]);
-        setFechaFin(hoy.toISOString().split('T')[0]);
+        aplicarPeriodo('quincenal'); // Establecer período quincenal por defecto
     }, []);
+
+    // Aplicar período automáticamente cuando cambie
+    useEffect(() => {
+        if (periodo) {
+            aplicarPeriodo(periodo);
+        }
+    }, [periodo]);
+
+    // Función para aplicar el período seleccionado
+    const aplicarPeriodo = (tipoPeriodo) => {
+        const hoy = new Date();
+        let fechaInicioPeriodo = new Date();
+        
+        switch (tipoPeriodo) {
+            case 'semanal':
+                fechaInicioPeriodo.setDate(hoy.getDate() - 7);
+                break;
+            case 'quincenal':
+                fechaInicioPeriodo.setDate(hoy.getDate() - 15);
+                break;
+            case 'mensual':
+                fechaInicioPeriodo.setMonth(hoy.getMonth() - 1);
+                break;
+            default:
+                fechaInicioPeriodo.setDate(hoy.getDate() - 15);
+        }
+        
+        setFechaInicio(fechaInicioPeriodo.toISOString().split('T')[0]);
+        setFechaFin(hoy.toISOString().split('T')[0]);
+    };
+
+    // Manejar cambio de período
+    const handlePeriodoChange = (nuevoPeriodo) => {
+        setPeriodo(nuevoPeriodo);
+        // Las fechas se actualizarán automáticamente por el useEffect
+    };
 
     // Cargar lista de instructores
     const cargarInstructores = async () => {
@@ -65,6 +95,7 @@ export default function HonorariosPage() {
             setCargando(true);
             console.log('🔍 Buscando cursos para instructor:', instructorId);
             console.log('📅 Fechas:', fechaInicio, 'a', fechaFin);
+            console.log('📆 Período:', periodo);
             
             const url = `/api/honorarios/instructor/${instructorId}/cursos-pendientes?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
             console.log('🌐 URL de la petición:', url);
@@ -142,7 +173,7 @@ export default function HonorariosPage() {
         window.open('/admin/honorarios/recibo', '_blank');
     };
 
-    // Actualizar datos cuando cambien las fechas
+    // Actualizar datos cuando cambien las fechas manualmente
     const actualizarDatos = async () => {
         if (instructorSeleccionado && fechaInicio && fechaFin) {
             await handleInstructorChange({ 
@@ -151,169 +182,344 @@ export default function HonorariosPage() {
         }
     };
 
+    // Obtener descripción del período
+    const getDescripcionPeriodo = () => {
+        switch (periodo) {
+            case 'semanal':
+                return 'Última semana';
+            case 'quincenal':
+                return 'Última quincena';
+            case 'mensual':
+                return 'Último mes';
+            default:
+                return 'Período personalizado';
+        }
+    };
+
     return (
-        <div className={styles.container}>
+        <div className={styles.pageContainer}>
+            {/* Header con azul oscuro */}
             <header className={styles.header}>
-                <Link href="/admin" className={styles.backButton}>
-                    ← Volver 
-                </Link>
-                <h1>Honorarios de Instructores</h1>
+                <div className={styles.titleSection}>
+                    <h1>Generación de Recibos</h1>
+                    <p>Selecciona un instructor y período para generar el recibo de honorarios</p>
+                </div>
+                <div className={styles.logoSection}>
+                    <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
+                    <div className={styles.logoText}>
+                        <span className={styles.logoTitle}>BEYCO</span>
+                        <span className={styles.logoSubtitle}>Consultores</span>
+                    </div>
+                </div>
             </header>
 
-            <div className={styles.content}>
-                {/* Panel de Selección */}
-                <div className={styles.searchPanel}>
-                    <h2>Seleccionar Instructor</h2>
-                    
-                    <div className={styles.selectContainer}>
-                        <select 
-                            onChange={handleInstructorChange}
-                            className={styles.instructorSelect}
+            <main className={styles.mainContent}>
+                {/* Controles principales */}
+                <div className={styles.controls}>
+                    <div className={styles.controlsLeft}>
+                        <Link href="/admin" className={styles.btnAtras}>
+                            ← Volver 
+                        </Link>
+                    </div>
+                    <div className={styles.controlsRight}>
+                        <button 
+                            onClick={cargarInstructores}
+                            className={styles.btnActualizar}
                             disabled={cargando}
                         >
-                            <option value="0">
-                                {cargando ? 'Cargando...' : 'Seleccionar instructor'}
-                            </option>
-                            {instructores.map(instructor => (
-                                <option 
-                                    key={instructor.numEmpleado} 
-                                    value={instructor.numEmpleado}
-                                >
-                                    {instructor.nombre} {instructor.apellidoPaterno} {instructor.apellidoMaterno}
+                            🔄 Actualizar
+                        </button>
+                    </div>
+                </div>
+
+                {/* Contenido principal */}
+                <div className={styles.contentGrid}>
+                    {/* Panel de selección */}
+                    <div className={styles.selectionPanel}>
+                        <div className={styles.panelHeader}>
+                            <h2>Seleccionar Instructor</h2>
+                            <div className={styles.headerDivider}></div>
+                        </div>
+                        
+                        <div className={styles.selectContainer}>
+                            <label className={styles.selectLabel}>Instructor:</label>
+                            <select 
+                                onChange={handleInstructorChange}
+                                className={styles.instructorSelect}
+                                disabled={cargando}
+                            >
+                                <option value="0">
+                                    {cargando ? '⏳ Cargando instructores...' : '👨‍🏫 Seleccionar instructor'}
                                 </option>
-                            ))}
-                        </select>
+                                {instructores.map(instructor => (
+                                    <option 
+                                        key={instructor.numEmpleado} 
+                                        value={instructor.numEmpleado}
+                                    >
+                                        {instructor.nombre} {instructor.apellidoPaterno} {instructor.apellidoMaterno}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Información del instructor seleccionado */}
+                        {instructorSeleccionado && (
+                            <div className={styles.instructorCard}>
+                                <div className={styles.cardHeader}>
+                                    <h3>Información del Instructor</h3>
+                                    <div className={styles.statusIndicator}></div>
+                                </div>
+                                <div className={styles.instructorInfo}>
+                                    <div className={styles.infoRow}>
+                                        <span className={styles.infoLabel}>Nombre:</span>
+                                        <span className={styles.infoValue}>{instructorSeleccionado.instructorNombre}</span>
+                                    </div>
+                                    <div className={styles.infoRow}>
+                                        <span className={styles.infoLabel}>Email:</span>
+                                        <span className={styles.infoValue}>{instructorSeleccionado.instructorEmail}</span>
+                                    </div>
+                                    <div className={styles.infoRow}>
+                                        <span className={styles.infoLabel}>Período:</span>
+                                        <span className={styles.infoValue}>{getDescripcionPeriodo()}</span>
+                                    </div>
+                                    <div className={styles.infoRow}>
+                                        <span className={styles.infoLabel}>Cursos pendientes:</span>
+                                        <span className={styles.infoValue}>{cursosPendientes.length}</span>
+                                    </div>
+                                    <div className={styles.infoRow}>
+                                        <span className={styles.infoLabel}>Total pendiente:</span>
+                                        <span className={styles.infoValueHighlight}>${totalPagar.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Estadísticas rápidas */}
+                        <div className={styles.statsCard}>
+                            <div className={styles.statItem}>
+                                <span className={styles.statNumber}>{instructores.length}</span>
+                                <span className={styles.statLabel}>Instructores</span>
+                            </div>
+                            <div className={styles.statItem}>
+                                <span className={styles.statNumber}>
+                                    {instructores.reduce((total, instructor) => total + (instructor.cursosCount || 0), 0)}
+                                </span>
+                                <span className={styles.statLabel}>Total Cursos</span>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Información del instructor seleccionado */}
-                    {instructorSeleccionado && (
-                        <div className={styles.instructorInfo}>
-                            <h3>Información del Instructor</h3>
-                            <p><strong>Nombre:</strong> {instructorSeleccionado.instructorNombre}</p>
-                            <p><strong>Email:</strong> {instructorSeleccionado.instructorEmail}</p>
-                            <p><strong>Total pendiente:</strong> ${totalPagar.toFixed(2)}</p>
-                            <p><strong>Cursos pendientes:</strong> {cursosPendientes.length}</p>
-                        </div>
-                    )}
+                    {/* Panel de detalles */}
+                    <div className={styles.detailsPanel}>
+                        {instructorSeleccionado ? (
+                            <>
+                                {/* Encabezado del instructor */}
+                                <div className={styles.instructorHeader}>
+                                    <div className={styles.instructorTitle}>
+                                        <h2>{instructorSeleccionado.instructorNombre}</h2>
+                                        <p>{instructorSeleccionado.instructorEmail}</p>
+                                        <div className={styles.periodoInfo}>
+                                            <span className={styles.periodoBadge}>{getDescripcionPeriodo()}</span>
+                                            <span className={styles.fechasInfo}>
+                                                {new Date(fechaInicio).toLocaleDateString('es-ES')} - {new Date(fechaFin).toLocaleDateString('es-ES')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className={styles.instructorStats}>
+                                        <div className={styles.statBadge}>
+                                            <span className={styles.statBadgeNumber}>{cursosPendientes.length}</span>
+                                            <span className={styles.statBadgeLabel}>Cursos</span>
+                                        </div>
+                                        <div className={styles.statBadge}>
+                                            <span className={styles.statBadgeNumber}>
+                                                {cursosPendientes.reduce((sum, curso) => sum + (curso.horasImpartidas || 0), 0)}
+                                            </span>
+                                            <span className={styles.statBadgeLabel}>Horas</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Configuración de Periodo */}
+                                <div className={styles.configSection}>
+                                    <h3>Configuración del Período</h3>
+                                    <div className={styles.configGrid}>
+                                        <div className={styles.periodoOptions}>
+                                            <label className={styles.optionLabel}>
+                                                <input
+                                                    type="radio"
+                                                    value="semanal"
+                                                    checked={periodo === 'semanal'}
+                                                    onChange={(e) => handlePeriodoChange(e.target.value)}
+                                                />
+                                                <span className={styles.optionText}>
+                                                    Semanal
+                                                    <span className={styles.optionDescription}>(Últimos 7 días)</span>
+                                                </span>
+                                            </label>
+                                            <label className={styles.optionLabel}>
+                                                <input
+                                                    type="radio"
+                                                    value="quincenal"
+                                                    checked={periodo === 'quincenal'}
+                                                    onChange={(e) => handlePeriodoChange(e.target.value)}
+                                                />
+                                                <span className={styles.optionText}>
+                                                    Quincenal
+                                                    <span className={styles.optionDescription}>(Últimos 15 días)</span>
+                                                </span>
+                                            </label>
+                                            <label className={styles.optionLabel}>
+                                                <input
+                                                    type="radio"
+                                                    value="mensual"
+                                                    checked={periodo === 'mensual'}
+                                                    onChange={(e) => handlePeriodoChange(e.target.value)}
+                                                />
+                                                <span className={styles.optionText}>
+                                                    Mensual
+                                                    <span className={styles.optionDescription}>(Últimos 30 días)</span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                        
+                                        <div className={styles.fechasContainer}>
+                                            <div className={styles.fechaInput}>
+                                                <label className={styles.fechaLabel}>Fecha Inicio</label>
+                                                <input
+                                                    type="date"
+                                                    value={fechaInicio}
+                                                    onChange={(e) => setFechaInicio(e.target.value)}
+                                                    onBlur={actualizarDatos}
+                                                    className={styles.fechaField}
+                                                />
+                                            </div>
+                                            <div className={styles.fechaInput}>
+                                                <label className={styles.fechaLabel}>Fecha Fin</label>
+                                                <input
+                                                    type="date"
+                                                    value={fechaFin}
+                                                    onChange={(e) => setFechaFin(e.target.value)}
+                                                    onBlur={actualizarDatos}
+                                                    className={styles.fechaField}
+                                                />
+                                            </div>
+                                            <div className={styles.fechaActions}>
+                                                <button 
+                                                    onClick={actualizarDatos}
+                                                    className={styles.btnAplicarFechas}
+                                                    disabled={cargando}
+                                                >
+                                                    {cargando ? '⏳' : '↻'} Aplicar Fechas
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Lista de Cursos Pendientes */}
+                                <div className={styles.cursosSection}>
+                                    <div className={styles.sectionHeader}>
+                                        <h3>Pagos Pendientes</h3>
+                                        <span className={styles.counterBadge}>{cursosPendientes.length}</span>
+                                    </div>
+                                    
+                                    {cursosPendientes.length > 0 ? (
+                                        <div className={styles.tableContainer}>
+                                            <table className={styles.cursosTable}>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Curso</th>
+                                                        <th>Fecha</th>
+                                                        <th>Horas</th>
+                                                        <th>Monto</th>
+                                                        <th>Estatus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {cursosPendientes.map(curso => (
+                                                        <tr key={curso.id}>
+                                                            <td className={styles.cursoNombre}>
+                                                                {curso.cursoNombre}
+                                                            </td>
+                                                            <td className={styles.cursoFecha}>
+                                                                {new Date(curso.fechaCurso).toLocaleDateString('es-ES')}
+                                                            </td>
+                                                            <td className={styles.cursoHoras}>
+                                                                {curso.horasImpartidas}
+                                                            </td>
+                                                            <td className={styles.cursoMonto}>
+                                                                ${parseFloat(curso.monto).toFixed(2)}
+                                                            </td>
+                                                            <td>
+                                                                <span className={`${styles.status} ${
+                                                                    curso.estatus === 'pagado' ? styles.pagado : 
+                                                                    curso.estatus === 'cancelado' ? styles.cancelado : 
+                                                                    styles.pendiente
+                                                                }`}>
+                                                                    {curso.estatus}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) : (
+                                        <div className={styles.noData}>
+                                            <div className={styles.noDataIcon}>📭</div>
+                                            <p>No hay pagos pendientes en el período seleccionado</p>
+                                            <p className={styles.noDataSubtitle}>
+                                                Período: {new Date(fechaInicio).toLocaleDateString('es-ES')} - {new Date(fechaFin).toLocaleDateString('es-ES')}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Resumen y Generar Recibo */}
+                                <div className={styles.resumenSection}>
+                                    <div className={styles.resumenCard}>
+                                        <div className={styles.resumenContent}>
+                                            <div className={styles.totalInfo}>
+                                                <span className={styles.totalLabel}>Total a Pagar</span>
+                                                <span className={styles.totalAmount}>${totalPagar.toFixed(2)}</span>
+                                                <span className={styles.periodoResumen}>
+                                                    {getDescripcionPeriodo()} • {cursosPendientes.filter(c => c.estatus === 'pendiente').length} pagos
+                                                </span>
+                                            </div>
+                                            <button 
+                                                onClick={generarRecibo}
+                                                className={styles.generateButton}
+                                                disabled={totalPagar === 0 || cargando}
+                                            >
+                                                {cargando ? (
+                                                    <>⏳ Procesando...</>
+                                                ) : (
+                                                    <>📄 Generar Recibo de Pago</>
+                                                )}
+                                            </button>
+                                        </div>
+                                        <div className={styles.resumenFooter}>
+                                            <span className={styles.footerText}>
+                                                Período: {new Date(fechaInicio).toLocaleDateString('es-ES')} - {new Date(fechaFin).toLocaleDateString('es-ES')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className={styles.placeholder}>
+                                <div className={styles.placeholderIcon}>👨‍🏫</div>
+                                <h3>Selecciona un Instructor</h3>
+                                <p>Elige un instructor de la lista para ver sus pagos pendientes y generar recibos</p>
+                                <div className={styles.periodoPreview}>
+                                    <span className={styles.periodoPreviewLabel}>Período actual:</span>
+                                    <span className={styles.periodoPreviewValue}>{getDescripcionPeriodo()}</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
-
-                {/* Panel de Cursos y Configuración */}
-                <div className={styles.detailsPanel}>
-                    {instructorSeleccionado ? (
-                        <>
-                            <div className={styles.instructorHeader}>
-                                <h2>Instructor: {instructorSeleccionado.instructorNombre}</h2>
-                                <p>Email: {instructorSeleccionado.instructorEmail}</p>
-                            </div>
-
-                            {/* Configuración de Periodo */}
-                            <div className={styles.periodoConfig}>
-                                <h3>Configuración de Periodo</h3>
-                                <div className={styles.periodoOptions}>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            value="semanal"
-                                            checked={periodo === 'semanal'}
-                                            onChange={(e) => setPeriodo(e.target.value)}
-                                        />
-                                        Semanal
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            value="quincenal"
-                                            checked={periodo === 'quincenal'}
-                                            onChange={(e) => setPeriodo(e.target.value)}
-                                        />
-                                        Quincenal
-                                    </label>
-                                </div>
-                                
-                                <div className={styles.fechasInput}>
-                                    <div>
-                                        <label>Fecha Inicio:</label>
-                                        <input
-                                            type="date"
-                                            value={fechaInicio}
-                                            onChange={(e) => setFechaInicio(e.target.value)}
-                                            onBlur={actualizarDatos}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label>Fecha Fin:</label>
-                                        <input
-                                            type="date"
-                                            value={fechaFin}
-                                            onChange={(e) => setFechaFin(e.target.value)}
-                                            onBlur={actualizarDatos}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Lista de Cursos Pendientes */}
-                            <div className={styles.cursosList}>
-                                <h3>Pagos Pendientes</h3>
-                                {cursosPendientes.length > 0 ? (
-                                    <table className={styles.cursosTable}>
-                                        <thead>
-                                            <tr>
-                                                <th>Curso</th>
-                                                <th>Fecha</th>
-                                                <th>Horas</th>
-                                                <th>Monto</th>
-                                                <th>Estatus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {cursosPendientes.map(curso => (
-                                                <tr key={curso.id}>
-                                                    <td>{curso.cursoNombre}</td>
-                                                    <td>{new Date(curso.fechaCurso).toLocaleDateString()}</td>
-                                                    <td>{curso.horasImpartidas}</td>
-                                                    <td>${parseFloat(curso.monto).toFixed(2)}</td>
-                                                    <td>
-                                                        <span className={`${styles.status} ${
-                                                            curso.estatus === 'pagado' ? styles.pagado : 
-                                                            curso.estatus === 'cancelado' ? styles.cancelado : 
-                                                            styles.pendiente
-                                                        }`}>
-                                                            {curso.estatus}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                ) : (
-                                    <div className={styles.noData}>
-                                        <p>No hay pagos pendientes en el periodo seleccionado</p>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Resumen y Generar Recibo */}
-                            <div className={styles.resumenPanel}>
-                                <div className={styles.totalSection}>
-                                    <h3>Total a Pagar: ${totalPagar.toFixed(2)}</h3>
-                                    <button 
-                                        onClick={generarRecibo}
-                                        className={styles.generateButton}
-                                        disabled={totalPagar === 0 || cargando}
-                                    >
-                                        {cargando ? '⏳ Cargando...' : '📄 Generar Recibo de Pago'}
-                                    </button>
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        <div className={styles.placeholder}>
-                            <p>Selecciona un instructor para ver sus pagos pendientes</p>
-                        </div>
-                    )}
-                </div>
-            </div>
+            </main>
         </div>
     );
 }

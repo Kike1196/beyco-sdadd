@@ -1,287 +1,769 @@
-/* app/admin/honorarios/recibo/Recibo.module.css */
-.container {
+/* Recibo.module.css */
+.pageContainer {
+    background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
     min-height: 100vh;
-    background: #f5f5f5;
-    padding: 20px;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
 }
 
-.controls {
-    max-width: 800px;
-    margin: 0 auto 20px;
+/* Header con azul oscuro */
+.header {
     display: flex;
     justify-content: space-between;
-}
-
-.backButton, .printButton {
-    background: #667eea;
+    align-items: center;
+    background: rgba(0, 31, 63, 0.95);
     color: white;
-    border: none;
-    padding: 12px 25px;
+    padding: 1.5rem 2.5rem;
+    border-bottom: 3px solid #28a745;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.titleSection h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+}
+
+.titleSection p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1rem;
+    color: #e0e0e0;
+}
+
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    height: 80px;
     border-radius: 8px;
-    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.logoText {
+    display: flex;
+    flex-direction: column;
+}
+
+.logoTitle {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.logoSubtitle {
+    font-size: 1rem;
+    color: #28a745;
     font-weight: 600;
+}
+
+.mainContent {
+    background: #f8f9fa;
+    padding: 2rem;
+    min-height: calc(100vh - 120px);
+}
+
+/* Controles */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+}
+
+.controlsLeft, .controlsRight {
+    display: flex;
+    gap: 1rem;
+}
+
+.btnAtras, .btnImprimir {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.backButton:hover, .printButton:hover {
-    background: #5a6fd8;
+.btnAtras {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+}
+
+.btnAtras:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.loading {
-    text-align: center;
-    padding: 50px;
-    font-size: 1.2rem;
-    color: #666;
+.btnImprimir {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: white;
+}
+
+.btnImprimir:hover {
+    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Contenedor del recibo */
+.reciboContainer {
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .recibo {
-    max-width: 800px;
-    margin: 0 auto;
     background: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 31, 63, 0.2);
+    border: 2px solid #e9ecef;
 }
 
+/* Encabezado del recibo con azul oscuro - COMPACTO */
 .reciboHeader {
-    text-align: center;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #333;
-    padding-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+    color: white;
 }
 
-.reciboHeader h1 {
-    font-size: 2.5rem;
-    margin: 0;
-    color: #333;
-    font-weight: bold;
+.companyLogo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-.reciboHeader h2 {
-    font-size: 1.5rem;
-    margin: 5px 0 0 0;
-    color: #666;
+.reciboLogo {
+    height: 60px;
+    border-radius: 6px;
 }
 
-.reciboTitle {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.reciboTitle h2 {
+.companyText h1 {
     font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
     margin: 0;
-    color: #333;
+    line-height: 1;
+}
+
+.companyText h2 {
+    font-size: 1.1rem;
+    color: #28a745;
+    margin: 0.25rem 0 0 0;
     font-weight: 600;
 }
 
+.companyText p {
+    color: #e0e0e0;
+    margin: 0.25rem 0 0 0;
+    font-size: 0.8rem;
+}
+
 .reciboInfo {
-    margin-bottom: 30px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
+    text-align: right;
 }
 
-.leftColumn p {
-    margin: 8px 0;
+.folio, .fecha {
+    margin-bottom: 0.5rem;
+}
+
+.folioLabel, .fechaLabel {
+    font-weight: 600;
+    color: #e0e0e0;
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.folioValue {
+    font-weight: bold;
+    color: white;
     font-size: 1.1rem;
+}
+
+.fechaValue {
+    color: #e0e0e0;
+    font-size: 0.9rem;
+}
+
+/* Título del recibo con azul oscuro - COMPACTO */
+.reciboTitle {
+    text-align: center;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #00264d 0%, #001f3f 100%);
+    color: white;
+    border-bottom: 2px solid #28a745;
+}
+
+.reciboTitle h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Información del instructor - COMPACTA */
+.instructorSection {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.infoGridCompact {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.infoItemCompact {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    background: white;
+    border-radius: 6px;
+    border-left: 3px solid #001f3f;
+    font-size: 0.85rem;
+}
+
+.infoItemCompact strong {
+    color: #001f3f;
+    font-weight: 600;
+}
+
+.infoItemCompact span:last-child {
     color: #333;
+    font-weight: 500;
 }
 
-.leftColumn strong {
-    color: #000;
-}
-
+/* Sección de cursos - COMPACTA */
 .cursosSection {
-    margin-bottom: 30px;
+    padding: 1rem 2rem;
 }
 
 .cursosSection h3 {
-    margin-bottom: 15px;
-    color: #333;
-    font-size: 1.3rem;
-    border-bottom: 2px solid #667eea;
-    padding-bottom: 8px;
+    color: #001f3f;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.tableContainer {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 .cursosTable {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    font-size: 0.75rem;
 }
 
 .cursosTable th {
-    background: #667eea;
+    background: linear-gradient(135deg, #001f3f 0%, #00264d 100%);
     color: white;
-    padding: 12px 8px;
+    padding: 0.6rem 0.5rem;
     text-align: left;
     font-weight: 600;
-    border: 1px solid #5a6fd8;
+    border: 1px solid #dee2e6;
+    font-size: 0.7rem;
+    text-transform: uppercase;
 }
 
 .cursosTable td {
-    padding: 10px 8px;
-    border: 1px solid #ddd;
-    color: #333;
+    padding: 0.5rem;
+    border: 1px solid #e9ecef;
+    vertical-align: top;
+    background: white;
 }
 
 .cursoNombre {
     font-weight: 500;
-    color: #000;
+    color: #333;
+    font-size: 0.7rem;
+    line-height: 1.2;
 }
 
-.cursoFecha, .cursoHoras, .cursoMonto {
+.cursoFecha, .cursoHoras {
     text-align: center;
+    color: #666;
     font-weight: 500;
+    font-size: 0.7rem;
 }
 
 .cursoMonto {
-    color: #28a745;
-    font-weight: 600;
-}
-
-.resumenPago {
-    margin-bottom: 30px;
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-}
-
-.resumenTable {
-    width: 100%;
-    max-width: 400px;
-    margin-left: auto;
-}
-
-.resumenTable td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    color: #333;
-}
-
-.resumenTable strong {
-    color: #000;
-}
-
-.totalAmount {
-    font-size: 1.4rem;
+    text-align: right;
     font-weight: 700;
     color: #28a745;
+    font-size: 0.75rem;
 }
 
+/* Estados */
 .status {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 700;
     text-transform: uppercase;
+    display: inline-block;
+    text-align: center;
+    min-width: 70px;
 }
 
-.status.pendiente {
+.pendiente {
     background: #fff3cd;
     color: #856404;
-    border: 1px solid #ffeaa7;
+    border: 1px solid #ffd43b;
 }
 
+/* Resumen de pago - COMPACTO */
+.resumenSection {
+    padding: 1rem 2rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.resumenGridCompact {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.resumenItemCompact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 6px;
+    text-align: center;
+    border: 1px solid #e9ecef;
+    font-size: 0.8rem;
+}
+
+.resumenItemCompact span:first-child {
+    color: #666;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.resumenItemCompact strong {
+    color: #001f3f;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.totalCompact {
+    background: linear-gradient(135deg, #001f3f 0%, #00264d 100%);
+    color: white;
+    grid-column: 1 / -1;
+}
+
+.totalCompact span:first-child {
+    color: white;
+    font-weight: 600;
+}
+
+.totalAmountCompact {
+    color: white !important;
+    font-size: 1.2rem !important;
+}
+
+/* Observaciones COMPACTAS */
 .observaciones {
-    background: #fff3cd;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    border-left: 4px solid #ffc107;
-}
-
-.observaciones h4 {
-    margin: 0 0 10px 0;
-    color: #856404;
-    font-size: 1.1rem;
+    padding: 0.75rem 2rem;
+    background: #e7f3ff;
+    border-top: 1px solid #b3d7ff;
+    font-size: 0.8rem;
 }
 
 .observaciones p {
     margin: 0;
-    color: #856404;
-    font-size: 1rem;
+    color: #333;
+    line-height: 1.3;
 }
 
-.firmas {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 50px;
-    padding-top: 30px;
-    border-top: 2px solid #ddd;
+.observaciones strong {
+    color: #001f3f;
 }
 
-.firma {
+/* Firmas COMPACTAS */
+.firmasSection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e9ecef;
+    background: white;
+}
+
+.firmaCompact {
     text-align: center;
-    width: 45%;
+    padding: 1rem;
 }
 
 .lineaFirma {
-    width: 200px;
+    width: 120px;
     height: 1px;
     background: #333;
-    margin: 0 auto 15px;
-    border-bottom: 1px solid #333;
+    margin: 0 auto 0.75rem auto;
 }
 
-.firma p {
-    margin: 5px 0;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.firma p:first-of-type {
+.firmaNombre {
     font-weight: 600;
-    color: #333;
+    color: #001f3f;
+    margin: 0.5rem 0 0.25rem 0;
+    font-size: 0.85rem;
 }
 
-/* Estilos para impresión */
+.firmaCargo {
+    color: #666;
+    margin: 0;
+    font-size: 0.75rem;
+}
+
+/* Footer del recibo */
+.reciboFooter {
+    text-align: center;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #001f3f 0%, #00264d 100%);
+    color: white;
+    border-top: 2px solid #28a745;
+}
+
+.reciboFooter p {
+    margin: 0.25rem 0;
+    font-size: 0.7rem;
+    color: #e0e0e0;
+}
+
+/* Estados de carga */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    font-size: 1.1rem;
+    color: white;
+    text-align: center;
+}
+
+.spinner {
+    border: 4px solid rgba(255,255,255,0.3);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========================================================================== */
+/* ESTILOS PARA IMPRESIÓN - OPTIMIZADO PARA UNA SOLA HOJA */
+/* ========================================================================== */
+
 @media print {
-    .controls {
-        display: none;
+    /* Ocultar elementos no necesarios en impresión */
+    .noPrint {
+        display: none !important;
     }
     
-    .container {
-        background: white;
-        padding: 0;
+    .header,
+    .controls,
+    .mainContent {
+        display: none !important;
+    }
+    
+    /* Configuración de página */
+    @page {
+        margin: 0.5cm;
+        size: A4 portrait;
+    }
+    
+    /* Aplicar estilos al contenedor principal */
+    .pageContainer {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: white !important;
+        min-height: auto !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        display: block !important;
+    }
+    
+    .reciboContainer {
+        max-width: 100% !important;
+        margin: 0 !important;
+        display: block !important;
     }
     
     .recibo {
-        box-shadow: none;
-        padding: 20px;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
     
-    .backButton, .printButton {
-        display: none;
+    /* Optimizar tamaños para impresión - MÁS COMPACTO */
+    .reciboHeader {
+        padding: 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .companyText h1 {
+        font-size: 1.4rem !important;
+    }
+    
+    .companyText h2 {
+        font-size: 0.9rem !important;
+    }
+    
+    .companyText p {
+        font-size: 0.7rem !important;
+    }
+    
+    .reciboLogo {
+        height: 45px !important;
+    }
+    
+    .folioValue {
+        font-size: 0.9rem !important;
+    }
+    
+    .fechaValue {
+        font-size: 0.8rem !important;
+    }
+    
+    .reciboTitle {
+        padding: 0.75rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .reciboTitle h2 {
+        font-size: 1.1rem !important;
+    }
+    
+    .instructorSection {
+        padding: 0.75rem 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .infoGridCompact {
+        gap: 0.5rem !important;
+    }
+    
+    .infoItemCompact {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.75rem !important;
+    }
+    
+    .cursosSection {
+        padding: 0.75rem 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .cursosSection h3 {
+        font-size: 0.9rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .cursosTable {
+        font-size: 0.65rem !important;
+    }
+    
+    .cursosTable th,
+    .cursosTable td {
+        padding: 0.4rem 0.3rem !important;
+    }
+    
+    .cursoNombre {
+        font-size: 0.65rem !important;
+    }
+    
+    .resumenSection {
+        padding: 0.75rem 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .resumenGridCompact {
+        gap: 0.5rem !important;
+    }
+    
+    .resumenItemCompact {
+        padding: 0.5rem !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .totalAmountCompact {
+        font-size: 1rem !important;
+    }
+    
+    .observaciones {
+        padding: 0.6rem 1rem !important;
+        margin-bottom: 0.5rem !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .firmasSection {
+        padding: 1rem !important;
+        gap: 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .firmaCompact {
+        padding: 0.75rem !important;
+    }
+    
+    .lineaFirma {
+        width: 100px !important;
+    }
+    
+    .firmaNombre {
+        font-size: 0.75rem !important;
+    }
+    
+    .firmaCargo {
+        font-size: 0.65rem !important;
+    }
+    
+    .reciboFooter {
+        padding: 0.75rem !important;
+    }
+    
+    .reciboFooter p {
+        font-size: 0.6rem !important;
+    }
+    
+    /* Asegurar que los colores se impriman */
+    .reciboHeader {
+        background: #001f3f !important;
+    }
+    
+    .reciboTitle {
+        background: #00264d !important;
+    }
+    
+    .cursosTable th {
+        background: #001f3f !important;
+        color: white !important;
+    }
+    
+    .totalCompact {
+        background: #001f3f !important;
+        color: white !important;
+    }
+    
+    .status.pendiente {
+        background: #fff3cd !important;
+        color: #856404 !important;
+    }
+    
+    /* Forzar una sola página */
+    .recibo {
+        height: auto !important;
+        max-height: 27.7cm !important; /* Altura máxima A4 */
+    }
+    
+    /* Evitar saltos de página */
+    .reciboHeader,
+    .instructorSection,
+    .cursosSection,
+    .resumenSection,
+    .observaciones,
+    .firmasSection {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .container {
-        padding: 10px;
+    .pageContainer {
+        padding: 0;
     }
     
-    .recibo {
-        padding: 20px;
-    }
-    
-    .cursosTable {
-        font-size: 0.8rem;
-    }
-    
-    .cursosTable th,
-    .cursosTable td {
-        padding: 6px 4px;
-    }
-    
-    .firmas {
+    .header {
         flex-direction: column;
-        gap: 30px;
+        text-align: center;
+        gap: 1rem;
+        padding: 1rem;
     }
     
-    .firma {
-        width: 100%;
+    .titleSection h1 {
+        font-size: 1.8rem;
+    }
+    
+    .mainContent {
+        padding: 1rem;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .controlsLeft, .controlsRight {
+        justify-content: center;
+    }
+    
+    .reciboHeader {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .companyLogo {
+        justify-content: center;
+    }
+    
+    .reciboInfo {
+        text-align: center;
+    }
+    
+    .infoGridCompact {
+        grid-template-columns: 1fr;
+    }
+    
+    .resumenGridCompact {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .totalCompact {
+        grid-column: 1 / -1;
+    }
+    
+    .firmasSection {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem;
     }
 }

@@ -21,6 +21,55 @@ export const api = {
   health: async () => {
     const response = await fetch(`${API_BASE_URL}/api/health`);
     return response.json();
+  },
+
+  // NUEVAS FUNCIONES PARA EVALUACIONES
+  obtenerCursosInstructor: async (instructorId) => {
+    const response = await fetch(`${API_BASE_URL}/api/instructor/cursos?instructorId=${instructorId}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || `Error ${response.status}`);
+    }
+    
+    return response.json();
+  },
+
+  obtenerAlumnosCurso: async (cursoId) => {
+    const response = await fetch(`${API_BASE_URL}/api/cursos/alumnos?cursoId=${cursoId}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || `Error ${response.status}`);
+    }
+    
+    return response.json();
+  },
+
+  obtenerCalificacionesCurso: async (cursoId) => {
+    const response = await fetch(`${API_BASE_URL}/api/evaluaciones/calificaciones?cursoId=${cursoId}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || `Error ${response.status}`);
+    }
+    
+    return response.json();
+  },
+
+  guardarCalificacion: async (calificacionData) => {
+    const response = await fetch(`${API_BASE_URL}/api/evaluaciones/guardar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(calificacionData),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || `Error ${response.status}`);
+    }
+    
+    return response.json();
   }
 };
 
@@ -34,5 +83,4 @@ export const testConnection = async () => {
     console.error('Error de conexión:', error);
     return false;
   }
-  
 };

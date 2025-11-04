@@ -1,0 +1,603 @@
+/* app/instructor/honorarios/Honorarios.module.css */
+.pageContainer {
+    background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+    min-height: 100vh;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 31, 63, 0.95);
+    color: white;
+    padding: 1.5rem 2.5rem;
+    border-bottom: 3px solid #28a745;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.titleSection h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+}
+
+.titleSection p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1rem;
+    color: #e0e0e0;
+}
+
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    height: 80px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.logoText {
+    display: flex;
+    flex-direction: column;
+}
+
+.logoTitle {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.logoSubtitle {
+    font-size: 1rem;
+    color: #28a745;
+    font-weight: 600;
+}
+
+.mainContent {
+    background: #f8f9fa;
+    padding: 2rem;
+    min-height: calc(100vh - 120px);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.breadcrumbLink {
+    color: #001f3f;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.breadcrumbLink:hover {
+    color: #003366;
+    text-decoration: underline;
+}
+
+.breadcrumbSeparator {
+    margin: 0 0.5rem;
+    color: #666;
+}
+
+.breadcrumbCurrent {
+    color: #666;
+    font-weight: 500;
+}
+
+/* Resumen de honorarios */
+.resumenHonorarios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.tarjetaEstadistica {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.tarjetaEstadistica:hover {
+    border-color: #001f3f;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.15);
+}
+
+.tarjetaEstadistica h3 {
+    font-size: 1rem;
+    color: #666;
+    margin: 0 0 1rem 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tarjetaEstadistica .numero {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #001f3f;
+    line-height: 1;
+}
+
+/* Tabla de honorarios */
+.tableContainer {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.tableHeader {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8f9fa;
+}
+
+.tableHeader h3 {
+    margin: 0;
+    color: #001f3f;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+/* Tabla */
+.cursosTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cursosTable th,
+.cursosTable td {
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    color: #000000;
+}
+
+.cursosTable thead {
+    background-color: #001f3f;
+}
+
+.cursosTable th {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1.5rem 1.5rem;
+}
+
+.cursosTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.cursosTable tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estados */
+.status {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 80px;
+}
+
+.pagado {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.pendiente {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+/* Botón detalles */
+.btnInscribir {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.btnInscribir:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Detalles de honorarios */
+.detalleFila {
+    background-color: #f8f9fa !important;
+}
+
+.detalleHonorario {
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    margin: 0.5rem;
+    border-left: 4px solid #001f3f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.detalleHonorario h4 {
+    margin: 0 0 1.5rem 0;
+    color: #001f3f;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.75rem;
+}
+
+.detalleGrid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.detalleItem {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.detalleItem:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.detalleCurso {
+    font-weight: 600;
+    color: #001f3f;
+    font-size: 1rem;
+}
+
+.detalleHoras {
+    color: #666;
+    text-align: center;
+    font-weight: 500;
+}
+
+.detalleMonto {
+    font-weight: 700;
+    color: #28a745;
+    text-align: right;
+    font-size: 1.1rem;
+}
+
+.detalleTotal {
+    text-align: right;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e9ecef;
+    font-size: 1.3rem;
+    color: #001f3f;
+    font-weight: 700;
+}
+
+/* Información adicional */
+.infoAdicional {
+    background: white;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    margin-bottom: 2rem;
+    border: 2px solid #e9ecef;
+}
+
+.infoAdicional h3 {
+    margin: 0 0 2rem 0;
+    color: #001f3f;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.infoItem {
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #001f3f;
+    transition: all 0.3s ease;
+}
+
+.infoItem:hover {
+    background: #e9ecef;
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.infoItem h4 {
+    margin: 0 0 1rem 0;
+    color: #001f3f;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.infoItem p {
+    margin: 0;
+    color: #666;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Botón volver */
+.actionsSection {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.btnVolver {
+    background: #6c757d;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.btnVolver:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    color: white;
+}
+
+/* Loading */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.spinner {
+    border: 4px solid #f3f4f6;
+    border-left: 4px solid #001f3f;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Notificaciones */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 1001;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification.success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.notification.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.notification.warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.notification.info {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+.notificationIcon {
+    font-weight: bold;
+}
+
+.notificationMessage {
+    flex: 1;
+}
+
+.notificationClose {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notificationProgress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: currentColor;
+    opacity: 0.3;
+    animation: progress 5s linear forwards;
+}
+
+@keyframes progress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* Estados */
+.noData {
+    text-align: center;
+    padding: 3rem !important;
+    color: #666;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .mainContent {
+        padding: 1rem;
+    }
+    
+    .resumenHonorarios {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .tarjetaEstadistica {
+        padding: 1.5rem;
+    }
+    
+    .tarjetaEstadistica .numero {
+        font-size: 2rem;
+    }
+    
+    .cursosTable {
+        font-size: 0.8rem;
+    }
+    
+    .cursosTable th,
+    .cursosTable td {
+        padding: 1rem 0.75rem;
+    }
+    
+    .detalleItem {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .infoGrid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .infoItem {
+        padding: 1.5rem;
+    }
+    
+    .breadcrumb {
+        flex-wrap: wrap;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .titleSection h1 {
+        font-size: 1.8rem;
+    }
+    
+    .logo {
+        height: 60px;
+    }
+    
+    .logoTitle {
+        font-size: 1.5rem;
+    }
+    
+    .resumenHonorarios {
+        grid-template-columns: 1fr;
+    }
+    
+    .btnInscribir {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .detalleHonorario {
+        padding: 1.5rem;
+    }
+}

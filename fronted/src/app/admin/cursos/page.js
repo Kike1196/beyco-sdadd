@@ -1,7 +1,9 @@
+// app/admin/cursos/page.js - VERSIÓN CON DISEÑO PROFESIONAL
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import styles from './Cursos.module.css';
 
 // --- Componente de Notificación ---
@@ -16,10 +18,12 @@ const NotificationToast = ({ message, type, onClose }) => {
     const icon = { success: '✓', error: '✕', warning: '⚠' };
 
     return (
-        <div className={`${styles.notification} ${styles[type]}`}>
-            <span className={styles.notificationIcon}>{icon[type]}</span>
-            <span className={styles.notificationMessage}>{message}</span>
-            <button onClick={onClose} className={styles.notificationClose}>×</button>
+        <div className={`${styles.notification} ${styles[`notification${type.charAt(0).toUpperCase() + type.slice(1)}`]}`}>
+            <div className={styles.notificationContent}>
+                <span className={styles.notificationIcon}>{icon[type]}</span>
+                <span className={styles.notificationMessage}>{message}</span>
+                <button onClick={onClose} className={styles.notificationClose}>×</button>
+            </div>
             <div className={styles.notificationProgress}></div>
         </div>
     );
@@ -187,15 +191,20 @@ export default function CursosPage() {
                 const cursosData = await cursosRes.json();
                 setCursos(cursosData);
 
-                // Cargar instructores
+                // ✅ CORREGIDO: Usar el endpoint correcto para instructores
                 try {
-                    const instructoresRes = await fetch('http://localhost:8080/api/usuarios/instructores');
+                    const instructoresRes = await fetch('http://localhost:8080/api/instructores');
                     if (instructoresRes.ok) {
                         const instructoresData = await instructoresRes.json();
+                        console.log('Instructores cargados:', instructoresData);
                         setInstructores(instructoresData);
+                    } else {
+                        console.error('Error cargando instructores:', instructoresRes.status);
+                        showNotification(`Error cargando instructores: ${instructoresRes.status}`, 'warning');
                     }
                 } catch (error) {
-                    console.warn("Error cargando instructores:", error);
+                    console.error("Error cargando instructores:", error);
+                    showNotification("Error al cargar la lista de instructores", 'error');
                 }
 
                 // CARGAR EMPRESAS - SOLO EJEMPLOS (SIN BACKEND)
@@ -234,7 +243,10 @@ export default function CursosPage() {
         if (isAdding || isEditing) return;
         setSelectedCurso(curso);
         const normalizeString = (str) => str.toString().toLowerCase().trim();
+        
+        // ✅ Buscar instructor por número de empleado (más confiable que por nombre)
         const instructorEncontrado = instructores.find(i => 
+            i.numEmpleado === curso.instructorId || // Si el curso ya tiene instructorId
             normalizeString(`${i.nombre} ${i.apellidoPaterno} ${i.apellidoMaterno}`).includes(normalizeString(curso.instructor))
         );
         const instructorId = instructorEncontrado ? instructorEncontrado.numEmpleado : '';
@@ -434,137 +446,212 @@ export default function CursosPage() {
 
     return (
         <div className={styles.pageContainer}>
-            {notification.show && (
-                <NotificationToast 
-                    message={notification.message}
-                    type={notification.type}
-                    onClose={closeNotification}
-                />
-            )}
-
-            <ConfirmModal
-                isOpen={confirmation.isOpen}
-                onClose={closeConfirmation}
-                onConfirm={confirmation.onConfirm}
-                title={confirmation.title}
-                message={confirmation.message}
-            />
-
+            {/* Header con azul oscuro */}
             <header className={styles.header}>
-                <div className={styles.titleSection}><h1>Asignación de Cursos</h1></div>
-                <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
+                <div className={styles.titleSection}>
+                    <h1>Gestión de Cursos</h1>
+                    <p></p>
+                </div>
+                <div className={styles.logoSection}>
+                    <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
+                    <div className={styles.logoText}>
+                        <span className={styles.logoTitle}></span>
+                        <span className={styles.logoSubtitle}></span>
+                    </div>
+                </div>
             </header>
 
             <main className={styles.mainContent}>
-                <div className={styles.toolbar}>
-                    <input 
-                        type="text" 
-                        placeholder="Buscar..." 
-                        className={styles.searchInput}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                {notification.show && (
+                    <NotificationToast 
+                        message={notification.message}
+                        type={notification.type}
+                        onClose={closeNotification}
                     />
-                    <div className={styles.filterOptions}>
-                        <label>
-                            <input type="radio" name="filter" value="nombre" checked={filterBy === 'nombre'} onChange={(e) => setFilterBy(e.target.value)} /> 
-                            Nombre de curso
-                        </label>
-                        <label>
-                            <input type="radio" name="filter" value="instructor" checked={filterBy === 'instructor'} onChange={(e) => setFilterBy(e.target.value)} /> 
-                            Instructor
-                        </label>
-                        <label>
-                            <input type="radio" name="filter" value="empresa" checked={filterBy === 'empresa'} onChange={(e) => setFilterBy(e.target.value)} /> 
-                            Empresa
-                        </label>
+                )}
+
+                <ConfirmModal
+                    isOpen={confirmation.isOpen}
+                    onClose={closeConfirmation}
+                    onConfirm={confirmation.onConfirm}
+                    title={confirmation.title}
+                    message={confirmation.message}
+                />
+
+                {/* Controles principales */}
+                <div className={styles.controls}>
+                    <div className={styles.controlsLeft}>
+                        <button onClick={() => router.back()} className={styles.btnAtras}>
+                            ← Volver 
+                        </button>
                     </div>
-                </div>
-                
-                <div className={styles.tableContainer}>
-                    {loading ? (
-                        <p className={styles.loading}>Cargando cursos...</p>
-                    ) : (
-                        <table className={styles.cursosTable}>
-                            <thead>
-                                <tr>
-                                    <th>Curso</th>
-                                    <th>STPS</th>
-                                    <th>Horas</th>
-                                    <th>Fecha</th>
-                                    <th>Instructor</th>
-                                    <th>Empresa</th>
-                                    <th>Lugar</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {isAdding && (
-                                    <EditRow 
-                                        curso={cursoData} 
-                                        onChange={handleInputChange} 
-                                        instructores={instructores} 
-                                        empresas={empresas} 
-                                        catalogoCursos={catalogoCursos} 
-                                        formErrors={formErrors}
-                                    />
-                                )}
-                                {filteredCursos.map(curso => (
-                                    isEditing && selectedCurso?.id === curso.id ? (
-                                        <EditRow
-                                            key={curso.id}
-                                            curso={cursoData}
-                                            onChange={handleInputChange}
-                                            instructores={instructores}
-                                            empresas={empresas}
-                                            catalogoCursos={catalogoCursos}
-                                            formErrors={formErrors}
-                                        />
-                                    ) : (
-                                        <tr 
-                                            key={curso.id}
-                                            onClick={() => handleSelectCurso(curso)}
-                                            className={selectedCurso?.id === curso.id ? styles.selectedRow : ''}
-                                        >
-                                            <td>{curso.nombre}</td>
-                                            <td>{curso.stps}</td>
-                                            <td>{curso.horas}</td>
-                                            <td>{curso.fechaIngreso ? new Date(curso.fechaIngreso).toLocaleDateString('es-ES') : 'Sin fecha'}</td>
-                                            <td>{curso.instructor}</td>
-                                            <td>{curso.empresa}</td>
-                                            <td>{curso.lugar}</td>
-                                        </tr>
-                                    )
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
+                    <div className={styles.controlsRight}>
+                        <button 
+                            onClick={() => window.location.reload()}
+                            className={styles.btnActualizar}
+                            disabled={loading}
+                        >
+                            🔄 Actualizar
+                        </button>
+                    </div>
                 </div>
 
-                <footer className={styles.footer}>
-                    <div className={styles.actionButtons}>
-                        <button onClick={handleAgregarClick} className={styles.btn} disabled={isAdding || isEditing}>Agregar</button>
-                        <button onClick={handleModificarClick} className={styles.btn} disabled={!selectedCurso || isAdding || isEditing}>Modificar</button>
-                        <button onClick={handleEliminarClick} className={styles.btn} disabled={!selectedCurso || isAdding || isEditing}>Eliminar</button>
-                        <button onClick={handleGuardarClick} className={styles.btnGuardar} disabled={!isAdding && !isEditing}>Guardar</button>
-                        {(isAdding || isEditing) && (
-                            <button onClick={handleCancelarClick} className={styles.btnCancelar}>Cancelar</button>
+                {/* Panel de búsqueda y filtros */}
+                <div className={styles.searchPanel}>
+                    <div className={styles.searchContainer}>
+                        <input 
+                            type="text" 
+                            placeholder="Buscar cursos..." 
+                            className={styles.searchInput}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className={styles.filterOptions}>
+                        <label className={styles.filterLabel}>
+                            <input 
+                                type="radio" 
+                                name="filter" 
+                                value="nombre" 
+                                checked={filterBy === 'nombre'} 
+                                onChange={(e) => setFilterBy(e.target.value)} 
+                            /> 
+                            <span className={styles.filterText}>Nombre de curso</span>
+                        </label>
+                        <label className={styles.filterLabel}>
+                            <input 
+                                type="radio" 
+                                name="filter" 
+                                value="instructor" 
+                                checked={filterBy === 'instructor'} 
+                                onChange={(e) => setFilterBy(e.target.value)} 
+                            /> 
+                            <span className={styles.filterText}>Instructor</span>
+                        </label>
+                        <label className={styles.filterLabel}>
+                            <input 
+                                type="radio" 
+                                name="filter" 
+                                value="empresa" 
+                                checked={filterBy === 'empresa'} 
+                                onChange={(e) => setFilterBy(e.target.value)} 
+                            /> 
+                            <span className={styles.filterText}>Empresa</span>
+                        </label>
+                    </div>
+                </div>
+
+                {/* Tabla de cursos */}
+                <div className={styles.tableSection}>
+                    <div className={styles.sectionHeader}>
+                        <h2>Lista de Cursos</h2>
+                        <span className={styles.counterBadge}>{filteredCursos.length}</span>
+                    </div>
+                    
+                    <div className={styles.tableContainer}>
+                        {loading ? (
+                            <div className={styles.loading}>
+                                ⏳ Cargando cursos...
+                            </div>
+                        ) : (
+                            <table className={styles.cursosTable}>
+                                <thead>
+                                    <tr>
+                                        <th>Curso</th>
+                                        <th>STPS</th>
+                                        <th>Horas</th>
+                                        <th>Fecha</th>
+                                        <th>Instructor</th>
+                                        <th>Empresa</th>
+                                        <th>Lugar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {isAdding && (
+                                        <EditRow 
+                                            curso={cursoData} 
+                                            onChange={handleInputChange} 
+                                            instructores={instructores} 
+                                            empresas={empresas} 
+                                            catalogoCursos={catalogoCursos} 
+                                            formErrors={formErrors}
+                                        />
+                                    )}
+                                    {filteredCursos.map(curso => (
+                                        isEditing && selectedCurso?.id === curso.id ? (
+                                            <EditRow
+                                                key={curso.id}
+                                                curso={cursoData}
+                                                onChange={handleInputChange}
+                                                instructores={instructores}
+                                                empresas={empresas}
+                                                catalogoCursos={catalogoCursos}
+                                                formErrors={formErrors}
+                                            />
+                                        ) : (
+                                            <tr 
+                                                key={curso.id}
+                                                onClick={() => handleSelectCurso(curso)}
+                                                className={`${styles.tableRow} ${
+                                                    selectedCurso?.id === curso.id ? styles.selectedRow : ''
+                                                }`}
+                                            >
+                                                <td className={styles.cursoNombre}>{curso.nombre}</td>
+                                                <td className={styles.cursoStps}>{curso.stps}</td>
+                                                <td className={styles.cursoHoras}>{curso.horas}</td>
+                                                <td className={styles.cursoFecha}>
+                                                    {curso.fechaIngreso ? new Date(curso.fechaIngreso).toLocaleDateString('es-ES') : 'Sin fecha'}
+                                                </td>
+                                                <td className={styles.cursoInstructor}>{curso.instructor}</td>
+                                                <td className={styles.cursoEmpresa}>{curso.empresa}</td>
+                                                <td className={styles.cursoLugar}>{curso.lugar}</td>
+                                            </tr>
+                                        )
+                                    ))}
+                                </tbody>
+                            </table>
                         )}
                     </div>
-                    <div className={styles.linkButtons}>
-                        <button 
-                            onClick={() => router.push('/admin/historial')}
-                            className={styles.btnLink}
-                        >
-                            Historial de cursos
-                        </button>
-                        <button 
-                            onClick={() => router.push('/admin/catalogo')}
-                            className={styles.btnLink}
-                        >
-                            Catálogo de cursos
-                        </button>
+                </div>
+
+                {/* Panel de acciones */}
+                <div className={styles.actionsPanel}>
+                    <div className={styles.actionsSection}>
+                        <h3>Acciones</h3>
+                        <div className={styles.actionButtons}>
+                            <button onClick={handleAgregarClick} className={styles.btnAgregar} disabled={isAdding || isEditing}>
+                                ➕ Agregar Curso
+                            </button>
+                            <button onClick={handleModificarClick} className={styles.btnModificar} disabled={!selectedCurso || isAdding || isEditing}>
+                                ✏️ Modificar
+                            </button>
+                            <button onClick={handleEliminarClick} className={styles.btnEliminar} disabled={!selectedCurso || isAdding || isEditing}>
+                                🗑️ Eliminar
+                            </button>
+                            <button onClick={handleGuardarClick} className={styles.btnGuardar} disabled={!isAdding && !isEditing}>
+                                💾 Guardar
+                            </button>
+                            {(isAdding || isEditing) && (
+                                <button onClick={handleCancelarClick} className={styles.btnCancelar}>
+                                    ❌ Cancelar
+                                </button>
+                            )}
+                        </div>
                     </div>
-                    <button onClick={() => router.back()} className={styles.btnAtras}>Atrás</button>
-                </footer>
+
+                    {/* Enlaces rápidos */}
+                    <div className={styles.linksSection}>
+                        <h3>Navegación Rápida</h3>
+                        <div className={styles.linkButtons}>
+                            <Link href="/admin/historial" className={styles.btnLink}>
+                                📋 Historial de Cursos
+                            </Link>
+                            <Link href="/admin/catalogo" className={styles.btnLink}>
+                                📚 Catálogo de Cursos
+                            </Link>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     );

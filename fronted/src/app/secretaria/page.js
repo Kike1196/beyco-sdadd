@@ -3,76 +3,179 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './SecretariaDashboard.module.css';
-import InscribirAlumnos from './inscribirAlumnos/page';
 
 export default function SecretariaDashboard() {
-    const [activeModal, setActiveModal] = useState(null);
     const router = useRouter();
 
     const handleLogout = () => {
-        // Limpiar datos de sesión
         localStorage.removeItem('userData');
-        // Redirigir al login
         router.push('/');
     };
 
+    const navigateTo = (path) => {
+        router.push(`/secretaria/${path}`);
+    };
+
     return (
-        <div className={styles.dashboardContainer}>
-            {/* Header */}
+        <div className={styles.pageContainer}>
+            {/* Header con diseño profesional */}
             <header className={styles.header}>
                 <div className={styles.titleSection}>
-                    <h1>BEYCO Consultores</h1>
-                    <p>Sistema de Gestión de Cursos</p>
+                    <h1>Panel de Secretaría</h1>
+                    <p>Gestiona alumnos, documentos y recibos</p>
                 </div>
-                <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
+                <div className={styles.logoSection}>
+                    <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
+                    <div className={styles.logoText}>
+                        <span className={styles.logoTitle}>BEYCO</span>
+                        <span className={styles.logoSubtitle}>Consultores</span>
+                    </div>
+                </div>
             </header>
 
-            {/* Menú de opciones */}
-            <div className={styles.menuGrid}>
-                <button 
-                    className={styles.menuCard}
-                    onClick={() => setActiveModal('inscribir')}
-                >
-                    <div className={styles.cardIcon}>📋</div>
-                    <h2>Inscribir alumnos</h2>
-                    <p>Gestionar inscripciones a cursos</p>
-                </button>
+            <main className={styles.mainContent}>
+                {/* Mensaje de bienvenida */}
+                <div className={styles.welcomeSection}>
+                    <div className={styles.welcomeCard}>
+                        <div className={styles.welcomeIcon}>👩‍💼</div>
+                        <div className={styles.welcomeText}>
+                            <h2>¡Bienvenida de nuevo, Secretaría!</h2>
+                            <p>Sistema de gestión académica y administrativa</p>
+                        </div>
+                    </div>
+                </div>
 
-                <button className={styles.menuCard}>
-                    <div className={styles.cardIcon}>📄</div>
-                    <h2>Documentos</h2>
-                    <p>Generar y gestionar documentos</p>
-                </button>
+                {/* Navegación principal - AHORA CON NAVEGACIÓN */}
+                <div className={styles.navigationGrid}>
+                    <button 
+                        className={styles.navCard}
+                        onClick={() => navigateTo('inscribirAlumnos')}
+                    >
+                        <div className={styles.cardIcon}>📋</div>
+                        <div className={styles.cardContent}>
+                            <h3>Inscribir Alumnos</h3>
+                            <p>Gestionar inscripciones de alumnos a cursos</p>
+                        </div>
+                        <div className={styles.cardArrow}>→</div>
+                    </button>
 
-                <button className={styles.menuCard}>
-                    <div className={styles.cardIcon}>🧾</div>
-                    <h2>Recibos</h2>
-                    <p>Administrar recibos de pago</p>
-                </button>
+                    <button 
+                        className={styles.navCard}
+                        onClick={() => navigateTo('documentos')}
+                    >
+                        <div className={styles.cardIcon}>📄</div>
+                        <div className={styles.cardContent}>
+                            <h3>Documentos</h3>
+                            <p>Generar y gestionar documentos académicos</p>
+                        </div>
+                        <div className={styles.cardArrow}>→</div>
+                    </button>
 
-                <button className={styles.menuCard}>
-                    <div className={styles.cardIcon}>📊</div>
-                    <h2>Evaluaciones</h2>
-                    <p>Gestionar evaluaciones de alumnos</p>
-                </button>
-            </div>
+                    <button 
+                        className={styles.navCard}
+                        onClick={() => navigateTo('recibos')}
+                    >
+                        <div className={styles.cardIcon}>🧾</div>
+                        <div className={styles.cardContent}>
+                            <h3>Recibos</h3>
+                            <p>Administrar recibos de pago y facturación</p>
+                        </div>
+                        <div className={styles.cardArrow}>→</div>
+                    </button>
 
-            {/* Modal de inscripción de alumnos */}
-            {activeModal === 'inscribir' && (
-                <InscribirAlumnos 
-                    onClose={() => setActiveModal(null)} 
-                />
-            )}
-            
-            {/* Footer */}
-            <footer className={styles.footer}>
-                <button 
-                    onClick={handleLogout} 
-                    className={styles.logoutButton}
-                >
-                    🚪 Cerrar sesión
-                </button>
-            </footer>
+                    <button 
+                        className={styles.navCard}
+                        onClick={() => navigateTo('evaluaciones')}
+                    >
+                        <div className={styles.cardIcon}>📊</div>
+                        <div className={styles.cardContent}>
+                            <h3>Evaluaciones</h3>
+                            <p>Gestionar evaluaciones y calificaciones</p>
+                        </div>
+                        <div className={styles.cardArrow}>→</div>
+                    </button>
+                </div>
+
+                {/* Estadísticas rápidas */}
+                <div className={styles.statsSection}>
+                    <h3>Resumen del Sistema</h3>
+                    <div className={styles.statsGrid}>
+                        <div className={styles.statCard}>
+                            <div className={styles.statIcon}>👥</div>
+                            <div className={styles.statInfo}>
+                                <span className={styles.statNumber}>156</span>
+                                <span className={styles.statLabel}>Alumnos Activos</span>
+                            </div>
+                        </div>
+                        <div className={styles.statCard}>
+                            <div className={styles.statIcon}>📚</div>
+                            <div className={styles.statInfo}>
+                                <span className={styles.statNumber}>24</span>
+                                <span className={styles.statLabel}>Cursos Activos</span>
+                            </div>
+                        </div>
+                        <div className={styles.statCard}>
+                            <div className={styles.statIcon}>📄</div>
+                            <div className={styles.statInfo}>
+                                <span className={styles.statNumber}>89</span>
+                                <span className={styles.statLabel}>Documentos</span>
+                            </div>
+                        </div>
+                        <div className={styles.statCard}>
+                            <div className={styles.statIcon}>💰</div>
+                            <div className={styles.statInfo}>
+                                <span className={styles.statNumber}>45</span>
+                                <span className={styles.statLabel}>Pagos Pendientes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Actividades recientes */}
+                <div className={styles.activitiesSection}>
+                    <div className={styles.sectionHeader}>
+                        <h3>📋 Actividades Recientes</h3>
+                        <p>Últimas acciones en el sistema</p>
+                    </div>
+                    
+                    <div className={styles.activitiesList}>
+                        <div className={styles.activityItem}>
+                            <div className={styles.activityIcon}>✅</div>
+                            <div className={styles.activityContent}>
+                                <strong>Nueva inscripción completada</strong>
+                                <span>Juan Pérez - Seguridad Industrial</span>
+                                <small>Hace 2 horas</small>
+                            </div>
+                        </div>
+                        
+                        <div className={styles.activityItem}>
+                            <div className={styles.activityIcon}>📄</div>
+                            <div className={styles.activityContent}>
+                                <strong>Documento generado</strong>
+                                <span>Constancia de estudios - María García</span>
+                                <small>Hace 4 horas</small>
+                            </div>
+                        </div>
+                        
+                        <div className={styles.activityItem}>
+                            <div className={styles.activityIcon}>💰</div>
+                            <div className={styles.activityContent}>
+                                <strong>Pago registrado</strong>
+                                <span>Recibo #2456 - Carlos López</span>
+                                <small>Hace 6 horas</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Botón de cerrar sesión */}
+                <div className={styles.actionsSection}>
+                    <button onClick={handleLogout} className={styles.logoutButton}>
+                        <span className={styles.logoutIcon}>🚪</span>
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </main>
         </div>
     );
 }

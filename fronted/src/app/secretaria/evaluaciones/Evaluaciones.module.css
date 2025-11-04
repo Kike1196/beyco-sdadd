@@ -1,0 +1,282 @@
+.pageContainer {
+    background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.header {
+    background: rgba(0, 31, 63, 0.95);
+    color: white;
+    padding: 1.5rem 2.5rem;
+    border-bottom: 3px solid #28a745;
+}
+
+.headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.backButton {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.backButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-5px);
+}
+
+.titleSection h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+}
+
+.titleSection p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1rem;
+    color: #e0e0e0;
+}
+
+.logo {
+    height: 60px;
+    border-radius: 8px;
+}
+
+.mainContent {
+    background: #f8f9fa;
+    padding: 2rem;
+    min-height: calc(100vh - 120px);
+}
+
+.controlsSection {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.courseSelector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.courseSelector label {
+    font-weight: 600;
+    color: #001f3f;
+    white-space: nowrap;
+}
+
+.courseSelector select {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    flex: 1;
+    transition: all 0.3s ease;
+}
+
+.courseSelector select:focus {
+    outline: none;
+    border-color: #001f3f;
+}
+
+.saveButton {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.saveButton:hover:not(:disabled) {
+    background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.saveButton:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.gradesSection {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
+    margin-bottom: 2rem;
+}
+
+.gradesSection h2 {
+    color: #001f3f;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+}
+
+.gradesTable {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tableHeader {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: #001f3f;
+    color: white;
+    font-weight: 600;
+}
+
+.tableRow {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    align-items: center;
+}
+
+.tableRow:last-child {
+    border-bottom: none;
+}
+
+.tableRow:hover {
+    background: #f8f9fa;
+}
+
+.studentName {
+    font-weight: 600;
+    color: #001f3f;
+}
+
+.gradeInput {
+    padding: 0.5rem 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 1rem;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.gradeInput:focus {
+    outline: none;
+    border-color: #001f3f;
+}
+
+.status {
+    font-weight: 600;
+    text-align: center;
+}
+
+.statsSection {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
+}
+
+.statsSection h3 {
+    color: #001f3f;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.statCard {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.statCard:hover {
+    border-color: #001f3f;
+    transform: translateY(-2px);
+}
+
+.statNumber {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #001f3f;
+}
+
+.statLabel {
+    display: block;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .headerContent {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .mainContent {
+        padding: 1rem;
+    }
+    
+    .controlsSection {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .courseSelector {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .tableHeader,
+    .tableRow {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .statsGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+}
