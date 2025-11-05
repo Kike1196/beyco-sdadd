@@ -1,9 +1,10 @@
+// app/instructor/evidencias/page.js - PÁGINA DE EVIDENCIAS (MODIFICADA)
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import styles from './Evaluaciones.module.css';
+import styles from './Evidencia.module.css';
 
 // Componente de Notificación
 const NotificationToast = ({ message, type, onClose }) => {
@@ -26,15 +27,330 @@ const NotificationToast = ({ message, type, onClose }) => {
     );
 };
 
-export default function EvaluacionesPage() {
+    // Modal para subir evidencias (VERSIÓN CON TEXTO NEGRO)
+    const ModalSubirEvidencia = ({ curso, onClose, onEvidenciaSubida }) => {
+        const [archivos, setArchivos] = useState([]);
+        const [tipoEvidencia, setTipoEvidencia] = useState('foto');
+        const [descripcion, setDescripcion] = useState('');
+        const [subiendo, setSubiendo] = useState(false);
+
+        const handleArchivoChange = (e) => {
+            const files = Array.from(e.target.files);
+            setArchivos(files);
+        };
+
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            if (archivos.length === 0) {
+                alert('Por favor selecciona al menos un archivo');
+                return;
+            }
+
+            setSubiendo(true);
+            try {
+                // Simular subida de archivos
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                console.log('📤 Subiendo evidencias:', {
+                    cursoId: curso.id,
+                    tipo: tipoEvidencia,
+                    archivos: archivos.map(f => f.name),
+                    descripcion
+                });
+
+                onEvidenciaSubida({
+                    cursoId: curso.id,
+                    tipo: tipoEvidencia,
+                    archivos: archivos.map(f => ({ nombre: f.name, tipo: f.type })),
+                    descripcion,
+                    fecha: new Date().toISOString()
+                });
+
+                onClose();
+            } catch (error) {
+                console.error('Error subiendo evidencias:', error);
+                alert('Error al subir las evidencias');
+            } finally {
+                setSubiendo(false);
+            }
+        };
+
+        return (
+            <div className={styles.modalOverlay} onClick={onClose}>
+                <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.modalHeader}>
+                        <div>
+                            <h3>Subir Evidencias</h3>
+                            <p className={styles.cursoNombreModal}>{curso.nombre}</p>
+                        </div>
+                        <button className={styles.modalClose} onClick={onClose}>×</button>
+                    </div>
+                    
+                    <form onSubmit={handleSubmit} className={styles.evidenciaForm}>
+                        <div className={styles.modalBody}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.formLabel}>Tipo de Evidencia:</label>
+                                <select 
+                                    value={tipoEvidencia} 
+                                    onChange={(e) => setTipoEvidencia(e.target.value)}
+                                    className={styles.selectInput}
+                                >
+                                    <option value="foto">Fotografía</option>
+                                    <option value="documento">Documento</option>
+                                    <option value="lista_asistencia">Lista de Asistencia</option>
+                                </select>
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.formLabel}>Descripción:</label>
+                                <textarea
+                                    value={descripcion}
+                                    onChange={(e) => setDescripcion(e.target.value)}
+                                    placeholder="Descripción de la evidencia que estás subiendo..."
+                                    rows="3"
+                                    className={styles.textareaInput}
+                                />
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.formLabel}>Archivos:</label>
+                                <div className={styles.fileInputContainer}>
+                                    <input
+                                        type="file"
+                                        multiple
+                                        onChange={handleArchivoChange}
+                                        accept=".jpg,.jpeg,.png,.pdf"
+                                        className={styles.fileInput}
+                                        id="fileInput"
+                                    />
+                                    <label htmlFor="fileInput" className={styles.fileInputLabel}>
+                                        📁 Elegir archivos
+                                    </label>
+                                    <div className={styles.fileInfo}>
+                                        <span className={styles.fileStatus}>
+                                            {archivos.length === 0 
+                                                ? 'Ningún archivo seleccionado' 
+                                                : `${archivos.length} archivo(s) seleccionado(s)`
+                                            }
+                                        </span>
+                                        <small className={styles.fileFormats}>
+                                            Formatos permitidos: JPG, PNG, PDF (Máx. 10MB por archivo)
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {archivos.length > 0 && (
+                                <div className={styles.archivosSeleccionados}>
+                                    <h4>Archivos seleccionados:</h4>
+                                    <ul>
+                                        {archivos.map((archivo, index) => (
+                                            <li key={index} className={styles.archivoItem}>
+                                                <span className={styles.archivoIcon}>📎</span>
+                                                <div className={styles.archivoInfo}>
+                                                    <span className={styles.archivoNombre}>{archivo.name}</span>
+                                                    <span className={styles.archivoTamaño}>
+                                                        ({(archivo.size / 1024 / 1024).toFixed(2)} MB)
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className={styles.modalFooter}>
+                            <button 
+                                type="button" 
+                                onClick={onClose} 
+                                className={styles.btnCancelar}
+                                disabled={subiendo}
+                            >
+                                Cancelar
+                            </button>
+                            <button 
+                                type="submit" 
+                                className={styles.btnSubir}
+                                disabled={subiendo || archivos.length === 0}
+                            >
+                                {subiendo ? '📤 Subiendo...' : '📤 Subir Evidencias'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        );
+    };
+// Modal para ver evidencias existentes
+const ModalVerEvidencias = ({ curso, onClose }) => {
+    const [evidencias, setEvidencias] = useState([]);
+    const [cargando, setCargando] = useState(true);
+
+    useEffect(() => {
+        // Simular carga de evidencias existentes
+        const cargarEvidencias = async () => {
+            setCargando(true);
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Evidencias de ejemplo
+                const evidenciasEjemplo = [
+                    {
+                        id: 1,
+                        tipo: 'lista_asistencia',
+                        descripcion: 'Lista de asistencia del curso completo',
+                        archivos: [{ nombre: 'lista_asistencia_curso_2.pdf', tipo: 'application/pdf' }],
+                        fecha: '2025-04-02T10:00:00Z',
+                        subidoPor: 'Ana Solis'
+                    },
+                    {
+                        id: 2,
+                        tipo: 'foto',
+                        descripcion: 'Fotos de la sesión práctica',
+                        archivos: [
+                            { nombre: 'practica_1.jpg', tipo: 'image/jpeg' },
+                            { nombre: 'practica_2.jpg', tipo: 'image/jpeg' }
+                        ],
+                        fecha: '2025-04-02T14:30:00Z',
+                        subidoPor: 'Ana Solis'
+                    },
+                    {
+                        id: 3,
+                        tipo: 'documento',
+                        descripcion: 'Documento de evaluación teórica',
+                        archivos: [{ nombre: 'evaluacion_teorica.pdf', tipo: 'application/pdf' }],
+                        fecha: '2025-04-02T16:00:00Z',
+                        subidoPor: 'Ana Solis'
+                    }
+                ];
+                
+                setEvidencias(evidenciasEjemplo);
+            } catch (error) {
+                console.error('Error cargando evidencias:', error);
+            } finally {
+                setCargando(false);
+            }
+        };
+
+        cargarEvidencias();
+    }, [curso.id]);
+
+    const getIconoTipo = (tipo) => {
+        const iconos = {
+            foto: '📷',
+            documento: '📄',
+            lista_asistencia: '📋'
+        };
+        return iconos[tipo] || '📁';
+    };
+
+    const formatFecha = (fecha) => {
+        return new Date(fecha).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    return (
+        <div className={styles.modalOverlay} onClick={onClose}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                    <div>
+                        <h3>Evidencias del Curso</h3>
+                        <p className={styles.cursoNombreModal}>{curso.nombre}</p>
+                    </div>
+                    <button className={styles.modalClose} onClick={onClose}>×</button>
+                </div>
+                
+                <div className={styles.modalBody}>
+                    {cargando ? (
+                        <div className={styles.loading}>
+                            <div className={styles.spinner}></div>
+                            <p>Cargando evidencias...</p>
+                        </div>
+                    ) : evidencias.length > 0 ? (
+                        <div className={styles.evidenciasList}>
+                            <div className={styles.evidenciasHeader}>
+                                <span className={styles.totalEvidencias}>
+                                    Total: {evidencias.length} evidencia(s)
+                                </span>
+                            </div>
+                            
+                            <div className={styles.evidenciasGrid}>
+                                {evidencias.map(evidencia => (
+                                    <div key={evidencia.id} className={styles.evidenciaCard}>
+                                        <div className={styles.evidenciaHeader}>
+                                            <span className={styles.evidenciaIcon}>
+                                                {getIconoTipo(evidencia.tipo)}
+                                            </span>
+                                            <div className={styles.evidenciaInfo}>
+                                                <h4 className={styles.evidenciaTipo}>
+                                                    {evidencia.tipo === 'foto' ? 'FOTOGRAFÍA' : 
+                                                     evidencia.tipo === 'documento' ? 'DOCUMENTO' : 
+                                                     'LISTA DE ASISTENCIA'}
+                                                </h4>
+                                                <span className={styles.evidenciaFecha}>
+                                                    {formatFecha(evidencia.fecha)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <p className={styles.evidenciaDescripcion}>
+                                            {evidencia.descripcion}
+                                        </p>
+                                        
+                                        <div className={styles.evidenciaArchivos}>
+                                            <strong>Archivos:</strong>
+                                            <ul>
+                                                {evidencia.archivos.map((archivo, index) => (
+                                                    <li key={index}>
+                                                        📎 {archivo.nombre}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                        
+                                        <div className={styles.evidenciaFooter}>
+                                            <span className={styles.subidoPor}>
+                                                Subido por: {evidencia.subidoPor}
+                                            </span>
+                                            <button className={styles.btnDescargar}>
+                                                ⬇️ Descargar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className={styles.noEvidencias}>
+                            <div className={styles.noDataIcon}>📁</div>
+                            <h4>No hay evidencias registradas</h4>
+                            <p>Este curso no tiene evidencias subidas aún.</p>
+                        </div>
+                    )}
+                </div>
+                
+                <div className={styles.modalFooter}>
+                    <button onClick={onClose} className={styles.btnCerrar}>
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default function EvidenciasPage() {
     const [cursos, setCursos] = useState([]);
-    const [cursoSeleccionado, setCursoSeleccionado] = useState('');
-    const [alumnosCurso, setAlumnosCurso] = useState([]);
-    const [calificaciones, setCalificaciones] = useState({});
-    const [calificacionesGuardadas, setCalificacionesGuardadas] = useState({});
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
     const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+    const [modalSubir, setModalSubir] = useState({ show: false, curso: null });
+    const [modalVer, setModalVer] = useState({ show: false, curso: null });
 
     const router = useRouter();
 
@@ -49,6 +365,7 @@ export default function EvaluacionesPage() {
     const getUserData = () => {
         try {
             const userData = JSON.parse(localStorage.getItem('userData'));
+            console.log('👤 Datos de usuario:', userData);
             return userData;
         } catch (error) {
             console.error('Error obteniendo datos del usuario:', error);
@@ -56,132 +373,82 @@ export default function EvaluacionesPage() {
         }
     };
 
-    // FUNCIONES PARA CONECTAR CON LA BASE DE DATOS
-    const obtenerCursosDelInstructor = async (instructorId) => {
+    const formatFecha = (fecha) => {
+        if (!fecha) return '';
         try {
-            const response = await fetch(`/api/instructor/cursos?instructorId=${instructorId}`);
-            if (!response.ok) throw new Error('Error al obtener cursos');
-            const data = await response.json();
-            return data.cursos || [];
-        } catch (error) {
-            console.error('Error obteniendo cursos:', error);
-            // Datos de ejemplo como fallback
-            return [
-                { 
-                    id: 2, 
-                    nombre: "Manejo de Materiales y Residuos Peligrosos", 
-                    fechaIngreso: "2025-04-02", 
-                    lugar: "Patio de Maniobras",
-                    estado: "Activo",
-                    alumnosInscritos: 7,
-                    stps: "STPS-MP-004",
-                    tieneExamenPractico: true
-                },
-                { 
-                    id: 3, 
-                    nombre: "Seguridad Industrial", 
-                    fechaIngreso: "2025-04-22", 
-                    lugar: "Area de simulacion",
-                    estado: "Activo", 
-                    alumnosInscritos: 7,
-                    stps: "STPS-IC-003",
-                    tieneExamenPractico: true
-                }
-            ];
-        }
-    };
-
-    const obtenerAlumnosDelCurso = async (cursoId) => {
-        try {
-            const response = await fetch(`/api/cursos/alumnos?cursoId=${cursoId}`);
-            if (!response.ok) throw new Error('Error al obtener alumnos');
-            const data = await response.json();
-            return data.alumnos || [];
-        } catch (error) {
-            console.error('Error obteniendo alumnos:', error);
-            // Datos de ejemplo como fallback
-            const alumnosPorCurso = {
-                2: [
-                    {
-                        curp: 'AGSA940214TSLAS06',
-                        nombre: 'Alejandra',
-                        apellidoPaterno: 'Aguirre',
-                        apellidoMaterno: 'Soto',
-                        calificacion: 0,
-                        asistencia: '85%'
-                    },
-                    {
-                        curp: 'AGSA940214TSLAS12',
-                        nombre: 'Enrique',
-                        apellidoPaterno: 'Vazque',
-                        apellidoMaterno: 'Garcia',
-                        calificacion: 0,
-                        asistencia: '90%'
-                    }
-                ],
-                3: [
-                    {
-                        curp: 'AGSA940214TSLAS06',
-                        nombre: 'Alejandra',
-                        apellidoPaterno: 'Aguirre',
-                        apellidoMaterno: 'Soto',
-                        calificacion: 0,
-                        asistencia: '85%'
-                    },
-                    {
-                        curp: 'CRUB750305JLMCC02',
-                        nombre: 'Benito',
-                        apellidoPaterno: 'Cruz',
-                        apellidoMaterno: 'Robles',
-                        calificacion: 0,
-                        asistencia: '100%'
-                    }
-                ]
-            };
-            return alumnosPorCurso[cursoId] || [];
-        }
-    };
-
-    const obtenerCalificacionesDelCurso = async (cursoId) => {
-        try {
-            const response = await fetch(`/api/evaluaciones/calificaciones?cursoId=${cursoId}`);
-            if (!response.ok) throw new Error('Error al obtener calificaciones');
-            const data = await response.json();
-            return data.calificaciones || {};
-        } catch (error) {
-            console.error('Error obteniendo calificaciones:', error);
-            return {};
-        }
-    };
-
-    const guardarCalificacionEnBD = async (alumnoCurp, cursoId, calificacion) => {
-        try {
-            setSaving(true);
-            const response = await fetch('/api/evaluaciones/guardar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    alumnoCurp,
-                    cursoId,
-                    calificacion
-                }),
+            return new Date(fecha).toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
+        } catch (error) {
+            return fecha;
+        }
+    };
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al guardar calificación');
+    const determinarEstadoCurso = (fechaIngreso) => {
+        if (!fechaIngreso) return 'Programado';
+        
+        const hoy = new Date();
+        const fechaCurso = new Date(fechaIngreso);
+        
+        if (fechaCurso < hoy) return 'Finalizado';
+        
+        const unaSemanaDespues = new Date();
+        unaSemanaDespues.setDate(hoy.getDate() + 7);
+        
+        if (fechaCurso <= unaSemanaDespues) return 'Activo';
+        
+        return 'Programado';
+    };
+
+    const cargarCursosDesdeBackend = async (instructorId) => {
+        try {
+            console.log('🔄 Cargando cursos para instructor ID:', instructorId);
+            
+            const response = await fetch(`http://localhost:8080/api/instructor-cursos/instructor/${instructorId}`);
+            
+            console.log('🔍 Status de respuesta:', response.status);
+
+            if (response.ok) {
+                const cursosData = await response.json();
+                console.log('✅ Cursos cargados del backend:', cursosData);
+                return cursosData;
+            } else {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
 
-            const result = await response.json();
-            return result;
         } catch (error) {
-            console.error('Error guardando calificación:', error);
+            console.error('❌ Error en cargarCursosDesdeBackend:', error);
             throw error;
-        } finally {
-            setSaving(false);
         }
+    };
+
+    const procesarCurso = (curso) => {
+        console.log('🔧 Procesando curso:', curso);
+        
+        const fechaIngreso = curso.fechaIngreso || curso.Fecha_Imparticion;
+        const horas = curso.horas || 8;
+        const alumnosInscritos = curso.alumnosInscritos || 0;
+        const lugar = curso.lugar || curso.Lugar || 'Por definir';
+        const empresa = curso.empresa || 'Empresa no especificada';
+        const nombre = curso.nombre || curso.Nombre_curso;
+        const stps = curso.stps || curso.Clave_STPS;
+        
+        return {
+            id: curso.id || curso.Id_Curso,
+            nombre: nombre,
+            fechaIngreso: fechaIngreso,
+            lugar: lugar,
+            empresa: empresa,
+            instructor: curso.instructor || 'Instructor no asignado',
+            stps: stps,
+            horas: horas,
+            alumnosInscritos: alumnosInscritos,
+            estado: determinarEstadoCurso(fechaIngreso),
+            examenPractico: curso.examenPractico || false,
+            precio: curso.precio || 0
+        };
     };
 
     const cargarDatos = async () => {
@@ -192,268 +459,96 @@ export default function EvaluacionesPage() {
                 return;
             }
 
-            const cursosCargados = await obtenerCursosDelInstructor(userData.id);
-            setCursos(cursosCargados);
+            console.log('🎯 Cargando cursos para evidencias:', userData);
             
-        } catch (error) {
-            console.error('Error cargando datos:', error);
-            showNotification('Error al cargar los cursos', 'error');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const cargarAlumnosPorCurso = async (cursoId) => {
-        try {
-            setLoading(true);
-            const [alumnos, calificacionesExistentes] = await Promise.all([
-                obtenerAlumnosDelCurso(cursoId),
-                obtenerCalificacionesDelCurso(cursoId)
-            ]);
-            
-            setAlumnosCurso(alumnos);
-            setCalificacionesGuardadas(calificacionesExistentes);
-            
-        } catch (error) {
-            console.error('Error cargando alumnos:', error);
-            showNotification('Error al cargar los alumnos del curso', 'error');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleCalificarAlumno = async (alumnoCurp, calificacion) => {
-        try {
-            await guardarCalificacionEnBD(alumnoCurp, parseInt(cursoSeleccionado), calificacion);
-            showNotification(`Calificación guardada para ${alumnoCurp}: ${calificacion.resultado}`, 'success');
-            return true;
-        } catch (error) {
-            console.error('Error guardando calificación:', error);
-            showNotification(`Error al guardar calificación: ${error.message}`, 'error');
-            return false;
-        }
-    };
-
-    const handleCalificacionChange = (alumnoCurp, campo, valor) => {
-        if (campo !== 'observaciones') {
-            const numValue = parseInt(valor);
-            if (numValue > 100) {
-                valor = '100';
-            } else if (numValue < 0) {
-                valor = '0';
-            } else if (isNaN(numValue)) {
-                valor = '';
-            }
-        }
-
-        setCalificaciones(prev => ({
-            ...prev,
-            [alumnoCurp]: {
-                ...prev[alumnoCurp],
-                [campo]: campo === 'observaciones' ? valor : valor
-            }
-        }));
-    };
-
-    const calcularPromedio = (evalInicial, evalFinal, evalPractica, tieneExamenPractico) => {
-        const inicial = parseFloat(evalInicial) || 0;
-        const final = parseFloat(evalFinal) || 0;
-        const practica = parseFloat(evalPractica) || 0;
-        
-        let suma = 0;
-        let cantidadExamenes = 0;
-        
-        if (inicial > 0) {
-            suma += inicial;
-            cantidadExamenes++;
-        }
-        
-        if (final > 0) {
-            suma += final;
-            cantidadExamenes++;
-        }
-        
-        if (tieneExamenPractico && practica > 0) {
-            suma += practica;
-            cantidadExamenes++;
-        }
-        
-        if (cantidadExamenes === 0) return 0;
-        
-        return suma / cantidadExamenes;
-    };
-
-    const determinarResultado = (promedio, evalPractica, tieneExamenPractico, observaciones) => {
-        if (observaciones && observaciones.toLowerCase().includes('sin licencia')) {
-            return 'NO APTO';
-        }
-        
-        if (tieneExamenPractico) {
-            const practicoAprobado = (parseFloat(evalPractica) || 0) >= 80;
-            const promedioAprobado = promedio >= 70;
-            return practicoAprobado && promedioAprobado ? 'APTO' : 'NO APTO';
-        } else {
-            return promedio >= 70 ? 'APTO' : 'NO APTO';
-        }
-    };
-
-    const guardarCalificaciones = async () => {
-        const calificacionesCompletas = {};
-        let calificacionesGuardadasCount = 0;
-        let errores = 0;
-
-        for (const [curp, calif] of Object.entries(calificaciones)) {
-            if (calif && (calif.evaluacionFinal !== undefined || calif.examenPractico !== undefined)) {
-                const evalInicial = parseFloat(calif.evaluacionInicial) || 0;
-                const evalFinal = parseFloat(calif.evaluacionFinal) || 0;
-                const evalPractica = parseFloat(calif.examenPractico) || 0;
+            try {
+                const cursosCargados = await cargarCursosDesdeBackend(userData.id);
+                console.log('📊 Cursos recibidos del backend:', cursosCargados);
                 
-                const cursoActual = cursos.find(curso => curso.id === parseInt(cursoSeleccionado));
-                const tieneExamenPractico = cursoActual ? cursoActual.tieneExamenPractico : true;
+                const cursosProcesados = Array.isArray(cursosCargados) 
+                    ? cursosCargados.map(curso => procesarCurso(curso))
+                    : [];
                 
-                const promedio = calcularPromedio(evalInicial, evalFinal, evalPractica, tieneExamenPractico);
-                const resultado = determinarResultado(promedio, evalPractica, tieneExamenPractico, calif.observaciones);
+                console.log('🎨 Cursos procesados:', cursosProcesados);
                 
-                const calificacionCompleta = {
-                    evaluacionInicial: evalInicial,
-                    evaluacionFinal: evalFinal,
-                    examenPractico: evalPractica,
-                    promedio,
-                    resultado,
-                    observaciones: calif.observaciones || ''
-                };
+                setCursos(cursosProcesados);
+                setLoading(false);
                 
-                calificacionesCompletas[curp] = calificacionCompleta;
-                const guardadoExitoso = await handleCalificarAlumno(curp, calificacionCompleta);
-                
-                if (guardadoExitoso) {
-                    calificacionesGuardadasCount++;
+                if (cursosProcesados.length === 0) {
+                    showNotification('No tienes cursos asignados para subir evidencias', 'info');
                 } else {
-                    errores++;
+                    showNotification(`Cargados ${cursosProcesados.length} cursos para gestión de evidencias`, 'success');
                 }
-            }
-        }
-
-        if (calificacionesGuardadasCount > 0) {
-            setCalificacionesGuardadas(prev => ({ ...prev, ...calificacionesCompletas }));
-            setCalificaciones({});
-            
-            if (errores === 0) {
-                showNotification(`${calificacionesGuardadasCount} calificación(es) guardada(s) correctamente`, 'success');
-            } else {
-                showNotification(`${calificacionesGuardadasCount} calificación(es) guardadas, ${errores} con error`, 'warning');
-            }
-        }
-    };
-
-    const guardarCalificacionIndividual = async (alumnoCurp) => {
-        const calif = calificaciones[alumnoCurp];
-        if (calif && (calif.evaluacionFinal !== undefined || calif.examenPractico !== undefined)) {
-            const evalInicial = parseFloat(calif.evaluacionInicial) || 0;
-            const evalFinal = parseFloat(calif.evaluacionFinal) || 0;
-            const evalPractica = parseFloat(calif.examenPractico) || 0;
-            
-            const cursoActual = cursos.find(curso => curso.id === parseInt(cursoSeleccionado));
-            const tieneExamenPractico = cursoActual ? cursoActual.tieneExamenPractico : true;
-            
-            const promedio = calcularPromedio(evalInicial, evalFinal, evalPractica, tieneExamenPractico);
-            const resultado = determinarResultado(promedio, evalPractica, tieneExamenPractico, calif.observaciones);
-            
-            const calificacionCompleta = {
-                evaluacionInicial: evalInicial,
-                evaluacionFinal: evalFinal,
-                examenPractico: evalPractica,
-                promedio,
-                resultado,
-                observaciones: calif.observaciones || ''
-            };
-            
-            const guardadoExitoso = await handleCalificarAlumno(alumnoCurp, calificacionCompleta);
-            
-            if (guardadoExitoso) {
-                setCalificacionesGuardadas(prev => ({
-                    ...prev,
-                    [alumnoCurp]: calificacionCompleta
-                }));
                 
-                setCalificaciones(prev => {
-                    const nuevasCalificaciones = { ...prev };
-                    delete nuevasCalificaciones[alumnoCurp];
-                    return nuevasCalificaciones;
-                });
+            } catch (backendError) {
+                console.log('🔄 Falló conexión con backend, usando datos de ejemplo');
+                throw new Error('modo-desarrollo');
+            }
+            
+        } catch (error) {
+            console.error('💥 Error en cargarDatos:', error);
+            
+            if (error.message === 'modo-desarrollo') {
+                showNotification('Modo desarrollo: Mostrando datos de ejemplo', 'warning');
+                const userData = getUserData();
+                const cursosEjemplo = [
+                    { 
+                        Id_Curso: 2, 
+                        Nombre_curso: "Manejo de Materiales y Residuos Peligrosos", 
+                        Fecha_Imparticion: "2025-04-02", 
+                        Lugar: "Patio de Maniobras",
+                        empresa: "Industrias PEMEX",
+                        instructor: userData?.nombre || "Ana Solis",
+                        Clave_STPS: "STPS-MP-004",
+                        horas: 8,
+                        alumnosInscritos: 7
+                    },
+                    { 
+                        Id_Curso: 25, 
+                        Nombre_curso: "Soporte Vital Básico (BLS)", 
+                        Fecha_Imparticion: "2025-11-20", 
+                        Lugar: "Auditorio B", 
+                        empresa: "Servicios Corporativos",
+                        instructor: userData?.nombre || "Ana Solis",
+                        Clave_STPS: "BEY-SOP-001",
+                        horas: 8,
+                        alumnosInscritos: 5
+                    }
+                ].map(curso => procesarCurso(curso));
+                
+                setCursos(cursosEjemplo);
+                setLoading(false);
+            } else {
+                showNotification('Error al cargar los cursos: ' + error.message, 'error');
+                setLoading(false);
             }
         }
     };
 
-    const handleSeleccionarCurso = (cursoId) => {
-        setCursoSeleccionado(cursoId);
-        setCalificaciones({});
-        setCalificacionesGuardadas({});
-        if (cursoId) {
-            cargarAlumnosPorCurso(cursoId);
-        } else {
-            setAlumnosCurso([]);
-        }
+    const handleSubirEvidencia = (curso) => {
+        setModalSubir({ show: true, curso });
     };
 
-    const handleBlur = (alumnoCurp, campo, valor) => {
-        if (campo !== 'observaciones') {
-            const numValue = parseInt(valor);
-            if (isNaN(numValue)) {
-                handleCalificacionChange(alumnoCurp, campo, '');
-            } else if (numValue > 100) {
-                handleCalificacionChange(alumnoCurp, campo, '100');
-            } else if (numValue < 0) {
-                handleCalificacionChange(alumnoCurp, campo, '0');
-            }
-        }
+    const handleVerEvidencias = (curso) => {
+        setModalVer({ show: true, curso });
     };
 
-    const obtenerValorCampo = (alumnoCurp, campo) => {
-        // Primero verificar si hay cambios pendientes
-        if (calificaciones[alumnoCurp] && calificaciones[alumnoCurp][campo] !== undefined) {
-            const valor = calificaciones[alumnoCurp][campo];
-            return campo === 'observaciones' ? valor : (valor === '' ? '' : valor);
-        }
-        // Luego verificar calificaciones guardadas en BD
-        if (calificacionesGuardadas[alumnoCurp] && calificacionesGuardadas[alumnoCurp][campo] !== undefined) {
-            const valor = calificacionesGuardadas[alumnoCurp][campo];
-            return campo === 'observaciones' ? valor : (valor === 0 ? '' : valor.toString());
-        }
-        return '';
+    const handleEvidenciaSubida = (evidenciaData) => {
+        console.log('✅ Evidencia subida:', evidenciaData);
+        showNotification('Evidencias subidas correctamente', 'success');
     };
 
-    const tieneCambiosPendientes = (alumnoCurp) => {
-        return calificaciones[alumnoCurp] !== undefined;
+    const handleCerrarModalSubir = () => {
+        setModalSubir({ show: false, curso: null });
     };
 
-    const puedeCalificar = (alumnoCurp) => {
-        const calif = calificaciones[alumnoCurp];
-        if (!calif) return false;
-        
-        const tieneEvaluacionFinal = calif.evaluacionFinal !== undefined && calif.evaluacionFinal !== '';
-        const cursoActual = cursos.find(curso => curso.id === parseInt(cursoSeleccionado));
-        const tieneExamenPractico = cursoActual ? cursoActual.tieneExamenPractico : true;
-        const tieneExamenPracticoRequerido = !tieneExamenPractico || (calif.examenPractico !== undefined && calif.examenPractico !== '');
-        
-        return tieneEvaluacionFinal && tieneExamenPracticoRequerido;
+    const handleCerrarModalVer = () => {
+        setModalVer({ show: false, curso: null });
     };
-
-    const cursoActual = cursos.find(curso => curso.id === parseInt(cursoSeleccionado));
-    const tieneExamenPractico = cursoActual ? cursoActual.tieneExamenPractico : true;
 
     useEffect(() => {
         cargarDatos();
     }, []);
-
-    if (loading && !cursoSeleccionado) {
-        return (
-            <div className={styles.loading}>
-                <div className={styles.spinner}></div>
-                <p>Cargando evaluaciones...</p>
-            </div>
-        );
-    }
 
     return (
         <div className={styles.pageContainer}>
@@ -466,206 +561,158 @@ export default function EvaluacionesPage() {
                 />
             )}
 
+            {/* Modal Subir Evidencia */}
+            {modalSubir.show && (
+                <ModalSubirEvidencia 
+                    curso={modalSubir.curso} 
+                    onClose={handleCerrarModalSubir}
+                    onEvidenciaSubida={handleEvidenciaSubida}
+                />
+            )}
+
+            {/* Modal Ver Evidencias */}
+            {modalVer.show && (
+                <ModalVerEvidencias 
+                    curso={modalVer.curso} 
+                    onClose={handleCerrarModalVer}
+                />
+            )}
+
             {/* Header */}
             <header className={styles.header}>
                 <div className={styles.titleSection}>
-                    <h1>Sistema de Evaluaciones</h1>
-                    <p>Calificación de estudiantes y registro de resultados</p>
+                    <h1>Gestión de Evidencias</h1>
+                    <p>Sube y consulta evidencias de tus cursos</p>
                 </div>
                 <div className={styles.logoSection}>
                     <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
                     <div className={styles.logoText}>
-                        <span className={styles.logoTitle}>BEYCO</span>
-                        <span className={styles.logoSubtitle}>Consultores</span>
+                        <span className={styles.logoTitle}></span>
+                        <span className={styles.logoSubtitle}></span>
                     </div>
                 </div>
             </header>
 
             <main className={styles.mainContent}>
-                {/* Breadcrumb */}
-                <div className={styles.breadcrumb}>
-                    <Link href="/instructor" className={styles.breadcrumbLink}>Dashboard</Link>
-                    <span className={styles.breadcrumbSeparator}>/</span>
-                    <span className={styles.breadcrumbCurrent}>Evaluaciones</span>
+                {/* Información de la página */}
+                <div className={styles.infoSection}>
+                    <div className={styles.infoCard}>
+                        <h3>📁 Tipos de Evidencias Aceptadas</h3>
+                        <ul>
+                            <li>📷 Fotografías de sesiones prácticas</li>
+                            <li>📋 Listas de asistencia</li>
+                            <li>📄 Documentos de trabajo</li>
+                        </ul>
+                    </div>
                 </div>
 
-                {/* Selector de Curso */}
-                <div className={styles.selectorSection}>
-                    <label>Seleccionar Curso:</label>
-                    <select 
-                        value={cursoSeleccionado} 
-                        onChange={(e) => handleSeleccionarCurso(e.target.value)}
-                        className={styles.selector}
-                    >
-                        <option value="">-- Selecciona un curso --</option>
-                        {cursos.map(curso => (
-                            <option key={curso.id} value={curso.id}>
-                                {curso.nombre} - {new Date(curso.fechaIngreso).toLocaleDateString('es-ES')}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {cursoSeleccionado && (
-                    <div className={styles.tableContainer}>
-                        <div className={styles.tableHeader}>
-                            <h3>Calificaciones del Curso: {cursoActual?.nombre}</h3>
-                            <div className={styles.accionesHeader}>
-                                <span className={styles.contadorCambios}>
-                                    {Object.keys(calificaciones).length > 0 && 
-                                        `${Object.keys(calificaciones).length} calificación(es) pendiente(s)`
-                                    }
-                                </span>
-                                <button 
-                                    className={styles.btnGuardar} 
-                                    onClick={guardarCalificaciones}
-                                    disabled={Object.keys(calificaciones).length === 0 || saving}
-                                >
-                                    {saving ? '⏳ Guardando...' : '💾 Guardar Todas las Calificaciones'}
-                                </button>
-                            </div>
+                {/* Tabla de Cursos */}
+                <div className={styles.tableContainer}>
+                    <div className={styles.tableHeader}>
+                        <h3>Cursos para Gestión de Evidencias</h3>
+                        <div className={styles.tableActions}>
+                            <span className={styles.totalCursos}>
+                                {loading ? 'Cargando...' : `${cursos.length} curso(s)`}
+                            </span>
                         </div>
-                        
-                        {/* Notas importantes */}
-                        <div className={styles.notasImportantes}>
-                            <p>***El examen más importante es el práctico y el final, el práctico hay que acreditarlo con un 80%</p>
-                            <p>***Los promedios se obtienen con todos los exámenes disponibles (inicial, final y práctico si aplica)</p>
-                            <p>***El curso se acredita principalmente con el examen práctico (si aplica) y algunas observaciones con el instructor</p>
-                            <p>***Para ser APTO: Mínimo 70 de promedio y 80 en examen práctico (si aplica)</p>
-                        </div>
+                    </div>
 
-                        {loading ? (
-                            <div className={styles.loading}>
-                                <div className={styles.spinner}></div>
-                                <p>Cargando alumnos...</p>
-                            </div>
-                        ) : (
-                            <table className={styles.cursosTable}>
-                                <thead>
-                                    <tr>
-                                        <th>NOMBRE</th>
-                                        <th>EVALUACIÓN INICIAL</th>
-                                        <th>EVALUACIÓN FINAL</th>
-                                        {tieneExamenPractico && <th>EXAMEN PRÁCTICO</th>}
-                                        <th>PROMEDIO</th>
-                                        <th>RESULTADO</th>
-                                        <th>OBSERVACIONES</th>
-                                        <th>ACCIONES</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {alumnosCurso.length > 0 ? (
-                                        alumnosCurso.map(alumno => {
-                                            const califAlumno = calificaciones[alumno.curp] || calificacionesGuardadas[alumno.curp] || {};
-                                            const evalInicial = parseFloat(califAlumno.evaluacionInicial) || 0;
-                                            const evalFinal = parseFloat(califAlumno.evaluacionFinal) || 0;
-                                            const evalPractica = parseFloat(califAlumno.examenPractico) || 0;
-                                            
-                                            const promedio = califAlumno.promedio || calcularPromedio(evalInicial, evalFinal, evalPractica, tieneExamenPractico);
-                                            const resultado = califAlumno.resultado || determinarResultado(promedio, evalPractica, tieneExamenPractico, califAlumno.observaciones);
-                                            
-                                            const tieneCambios = tieneCambiosPendientes(alumno.curp);
-                                            const puedeGuardar = puedeCalificar(alumno.curp);
-                                            
-                                            return (
-                                                <tr key={alumno.curp} className={tieneCambios ? styles.filaConCambios : ''}>
-                                                    <td>
-                                                        <strong>{alumno.nombre} {alumno.apellidoPaterno} {alumno.apellidoMaterno}</strong>
-                                                        {tieneCambios && <span className={styles.indicatorCambios}> *</span>}
-                                                    </td>
-                                                    <td>
-                                                        <input 
-                                                            type="number"
-                                                            min="0"
-                                                            max="100"
-                                                            step="1"
-                                                            value={obtenerValorCampo(alumno.curp, 'evaluacionInicial')}
-                                                            onChange={(e) => handleCalificacionChange(alumno.curp, 'evaluacionInicial', e.target.value)}
-                                                            onBlur={(e) => handleBlur(alumno.curp, 'evaluacionInicial', e.target.value)}
-                                                            className={styles.calificacionInput}
-                                                            placeholder="0-100"
-                                                        />
-                                                    </td>
-                                                    <td>
-                                                        <input 
-                                                            type="number"
-                                                            min="0"
-                                                            max="100"
-                                                            step="1"
-                                                            value={obtenerValorCampo(alumno.curp, 'evaluacionFinal')}
-                                                            onChange={(e) => handleCalificacionChange(alumno.curp, 'evaluacionFinal', e.target.value)}
-                                                            onBlur={(e) => handleBlur(alumno.curp, 'evaluacionFinal', e.target.value)}
-                                                            className={styles.calificacionInput}
-                                                            placeholder="0-100"
-                                                            required
-                                                        />
-                                                    </td>
-                                                    {tieneExamenPractico && (
-                                                        <td>
-                                                            <input 
-                                                                type="number"
-                                                                min="0"
-                                                                max="100"
-                                                                step="1"
-                                                                value={obtenerValorCampo(alumno.curp, 'examenPractico')}
-                                                                onChange={(e) => handleCalificacionChange(alumno.curp, 'examenPractico', e.target.value)}
-                                                                onBlur={(e) => handleBlur(alumno.curp, 'examenPractico', e.target.value)}
-                                                                className={styles.calificacionInput}
-                                                                placeholder="0-100"
-                                                                required
-                                                            />
-                                                        </td>
-                                                    )}
-                                                    <td>
-                                                        <span className={styles.promedio}>
-                                                            {promedio > 0 ? promedio.toFixed(1) : '-'}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <span className={`${styles.resultado} ${resultado === 'APTO' ? styles.apto : styles.noApto}`}>
-                                                            {resultado || '-'}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <input 
-                                                            type="text"
-                                                            value={obtenerValorCampo(alumno.curp, 'observaciones')}
-                                                            onChange={(e) => handleCalificacionChange(alumno.curp, 'observaciones', e.target.value)}
-                                                            className={styles.observacionesInput}
-                                                            placeholder="Observaciones..."
-                                                        />
-                                                    </td>
-                                                    <td>
-                                                        <button 
-                                                            className={styles.btnGuardarIndividual}
-                                                            onClick={() => guardarCalificacionIndividual(alumno.curp)}
-                                                            disabled={!puedeGuardar || saving}
-                                                            title={puedeGuardar ? "Guardar calificación" : "Complete evaluación final" + (tieneExamenPractico ? " y examen práctico" : "")}
-                                                        >
-                                                            {saving ? '⏳' : '💾'} GUARDAR
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={tieneExamenPractico ? "8" : "7"} className={styles.noData}>
-                                                No hay alumnos inscritos en este curso
+                    {loading ? (
+                        <div className={styles.loading}>
+                            <div className={styles.spinner}></div>
+                            <p>Cargando cursos...</p>
+                        </div>
+                    ) : (
+                        <table className={styles.cursosTable}>
+                            <thead>
+                                <tr>
+                                    <th>Curso</th>
+                                    <th>Fecha</th>
+                                    <th>Lugar</th>
+                                    <th>Empresa</th>
+                                    <th>Estudiantes</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {cursos.length > 0 ? (
+                                    cursos.map(curso => (
+                                        <tr key={curso.id}>
+                                            <td>
+                                                <div className={styles.cursoInfo}>
+                                                    <strong className={styles.cursoNombre}>{curso.nombre}</strong>
+                                                    <div className={styles.cursoDetalles}>
+                                                        <span className={styles.cursoClave}>Clave: {curso.stps}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className={styles.fechaInfo}>
+                                                    <span className={styles.fechaPrincipal}>{formatFecha(curso.fechaIngreso)}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className={styles.lugar}>{curso.lugar}</span>
+                                            </td>
+                                            <td>
+                                                <span className={styles.empresa}>{curso.empresa}</span>
+                                            </td>
+                                            <td>
+                                                <div className={styles.estudiantesInfo}>
+                                                    <span className={styles.cantidadEstudiantes}>{curso.alumnosInscritos}</span>
+                                                    <span className={styles.estudiantesLabel}>estudiantes</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className={`${styles.status} ${styles[curso.estado?.toLowerCase()]}`}>
+                                                    {curso.estado}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div className={styles.accionesEvidencias}>
+                                                    <button 
+                                                        onClick={() => handleSubirEvidencia(curso)}
+                                                        className={styles.btnSubirEvidencia}
+                                                        title="Subir nuevas evidencias"
+                                                    >
+                                                        📤 Subir
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleVerEvidencias(curso)}
+                                                        className={styles.btnVerEvidencias}
+                                                        title="Ver evidencias existentes"
+                                                    >
+                                                        👁️ Ver
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        )}
-                    </div>
-                )}
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="7" className={styles.noData}>
+                                            <div className={styles.noDataContent}>
+                                                <div className={styles.noDataIcon}>📁</div>
+                                                <h4>No hay cursos asignados</h4>
+                                                <p>No tienes cursos disponibles para gestión de evidencias.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
 
-                {/* Botón volver */}
+                {/* Botones de acción */}
                 <div className={styles.actionsSection}>
-                    <Link href="/instructor" className={styles.btnVolver}>
-                        ← Volver al Dashboard
+                    <Link href="/instructor/dashboard" className={styles.btnVolver}>
+                        ← Volver 
                     </Link>
+                    <button onClick={() => cargarDatos()} className={styles.btnRecargar}>
+                        🔄 Actualizar
+                    </button>
                 </div>
             </main>
         </div>
