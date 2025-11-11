@@ -1,4 +1,4 @@
-/* app/LoginPage.module.css */
+/* Header con azul oscuro */
 .pageContainer {
     background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
     min-height: 100vh;
@@ -6,7 +6,6 @@
     font-family: 'Inter', sans-serif;
 }
 
-/* Header con azul oscuro */
 .header {
     display: flex;
     justify-content: center;
@@ -198,45 +197,12 @@
     text-decoration: underline;
 }
 
-/* Información de desarrollo */
-.devInfo {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
-
-.devTitle {
-    font-weight: 600;
-    color: #001f3f;
-    margin: 0 0 1rem 0;
-    font-size: 0.9rem;
-    text-align: center;
-}
-
-.devCredentials {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.credentialItem {
-    font-size: 0.8rem;
-    color: #666;
-    text-align: center;
-}
-
-.credentialItem strong {
-    color: #001f3f;
-}
-
 /* Sistema de Notificaciones */
 .notification {
-    position: fixed;            /* Fijo en la pantalla */
-    top: 150px;                  /* Separación desde la parte superior */
-    left: 50%;                  /* Punto medio horizontal */
-    transform: translateX(-50%); /* Centrado horizontal */
+    position: fixed;
+    top: 150px;
+    left: 50%;
+    transform: translateX(-50%);
     background: white;
     border-radius: 8px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -426,12 +392,175 @@
         padding: 1rem 1.5rem;
         font-size: 1rem;
     }
+}
+
+/* ✅ ESTILOS PARA VALIDACIONES Y MEJORAS VISUALES */
+
+/* Campos con error */
+.inputError {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff5f5;
+}
+
+.errorText {
+    color: #dc3545 !important;
+    font-size: 12px;
+    display: block;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* Helper text para contraseña */
+.passwordHelper {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Advertencia de intentos */
+.attemptsWarning {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    text-align: center;
+    margin: 1rem 0;
+    font-weight: 600;
+}
+
+/* Alerta de bloqueo */
+.lockWarning {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 1rem 0;
+    font-weight: 600;
+}
+
+.lockWarning strong {
+    color: #dc3545;
+}
+
+/* Estados de botón deshabilitado */
+.loginButton:disabled {
+    background: #6c757d !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Animaciones mejoradas */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Focus states mejorados */
+.formInput:focus {
+    outline: none;
+    border-color: #001f3f;
+    box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
+}
+
+/* Mejoras de accesibilidad */
+.formInput:invalid:not(:focus):not(:placeholder-shown) {
+    border-color: #dc3545;
+}
+
+/* Loading states mejorados */
+.loadingText {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* app/LoginPage.module.css - Agregar estos estilos */
+
+/* Indicador de estado del backend */
+.backendStatus {
+    position: fixed;                 /* fijo en pantalla */
+    top: 15rem;                       /* distancia desde arriba */
+    left: 50%;                       /* lo centramos horizontalmente */
+    transform: translateX(-50%);     /* ajuste exacto al centro */
     
-    .devInfo {
-        padding: 1rem;
-    }
-    
-    .credentialItem {
-        font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+
+    z-index: 1000;                   /* que quede por encima de otros elementos */
+}
+
+.backendStatusOnline {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+
+.backendStatusOffline {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.backendStatusChecking {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid #ffc107;
+}
+
+/* Alerta de backend offline */
+.backendOfflineWarning {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 1rem 0;
+    font-weight: 600;
+}
+
+/* Responsive para el indicador de backend */
+@media (max-width: 768px) {
+    .backendStatus {
+        position: relative;
+        right: auto;
+        top: auto;
+        transform: none;
+        margin-top: 1rem;
+        display: inline-block;
     }
 }

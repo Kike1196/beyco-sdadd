@@ -32,6 +32,7 @@
 
 .logo {
     height: 100px;
+    border-radius: 8px;
 }
 
 .mainContent {
@@ -63,6 +64,7 @@
     font-size: 1rem;
     margin-bottom: 1rem;
     transition: all 0.3s ease;
+    color: #000000;
 }
 
 .searchInput:focus {
@@ -86,7 +88,7 @@
     padding: 0.5rem;
     border-radius: 6px;
     transition: background-color 0.2s;
-    color: black;
+    color: #000000;
 }
 
 .filterOptions label:hover {
@@ -98,25 +100,25 @@
     flex-direction: column;
     gap: 1rem;
     align-items: end;
-    color: black;
+    color: #000000;
 }
 
-/* ✅ NUEVO: Estilos para el contenedor de período (año y mes) */
+/* ✅ NUEVO: Estilos para el contenedor de período con fechas */
 .periodFilter {
     display: flex;
     gap: 1rem;
-    align-items: center;
+    align-items: end;
 }
 
-.yearFilter, .monthFilter {
+.dateFilter {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 0.5rem;
     font-weight: 600;
-    color: black;
+    color: #000000;
 }
 
-.yearSelect, .monthSelect {
+.dateInput {
     padding: 0.5rem 1rem;
     border: 2px solid #e9ecef;
     border-radius: 6px;
@@ -124,14 +126,15 @@
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    min-width: 120px;
+    min-width: 150px;
+    color: #000000;
 }
 
-.yearSelect:hover, .monthSelect:hover {
+.dateInput:hover {
     border-color: #001f3f;
 }
 
-.yearSelect:focus, .monthSelect:focus {
+.dateInput:focus {
     outline: none;
     border-color: #001f3f;
     box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
@@ -253,7 +256,7 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
-    color: black
+    color: #000000;
 }
 
 .cursosTable th,
@@ -294,12 +297,12 @@
     border-radius: 4px;
 }
 
-.horas, .costo {
+.horas, .precio {
     text-align: center;
     font-weight: 600;
 }
 
-.costo {
+.precio {
     color: #28a745;
     font-weight: 700;
 }
@@ -473,13 +476,12 @@
         width: 100%;
     }
     
-    .yearFilter, .monthFilter {
+    .dateFilter {
         width: 100%;
-        justify-content: space-between;
     }
     
-    .yearSelect, .monthSelect {
-        flex: 1;
+    .dateInput {
+        width: 100%;
     }
     
     .actionButtons, .errorActions {
@@ -526,9 +528,198 @@
         gap: 0.5rem;
     }
     
-    .yearFilter, .monthFilter {
+    .dateFilter {
         flex-direction: column;
         align-items: start;
         gap: 0.5rem;
+    }
+    
+    .logo {
+        height: 80px;
+    }
+}
+
+/* Estilos adicionales para mejor visualización en móviles */
+@media (max-width: 1024px) {
+    .mainContent {
+        padding: 1.5rem;
+    }
+    
+    .header {
+        padding: 1.25rem 2rem;
+    }
+    
+    .titleSection h1 {
+        font-size: 2rem;
+    }
+}
+
+/* Mejoras de accesibilidad */
+.searchInput::placeholder {
+    color: #6c757d;
+}
+
+.dateInput::placeholder {
+    color: #6c757d;
+}
+
+/* Estados de focus mejorados */
+.btnExport:focus,
+.btnReport:focus,
+.btnBack:focus,
+.btnRetry:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Mejoras visuales para la tabla en pantallas grandes */
+@media (min-width: 1200px) {
+    .cursosTable {
+        font-size: 0.95rem;
+    }
+    
+    .cursosTable th,
+    .cursosTable td {
+        padding: 1.25rem;
+    }
+}
+
+/* Efectos de hover mejorados */
+.statCard {
+    position: relative;
+    overflow: hidden;
+}
+
+.statCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.statCard:hover::before {
+    left: 100%;
+}
+
+/* Scrollbar personalizado para la tabla */
+.tableContainer::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Estilos para los inputs de fecha en diferentes navegadores */
+.dateInput::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.dateInput::-webkit-datetime-edit {
+    padding: 0;
+}
+
+.dateInput::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+.dateInput::-webkit-datetime-edit-text {
+    padding: 0 0.2em;
+}
+
+/* Estilos para Firefox */
+.dateInput {
+    /* Firefox necesita un poco de ajuste */
+    min-height: 38px;
+}
+
+/* Estilos para Safari */
+@media not all and (min-resolution:.001dpcm) { 
+    @supports (-webkit-appearance:none) {
+        .dateInput {
+            padding: 0.6rem 1rem;
+        }
+    }
+}
+
+/* Mejoras de contraste para accesibilidad */
+@media (prefers-contrast: high) {
+    .statCard {
+        border: 2px solid white;
+    }
+    
+    .badgeSuccess {
+        border: 2px solid #155724;
+    }
+    
+    .badgeWarning {
+        border: 2px solid #856404;
+    }
+    
+    .badgeInfo {
+        border: 2px solid #004085;
+    }
+    
+    .badgeError {
+        border: 2px solid #721c24;
+    }
+}
+
+/* Modo oscuro opcional */
+@media (prefers-color-scheme: dark) {
+    .pageContainer {
+        background-color: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    .mainContent {
+        background-color: #2d2d2d;
+        color: #ffffff;
+    }
+    
+    .searchInput,
+    .dateInput {
+        background-color: #3d3d3d;
+        border-color: #4d4d4d;
+        color: #ffffff;
+    }
+    
+    .searchInput::placeholder,
+    .dateInput::placeholder {
+        color: #a0a0a0;
+    }
+    
+    .cursosTable {
+        color: #ffffff;
+    }
+    
+    .cursosTable th {
+        background-color: #3d3d3d;
+        color: #ffffff;
+    }
+    
+    .cursosTable tbody tr:hover {
+        background-color: #3d3d3d;
+    }
+    
+    .stpsCode {
+        background-color: #3d3d3d;
+        color: #ffffff;
     }
 }

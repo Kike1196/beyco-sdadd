@@ -1,4 +1,3 @@
-// controllers/HonorariosController.java
 package com.beyco.app.controllers;
 
 import com.beyco.app.models.HonorariosInstructorDTO;
@@ -25,7 +24,7 @@ public class HonorariosController {
     @Autowired
     private HonorariosService honorariosService;
 
-    // Endpoint para ver todos los cursos (debug)
+    // Endpoint para ver todos los cursos (debug) - CORREGIDO
     @GetMapping("/cursos")
     public ResponseEntity<?> listarTodosLosCursos() {
         try {
@@ -39,11 +38,11 @@ public class HonorariosController {
             
             System.out.println("✅ Cursos encontrados: " + cursos.size());
             for (PagoInstructor curso : cursos) {
-                System.out.println("Curso ID: " + curso.getId() + 
-                                 ", Instructor: " + curso.getInstructorNombre() + 
-                                 ", Curso: " + curso.getCursoNombre() + 
-                                 ", Fecha: " + curso.getFechaCurso() +
-                                 ", Precio: " + curso.getMonto());
+                System.out.println("Curso - Instructor ID: " + curso.getInstructorId() + 
+                                 ", Fecha: " + curso.getFechaPago() +
+                                 ", Monto: " + curso.getMonto() +
+                                 ", Horas: " + curso.getHorasImpartidas() +
+                                 ", Observaciones: " + curso.getObservaciones());
             }
             
             return ResponseEntity.ok(response);
@@ -58,7 +57,7 @@ public class HonorariosController {
         }
     }
 
-    // Endpoint para ver todos los pagos (debug)
+    // Endpoint para ver todos los pagos (debug) - CORREGIDO
     @GetMapping("/pagos")
     public ResponseEntity<?> listarTodosLosPagos() {
         try {
@@ -73,10 +72,11 @@ public class HonorariosController {
             System.out.println("✅ Pagos encontrados: " + pagos.size());
             for (PagoInstructor pago : pagos) {
                 System.out.println("Pago ID: " + pago.getId() + 
-                                 ", Instructor: " + pago.getInstructorNombre() + 
+                                 ", Instructor ID: " + pago.getInstructorId() +
                                  ", Fecha: " + pago.getFechaPago() +
                                  ", Monto: " + pago.getMonto() +
-                                 ", Estatus: " + pago.getEstatus());
+                                 ", Estatus: " + pago.getEstatus() +
+                                 ", Observaciones: " + pago.getObservaciones());
             }
             
             return ResponseEntity.ok(response);
@@ -105,10 +105,12 @@ public class HonorariosController {
             
             System.out.println("✅ Instructores activos encontrados: " + instructores.size());
             for (Usuario instructor : instructores) {
-                System.out.println("Instructor: " + instructor.getNombre() + " " + 
-                                 instructor.getApellidoPaterno() + " " + 
-                                 instructor.getApellidoMaterno() + 
-                                 " (ID: " + instructor.getNumEmpleado() + ")");
+                String nombreCompleto = instructor.getNombre() + " " + 
+                                      instructor.getApellidoPaterno() + " " + 
+                                      instructor.getApellidoMaterno();
+                System.out.println("Instructor: " + nombreCompleto.trim() + 
+                                 " (ID: " + instructor.getNumEmpleado() + 
+                                 ", Email: " + instructor.getCorreo() + ")");
             }
             
             return ResponseEntity.ok(response);
@@ -123,7 +125,7 @@ public class HonorariosController {
         }
     }
 
-    // Obtener cursos pendientes por instructor y periodo - ENDPOINT CORREGIDO
+    // Obtener cursos pendientes por instructor y periodo - CORREGIDO
     @GetMapping("/instructor/{instructorId}/cursos-pendientes")
     public ResponseEntity<?> obtenerCursosPendientes(
             @PathVariable("instructorId") int instructorId,
@@ -147,10 +149,12 @@ public class HonorariosController {
             
             if (honorarios.getCursosPendientes() != null) {
                 for (PagoInstructor curso : honorarios.getCursosPendientes()) {
-                    System.out.println("Curso: " + curso.getCursoNombre() + 
-                                     ", Fecha: " + curso.getFechaCurso() + 
+                    System.out.println("Curso - Instructor ID: " + curso.getInstructorId() + 
+                                     ", Fecha: " + curso.getFechaPago() + 
                                      ", Monto: " + curso.getMonto() + 
-                                     ", Estatus: " + curso.getEstatus());
+                                     ", Horas: " + curso.getHorasImpartidas() +
+                                     ", Estatus: " + curso.getEstatus() +
+                                     ", Observaciones: " + curso.getObservaciones());
                 }
             }
             
@@ -166,7 +170,7 @@ public class HonorariosController {
         }
     }
 
-    // Generar recibo de pago
+    // Generar recibo de pago - CORREGIDO
     @PostMapping("/generar-recibo")
     public ResponseEntity<?> generarReciboPago(@RequestBody Map<String, Object> request) {
         try {
@@ -228,7 +232,7 @@ public class HonorariosController {
         return ResponseEntity.ok(response);
     }
 
-    // Endpoint para crear datos de prueba en pagos_instructores
+    // Endpoint para crear datos de prueba en pagos_instructores - CORREGIDO
     @PostMapping("/crear-datos-prueba")
     public ResponseEntity<?> crearDatosPrueba() {
         try {
@@ -244,21 +248,32 @@ public class HonorariosController {
                 if (registrosCreados >= 2) break; // Solo crear 2 registros de prueba
                 
                 try {
+                    // Extraer información del curso desde las observaciones
+                    String observaciones = curso.getObservaciones();
+                    String nombreCurso = "Curso de prueba";
+                    if (observaciones != null && observaciones.contains("Curso: ")) {
+                        int start = observaciones.indexOf("Curso: ") + 7;
+                        int end = observaciones.indexOf(" (ID:");
+                        if (end > start) {
+                            nombreCurso = observaciones.substring(start, end);
+                        }
+                    }
+                    
                     // Insertar pago de prueba
                     boolean creado = honorariosService.crearPagoPrueba(
                         curso.getInstructorId(),
-                        curso.getFechaCurso(),
+                        curso.getFechaPago(), // Usar fechaPago en lugar de fechaCurso
                         curso.getMonto(),
                         curso.getHorasImpartidas(),
-                        curso.getCursoNombre()
+                        nombreCurso
                     );
                     
                     if (creado) {
                         registrosCreados++;
-                        System.out.println("✅ Creado pago de prueba para: " + curso.getCursoNombre());
+                        System.out.println("✅ Creado pago de prueba para: " + nombreCurso);
                     }
                 } catch (Exception e) {
-                    System.out.println("⚠️ Error creando pago para curso: " + curso.getCursoNombre() + " - " + e.getMessage());
+                    System.out.println("⚠️ Error creando pago para curso: " + e.getMessage());
                 }
             }
             
@@ -276,6 +291,65 @@ public class HonorariosController {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
             errorResponse.put("error", "Error al crear datos de prueba: " + e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    // Buscar instructores por criterio
+    @GetMapping("/instructores/buscar")
+    public ResponseEntity<?> buscarInstructores(@RequestParam("criterio") String criterio) {
+        try {
+            System.out.println("🔍 Buscando instructores con criterio: " + criterio);
+            List<Usuario> instructores = honorariosService.buscarInstructores(criterio);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", instructores);
+            response.put("total", instructores.size());
+            
+            System.out.println("✅ Instructores encontrados: " + instructores.size());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("❌ Error al buscar instructores: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "Error al buscar instructores: " + e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    // NUEVO: Endpoint para obtener cursos por instructor (debugging)
+    @GetMapping("/instructor/{instructorId}/cursos")
+    public ResponseEntity<?> obtenerCursosPorInstructor(@PathVariable("instructorId") int instructorId) {
+        try {
+            System.out.println("🔍 Buscando todos los cursos para instructor ID: " + instructorId);
+            
+            List<PagoInstructor> cursos = honorariosService.obtenerCursosPorInstructor(instructorId);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", cursos);
+            response.put("total", cursos.size());
+            
+            System.out.println("✅ Cursos encontrados para instructor " + instructorId + ": " + cursos.size());
+            for (PagoInstructor curso : cursos) {
+                System.out.println("Curso - Instructor ID: " + curso.getInstructorId() + 
+                                 ", Fecha: " + curso.getFechaPago() + 
+                                 ", Monto: " + curso.getMonto() +
+                                 ", Observaciones: " + curso.getObservaciones());
+            }
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("❌ Error al obtener cursos por instructor: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "Error al obtener cursos: " + e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
         }
     }

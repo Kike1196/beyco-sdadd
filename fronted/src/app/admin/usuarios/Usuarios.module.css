@@ -452,16 +452,7 @@
 }
 
 /* Modo info */
-.modoInfo {
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
-    display: inline-block;
-}
+
 
 .modoInfo.warning {
     background-color: #fff3cd;
@@ -794,4 +785,338 @@
 .btnFirma.inputError {
     border-color: #dc3545;
     box-shadow: 0 0 0 2px rgba(220,53,69,0.25);
+}
+
+/* ✅ NUEVOS ESTILOS PARA INTERFAZ SIMPLIFICADA */
+
+/* Estadísticas seleccionables */
+.statSelected {
+    font-weight: 700;
+    text-decoration: underline;
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}
+
+.statActive.statSelected {
+    color: #155724 !important;
+    background-color: #d4edda;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.statInactive.statSelected {
+    color: #721c24 !important;
+    background-color: #f8d7da;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* Estado clickeable */
+.clickableEstado {
+    cursor: pointer !important;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.clickableEstado:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.clickableEstado::after {
+    content: '🔄';
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.clickableEstado:hover::after {
+    opacity: 1;
+}
+
+/* Botones simplificados */
+.actionButtons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive para botones simplificados */
+@media (max-width: 768px) {
+    .actionButtons {
+        flex-direction: column;
+    }
+    
+    .btnAgregar, .btnModificar, .btnGuardar, .btnCancelar {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* Mejoras visuales para estadísticas */
+.statsDetails span {
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.statsDetails span:hover {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* ✅ ESTILOS PARA VALIDACIONES Y NOTIFICACIONES MEJORADAS */
+
+/* Texto de ayuda */
+.helperText {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Botón para remover firma */
+.btnRemoverFirma {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btnRemoverFirma:hover {
+    background: #c82333;
+}
+
+/* Estados de edición en el header */
+.warningText {
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.editingWarning {
+    color: #856404;
+    font-weight: 600;
+    margin-left: 1rem;
+}
+
+/* Mejoras visuales para campos con error */
+.inputError {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff5f5;
+}
+
+.errorText {
+    color: #dc3545 !important;
+    font-size: 12px;
+    display: block;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* Indicadores de campo obligatorio */
+.editInput::placeholder {
+    color: #6c757d !important;
+}
+
+/* Mejoras para el modo edición */
+.editingRow {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%) !important;
+    border-left: 4px solid #ffc107;
+}
+
+/* Estados de los botones mejorados */
+.btnAgregar:disabled,
+.btnModificar:disabled,
+.btnGuardar:disabled,
+.btnCancelar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Efectos de hover para estados clickeables */
+.clickableEstado:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+}
+
+/* Notificaciones mejoradas */
+.notification {
+    z-index: 10000;
+}
+
+/* Responsive para validaciones */
+@media (max-width: 768px) {
+    .errorText {
+        font-size: 11px;
+    }
+    
+    .helperText {
+        font-size: 0.7rem;
+    }
+    
+    .warningText {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+}
+
+/* Animaciones suaves para cambios de estado */
+.estado {
+    transition: all 0.3s ease;
+}
+
+/* Mejoras visuales para el formulario adicional */
+.additionalFields {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    background: #f8f9fa;
+}
+
+.additionalFields h3 {
+    color: #001f3f !important;
+    border-bottom: 2px solid #001f3f;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Estados de focus mejorados */
+.editInput:focus,
+.editSelect:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+/* ✅ ESTILOS PARA EL LOGO Y TÍTULO */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #001f3f;
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 8px 8px 0 0;
+}
+
+.titleSection {
+    flex: 1;
+}
+
+.headerTop {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.headerTop h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+}
+
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: 2rem;
+}
+
+.logo {
+    height: 100px;
+
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px solid #28a745;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.logoText {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.logoTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    line-height: 1;
+}
+
+.logoSubtitle {
+    font-size: 0.9rem;
+    color: #28a745;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* Responsive para el header */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .logoSection {
+        margin-left: 0;
+        justify-content: center;
+    }
+    
+    .headerTop h1 {
+        font-size: 1.5rem;
+    }
+    
+    .logo {
+        height: 50px;
+        width: 50px;
+    }
+    
+    .logoTitle {
+        font-size: 1.3rem;
+    }
+    
+    .logoSubtitle {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .logoSection {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .logoText {
+        align-items: center;
+    }
 }

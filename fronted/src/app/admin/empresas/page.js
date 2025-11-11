@@ -336,8 +336,8 @@ export default function EmpresasPage() {
                 <div className={styles.logoSection}>
                     <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
                     <div className={styles.logoText}>
-                        <span className={styles.logoTitle}>BEYCO</span>
-                        <span className={styles.logoSubtitle}>Consultores</span>
+                        <span className={styles.logoTitle}></span>
+                        <span className={styles.logoSubtitle}></span>
                     </div>
                 </div>
             </header>

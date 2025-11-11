@@ -1,4 +1,4 @@
-// app/admin/cursos/page.js - VERSIÓN CON DISEÑO PROFESIONAL
+// app/admin/cursos/page.js - VERSIÓN SIMPLIFICADA
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -147,6 +147,18 @@ const EditRow = ({ curso, onChange, instructores, empresas, catalogoCursos, form
                     required 
                 />
             </td>
+            <td>
+                <input 
+                    type="number" 
+                    name="pago" 
+                    value={curso.pago || ''} 
+                    onChange={onChange} 
+                    placeholder="Monto del pago" 
+                    min="0" 
+                    step="0.01"
+                    className={styles.pagoInput}
+                />
+            </td>
         </tr>
     );
 };
@@ -191,12 +203,11 @@ export default function CursosPage() {
                 const cursosData = await cursosRes.json();
                 setCursos(cursosData);
 
-                // ✅ CORREGIDO: Usar el endpoint correcto para instructores
+                // Cargar instructores
                 try {
                     const instructoresRes = await fetch('http://localhost:8080/api/instructores');
                     if (instructoresRes.ok) {
                         const instructoresData = await instructoresRes.json();
-                        console.log('Instructores cargados:', instructoresData);
                         setInstructores(instructoresData);
                     } else {
                         console.error('Error cargando instructores:', instructoresRes.status);
@@ -244,14 +255,12 @@ export default function CursosPage() {
         setSelectedCurso(curso);
         const normalizeString = (str) => str.toString().toLowerCase().trim();
         
-        // ✅ Buscar instructor por número de empleado (más confiable que por nombre)
         const instructorEncontrado = instructores.find(i => 
-            i.numEmpleado === curso.instructorId || // Si el curso ya tiene instructorId
+            i.numEmpleado === curso.instructorId ||
             normalizeString(`${i.nombre} ${i.apellidoPaterno} ${i.apellidoMaterno}`).includes(normalizeString(curso.instructor))
         );
         const instructorId = instructorEncontrado ? instructorEncontrado.numEmpleado : '';
         
-        // Buscar empresa por nombre exacto
         const empresaEncontrada = empresas.find(e => 
             e.nombre.trim().toLowerCase() === curso.empresa?.trim().toLowerCase()
         );
@@ -269,7 +278,8 @@ export default function CursosPage() {
             fechaIngreso: curso.fechaIngreso ? new Date(curso.fechaIngreso).toISOString().split('T')[0] : '',
             instructorId: instructorId,
             empresaId: empresaId,
-            lugar: curso.lugar || ''
+            lugar: curso.lugar || '',
+            pago: curso.pago || ''
         });
     };
 
@@ -280,7 +290,8 @@ export default function CursosPage() {
         setFormErrors({});
         setCursoData({ 
             fechaIngreso: new Date().toISOString().split('T')[0],
-            horas: 8
+            horas: 8,
+            pago: ''
         });
     };
 
@@ -313,17 +324,10 @@ export default function CursosPage() {
 
     const validateForm = () => {
         const errors = {};
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
 
         if (!cursoData.nombre) errors.nombre = "El nombre del curso es obligatorio.";
         if (!cursoData.fechaIngreso) {
             errors.fechaIngreso = "La fecha es obligatoria.";
-        } else {
-            const fechaIngresada = new Date(cursoData.fechaIngreso + 'T00:00:00');
-            if (fechaIngresada < today) {
-                errors.fechaIngreso = "La fecha no puede ser en el pasado.";
-            }
         }
         if (!cursoData.instructorId) errors.instructorId = "El instructor es obligatorio.";
         if (!cursoData.empresaId) errors.empresaId = "La empresa es obligatoria.";
@@ -338,33 +342,45 @@ export default function CursosPage() {
         const method = isAdding ? 'POST' : 'PUT';
         const url = isAdding ? 'http://localhost:8080/api/cursos' : `http://localhost:8080/api/cursos/${selectedCurso.id}`;
         
-        // Preparar datos para enviar
         const datosParaEnviar = {
-            ...cursoData,
-            empresaId: Number(cursoData.empresaId)
+            nombre: cursoData.nombre,
+            stps: cursoData.stps,
+            horas: parseInt(cursoData.horas),
+            fechaIngreso: cursoData.fechaIngreso,
+            instructorId: parseInt(cursoData.instructorId),
+            empresaId: parseInt(cursoData.empresaId),
+            lugar: cursoData.lugar,
+            pago: cursoData.pago ? parseFloat(cursoData.pago) : 0
         };
         
         try {
             const response = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify(datosParaEnviar),
             });
             
             if (!response.ok) {
-                const errorBody = await response.json().catch(() => ({ message: 'Error desconocido del servidor' }));
-                throw new Error(errorBody.message || `Error ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(errorText || `Error ${response.status} del servidor`);
             }
-            
-            // Recargar cursos
+
+            // Recargar la lista de cursos para ver los cambios
             const cursosRes = await fetch('http://localhost:8080/api/cursos');
-            const data = await cursosRes.json();
-            setCursos(data);
+            if (!cursosRes.ok) throw new Error('Error al cargar cursos actualizados');
+            
+            const cursosActualizados = await cursosRes.json();
+            setCursos(cursosActualizados);
+            
             showNotification(`Curso ${isAdding ? 'creado' : 'actualizado'} correctamente.`, 'success');
             executeCancel();
+            
         } catch (error) {
             console.error('Error al guardar:', error);
-            showNotification(error.message, 'error');
+            showNotification("Error al guardar: " + error.message, 'error');
             closeConfirmation();
         }
     };
@@ -385,9 +401,11 @@ export default function CursosPage() {
         if (!selectedCurso) return;
         try {
             const url = `http://localhost:8080/api/cursos/${selectedCurso.id}`;
+            
             const response = await fetch(url, { method: 'DELETE' });
             if (response.status === 204 || response.ok) {
-                setCursos(cursos.filter(c => c.id !== selectedCurso.id));
+                const nuevosCursos = cursos.filter(c => c.id !== selectedCurso.id);
+                setCursos(nuevosCursos);
                 setSelectedCurso(null);
                 showNotification("Curso eliminado correctamente.", 'success');
             } else {
@@ -409,7 +427,7 @@ export default function CursosPage() {
         }
         showConfirmation(
             "Confirmar Eliminación",
-            `¿Estás seguro de que quieres eliminar el curso "${selectedCurso.nombre}"?`,
+            `¿Estás seguro de que quieres eliminar el curso "${selectedCurso.nombre}"? Esta acción no se puede deshacer.`,
             executeDelete
         );
     };
@@ -425,14 +443,21 @@ export default function CursosPage() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         let updatedCursoData = { ...cursoData, [name]: value };
+        
         if (name === 'nombre') {
             const cursoSeleccionado = catalogoCursos.find(c => c.nombre === value);
-            updatedCursoData.stps = cursoSeleccionado ? (cursoSeleccionado.stps || '') : '';
-            // También actualizar las horas automáticamente desde el catálogo
-            if (cursoSeleccionado && cursoSeleccionado.horas) {
-                updatedCursoData.horas = cursoSeleccionado.horas;
+            if (cursoSeleccionado) {
+                updatedCursoData.stps = cursoSeleccionado.stps || '';
+                if (cursoSeleccionado.horas) {
+                    updatedCursoData.horas = cursoSeleccionado.horas;
+                }
+                // El precio del catálogo se puede usar como valor por defecto para el pago
+                if (cursoSeleccionado.precio && !cursoData.pago) {
+                    updatedCursoData.pago = cursoSeleccionado.precio;
+                }
             }
         }
+        
         setCursoData(updatedCursoData);
     };
 
@@ -444,13 +469,22 @@ export default function CursosPage() {
         }), [cursos, searchTerm, filterBy]
     );
 
+    // Función para formatear moneda
+    const formatCurrency = (amount) => {
+        if (!amount && amount !== 0) return '-';
+        return new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN'
+        }).format(amount);
+    };
+
     return (
         <div className={styles.pageContainer}>
             {/* Header con azul oscuro */}
             <header className={styles.header}>
                 <div className={styles.titleSection}>
                     <h1>Gestión de Cursos</h1>
-                    <p></p>
+                    <p>Sistema completo con gestión de pagos</p>
                 </div>
                 <div className={styles.logoSection}>
                     <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
@@ -553,6 +587,13 @@ export default function CursosPage() {
                             <div className={styles.loading}>
                                 ⏳ Cargando cursos...
                             </div>
+                        ) : filteredCursos.length === 0 ? (
+                            <div className={styles.noData}>
+                                📝 No se encontraron cursos
+                                {searchTerm && (
+                                    <p>Intenta con otros términos de búsqueda</p>
+                                )}
+                            </div>
                         ) : (
                             <table className={styles.cursosTable}>
                                 <thead>
@@ -564,6 +605,7 @@ export default function CursosPage() {
                                         <th>Instructor</th>
                                         <th>Empresa</th>
                                         <th>Lugar</th>
+                                        <th>Pago</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -605,6 +647,9 @@ export default function CursosPage() {
                                                 <td className={styles.cursoInstructor}>{curso.instructor}</td>
                                                 <td className={styles.cursoEmpresa}>{curso.empresa}</td>
                                                 <td className={styles.cursoLugar}>{curso.lugar}</td>
+                                                <td className={styles.cursoPago}>
+                                                    {formatCurrency(curso.pago)}
+                                                </td>
                                             </tr>
                                         )
                                     ))}
@@ -619,16 +664,32 @@ export default function CursosPage() {
                     <div className={styles.actionsSection}>
                         <h3>Acciones</h3>
                         <div className={styles.actionButtons}>
-                            <button onClick={handleAgregarClick} className={styles.btnAgregar} disabled={isAdding || isEditing}>
+                            <button 
+                                onClick={handleAgregarClick} 
+                                className={styles.btnAgregar} 
+                                disabled={isAdding || isEditing}
+                            >
                                 ➕ Agregar Curso
                             </button>
-                            <button onClick={handleModificarClick} className={styles.btnModificar} disabled={!selectedCurso || isAdding || isEditing}>
+                            <button 
+                                onClick={handleModificarClick} 
+                                className={styles.btnModificar} 
+                                disabled={!selectedCurso || isAdding || isEditing}
+                            >
                                 ✏️ Modificar
                             </button>
-                            <button onClick={handleEliminarClick} className={styles.btnEliminar} disabled={!selectedCurso || isAdding || isEditing}>
+                            <button 
+                                onClick={handleEliminarClick} 
+                                className={styles.btnEliminar} 
+                                disabled={!selectedCurso || isAdding || isEditing}
+                            >
                                 🗑️ Eliminar
                             </button>
-                            <button onClick={handleGuardarClick} className={styles.btnGuardar} disabled={!isAdding && !isEditing}>
+                            <button 
+                                onClick={handleGuardarClick} 
+                                className={styles.btnGuardar} 
+                                disabled={!isAdding && !isEditing}
+                            >
                                 💾 Guardar
                             </button>
                             {(isAdding || isEditing) && (
@@ -637,6 +698,17 @@ export default function CursosPage() {
                                 </button>
                             )}
                         </div>
+                        
+                        {/* Información del curso seleccionado */}
+                        {selectedCurso && !isAdding && !isEditing && (
+                            <div className={styles.selectedInfo}>
+                                <h4>Curso Seleccionado</h4>
+                                <p><strong>Nombre:</strong> {selectedCurso.nombre}</p>
+                                <p><strong>Instructor:</strong> {selectedCurso.instructor}</p>
+                                <p><strong>Empresa:</strong> {selectedCurso.empresa}</p>
+                                <p><strong>Pago:</strong> {formatCurrency(selectedCurso.pago)}</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Enlaces rápidos */}

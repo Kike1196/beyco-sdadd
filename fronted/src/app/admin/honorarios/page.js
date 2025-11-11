@@ -1,33 +1,28 @@
-// app/admin/honorarios/page.js
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './Honorarios.module.css';
 
+// URL base del backend Spring Boot
+const API_BASE_URL = 'http://localhost:8080/api';
+
 export default function HonorariosPage() {
     const [instructores, setInstructores] = useState([]);
     const [instructorSeleccionado, setInstructorSeleccionado] = useState(null);
-    const [cursosPendientes, setCursosPendientes] = useState([]);
+    const [cursos, setCursos] = useState([]);
     const [periodo, setPeriodo] = useState('quincenal');
     const [fechaInicio, setFechaInicio] = useState('');
     const [fechaFin, setFechaFin] = useState('');
     const [cargando, setCargando] = useState(false);
+    const [error, setError] = useState('');
 
-    // Cargar instructores al iniciar y establecer fechas por defecto
+    // Cargar instructores al iniciar
     useEffect(() => {
         cargarInstructores();
-        aplicarPeriodo('quincenal'); // Establecer período quincenal por defecto
+        aplicarPeriodo('quincenal');
     }, []);
 
-    // Aplicar período automáticamente cuando cambie
-    useEffect(() => {
-        if (periodo) {
-            aplicarPeriodo(periodo);
-        }
-    }, [periodo]);
-
-    // Función para aplicar el período seleccionado
     const aplicarPeriodo = (tipoPeriodo) => {
         const hoy = new Date();
         let fechaInicioPeriodo = new Date();
@@ -50,120 +45,221 @@ export default function HonorariosPage() {
         setFechaFin(hoy.toISOString().split('T')[0]);
     };
 
-    // Manejar cambio de período
-    const handlePeriodoChange = (nuevoPeriodo) => {
-        setPeriodo(nuevoPeriodo);
-        // Las fechas se actualizarán automáticamente por el useEffect
-    };
-
-    // Cargar lista de instructores
     const cargarInstructores = async () => {
         try {
             setCargando(true);
-            const response = await fetch('/api/honorarios/instructores');
-            const data = await response.json();
+            setError('');
             
-            if (data.success) {
-                setInstructores(data.data);
-                console.log('Instructores cargados:', data.data);
-            } else {
-                console.error('Error al cargar instructores:', data.error);
+            console.log('🔄 Cargando instructores desde Spring Boot...');
+            
+            const response = await fetch(`${API_BASE_URL}/instructores`);
+            
+            if (!response.ok) {
+                throw new Error(`Error ${response.status} al cargar instructores`);
             }
+            
+            const data = await response.json();
+            console.log('📊 Datos recibidos del backend:', data);
+            
+            const instructoresFormateados = data.map(instructor => ({
+                numEmpleado: instructor.numEmpleado || instructor.id || instructor.Num_Empleado,
+                nombre: instructor.nombre || instructor.Nombre,
+                apellidoPaterno: instructor.apellidoPaterno || instructor.Apellido_paterno,
+                apellidoMaterno: instructor.apellidoMaterno || instructor.Apellido_materno,
+                email: instructor.correo || instructor.email || instructor.Correo,
+                telefono: instructor.telefono || '',
+                especialidad: instructor.especialidad || 'Instructor',
+                totalCursos: 0,
+                cursosPendientes: 0,
+                totalPendiente: 0
+            }));
+            
+            setInstructores(instructoresFormateados);
+            console.log(`✅ ${instructoresFormateados.length} instructores cargados`);
+            
         } catch (error) {
-            console.error('Error al cargar instructores:', error);
+            console.error('❌ Error al cargar instructores:', error);
+            setError('Error al cargar la lista de instructores: ' + error.message);
         } finally {
             setCargando(false);
         }
     };
 
-    // Manejar cambio de instructor en el desplegable
+    // ✅ FUNCIÓN CORREGIDA: Calcular el pago del instructor basado en el precio del curso
+    const calcularPagoInstructor = (curso) => {
+        // Si el curso tiene un campo de pago específico para el instructor, usarlo
+        if (curso.pago && curso.pago > 0) {
+            return parseFloat(curso.pago);
+        }
+        
+        // Si no, calcular basado en el precio del curso
+        // Puedes ajustar este porcentaje según tus necesidades
+        const precio = curso.precio ? parseFloat(curso.precio) : 0;
+        const porcentajeInstructor = 0.6; // 60% del precio para el instructor (ajusta según necesites)
+        
+        return precio * porcentajeInstructor;
+    };
+
+    // ✅ FUNCIÓN CORREGIDA para cargar cursos del instructor
     const handleInstructorChange = async (event) => {
         const instructorId = parseInt(event.target.value);
         
-        if (instructorId === 0) {
+        if (instructorId === 0 || isNaN(instructorId)) {
             setInstructorSeleccionado(null);
-            setCursosPendientes([]);
-            return;
-        }
-
-        if (!fechaInicio || !fechaFin) {
-            alert('Por favor, establece las fechas de inicio y fin');
+            setCursos([]);
+            setError('');
             return;
         }
 
         try {
             setCargando(true);
-            console.log('🔍 Buscando cursos para instructor:', instructorId);
-            console.log('📅 Fechas:', fechaInicio, 'a', fechaFin);
-            console.log('📆 Período:', periodo);
+            setError('');
             
-            const url = `/api/honorarios/instructor/${instructorId}/cursos-pendientes?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
-            console.log('🌐 URL de la petición:', url);
+            console.log(`🔍 Cargando cursos para instructor ID: ${instructorId}`);
+            console.log(`📅 Período: ${fechaInicio} a ${fechaFin}`);
+            
+            const url = `${API_BASE_URL}/cursos`;
+            console.log('🌐 Fetching desde:', url);
             
             const response = await fetch(url);
             
-            console.log('📡 Estado de la respuesta:', response.status, response.statusText);
-            
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
             }
             
             const data = await response.json();
-            console.log('📊 Datos recibidos:', data);
+            console.log('📦 Respuesta completa del backend:', data);
+            console.log('📋 Ejemplo de curso:', data[0]);
             
-            if (data.success) {
-                const instructor = instructores.find(i => i.numEmpleado === instructorId);
-                setInstructorSeleccionado({
-                    ...instructor,
-                    ...data.data
-                });
-                setCursosPendientes(data.data.cursosPendientes || []);
-                console.log('✅ Cursos cargados:', data.data.cursosPendientes?.length || 0);
-            } else {
-                console.error('❌ Error del servidor:', data.error);
-                alert('Error al cargar los cursos pendientes: ' + data.error);
-                setInstructorSeleccionado(null);
-                setCursosPendientes([]);
+            // ✅ FILTRAR cursos del instructor seleccionado y por fechas
+            const cursosFiltrados = data.filter(curso => {
+                const esDelInstructor = curso.instructorId === instructorId;
+                
+                // Filtrar por fechas si están definidas
+                if (fechaInicio && fechaFin && curso.fechaIngreso) {
+                    const fechaCurso = new Date(curso.fechaIngreso);
+                    const fechaIni = new Date(fechaInicio);
+                    const fechaFi = new Date(fechaFin);
+                    
+                    // Ajustar las fechas para comparación correcta
+                    fechaCurso.setHours(0, 0, 0, 0);
+                    fechaIni.setHours(0, 0, 0, 0);
+                    fechaFi.setHours(23, 59, 59, 999);
+                    
+                    return esDelInstructor && fechaCurso >= fechaIni && fechaCurso <= fechaFi;
+                }
+                
+                return esDelInstructor;
+            });
+            
+            console.log(`✅ ${cursosFiltrados.length} cursos encontrados para el instructor`);
+            
+            if (cursosFiltrados.length > 0) {
+                console.log('📊 Primer curso:', cursosFiltrados[0]);
             }
+            
+            // ✅ NORMALIZAR datos de los cursos con el pago correcto
+            const cursosNormalizados = cursosFiltrados.map(curso => {
+                const pagoInstructor = calcularPagoInstructor(curso);
+                
+                console.log(`💰 Curso: ${curso.nombre}, Precio: ${curso.precio}, Pago: ${curso.pago}, Pago Calculado: ${pagoInstructor}`);
+                
+                return {
+                    id: curso.id,
+                    cursoNombre: curso.nombre,
+                    stps: curso.stps || 'N/A',
+                    horasImpartidas: curso.horas || 0,
+                    fechaCurso: curso.fechaIngreso,
+                    monto: pagoInstructor, // ✅ USAR el pago calculado
+                    precio: curso.precio || 0, // Mantener el precio original para referencia
+                    estatus: 'pendiente',
+                    lugar: curso.lugar || 'Sin especificar',
+                    empresaNombre: curso.empresa || 'Sin empresa'
+                };
+            });
+            
+            console.log('💵 Cursos con montos:', cursosNormalizados.map(c => ({ 
+                nombre: c.cursoNombre, 
+                monto: c.monto,
+                precio: c.precio
+            })));
+            
+            // Buscar información del instructor seleccionado
+            const instructor = instructores.find(i => i.numEmpleado === instructorId);
+            
+            if (!instructor) {
+                throw new Error('Instructor no encontrado');
+            }
+            
+            // Calcular total pendiente
+            const totalPendiente = cursosNormalizados.reduce((sum, curso) => 
+                sum + parseFloat(curso.monto || 0), 0
+            );
+            
+            console.log(`💰 Total a pagar al instructor: $${totalPendiente.toFixed(2)}`);
+            
+            const instructorData = {
+                instructorId: instructorId,
+                instructorNombre: `${instructor.nombre} ${instructor.apellidoPaterno} ${instructor.apellidoMaterno}`,
+                instructorEmail: instructor.email,
+                instructorEspecialidad: instructor.especialidad,
+                cursosPendientes: cursosNormalizados,
+                totalPendiente: totalPendiente,
+                totalCursos: cursosNormalizados.length
+            };
+            
+            setInstructorSeleccionado(instructorData);
+            setCursos(cursosNormalizados);
+            
+            console.log('✅ Datos del instructor cargados:', instructorData);
+            
         } catch (error) {
-            console.error('💥 Error de conexión:', error);
-            alert('Error al conectar con el servidor: ' + error.message);
+            console.error('💥 Error al cargar cursos:', error);
+            setError(`Error al cargar cursos: ${error.message}`);
             setInstructorSeleccionado(null);
-            setCursosPendientes([]);
+            setCursos([]);
         } finally {
             setCargando(false);
         }
     };
 
-    // Calcular total a pagar
-    const totalPagar = cursosPendientes.reduce((total, curso) => {
-        return total + (curso.estatus === 'pendiente' ? parseFloat(curso.monto) : 0);
-    }, 0);
+    // Calcular total a pagar (solo cursos pendientes)
+    const calcularTotalPagar = () => {
+        return cursos.reduce((total, curso) => {
+            return total + (curso.estatus === 'pendiente' ? parseFloat(curso.monto || 0) : 0);
+        }, 0);
+    };
+
+    // Calcular total de horas
+    const calcularTotalHoras = () => {
+        return cursos.reduce((total, curso) => {
+            return total + (curso.estatus === 'pendiente' ? parseInt(curso.horasImpartidas || 0) : 0);
+        }, 0);
+    };
 
     // Generar recibo
     const generarRecibo = () => {
-        if (!instructorSeleccionado || cursosPendientes.length === 0) {
-            alert('Selecciona un instructor con pagos pendientes');
+        if (!instructorSeleccionado || cursos.length === 0) {
+            setError('Selecciona un instructor con cursos');
             return;
         }
 
-        const pagosPendientesIds = cursosPendientes
-            .filter(curso => curso.estatus === 'pendiente')
-            .map(curso => curso.id);
-
-        if (pagosPendientesIds.length === 0) {
-            alert('No hay pagos pendientes para generar recibo');
+        const cursosPendientes = cursos.filter(curso => curso.estatus === 'pendiente');
+        
+        if (cursosPendientes.length === 0) {
+            setError('No hay pagos pendientes para generar recibo');
             return;
         }
 
         const reciboData = {
             instructor: instructorSeleccionado,
-            cursos: cursosPendientes.filter(curso => curso.estatus === 'pendiente'),
+            cursos: cursosPendientes,
             periodo: periodo,
             fechaInicio: fechaInicio,
             fechaFin: fechaFin,
-            total: totalPagar,
-            pagosIds: pagosPendientesIds
+            total: calcularTotalPagar(),
+            totalHoras: calcularTotalHoras(),
+            totalCursos: cursosPendientes.length
         };
 
         // Guardar en localStorage para usar en la página de recibo
@@ -177,7 +273,7 @@ export default function HonorariosPage() {
     const actualizarDatos = async () => {
         if (instructorSeleccionado && fechaInicio && fechaFin) {
             await handleInstructorChange({ 
-                target: { value: instructorSeleccionado.numEmpleado } 
+                target: { value: instructorSeleccionado.instructorId } 
             });
         }
     };
@@ -196,13 +292,25 @@ export default function HonorariosPage() {
         }
     };
 
+    // Formatear moneda
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN'
+        }).format(amount || 0);
+    };
+
+    const totalPagar = calcularTotalPagar();
+    const totalHoras = calcularTotalHoras();
+    const cursosPendientes = cursos.filter(curso => curso.estatus === 'pendiente');
+
     return (
         <div className={styles.pageContainer}>
-            {/* Header con azul oscuro */}
+            {/* Header */}
             <header className={styles.header}>
                 <div className={styles.titleSection}>
-                    <h1>Generación de Recibos</h1>
-                    <p>Selecciona un instructor y período para generar el recibo de honorarios</p>
+                    <h1>Generación de Recibos de Honorarios</h1>
+                    <p>Sistema integrado con Spring Boot Backend</p>
                 </div>
                 <div className={styles.logoSection}>
                     <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
@@ -214,6 +322,14 @@ export default function HonorariosPage() {
             </header>
 
             <main className={styles.mainContent}>
+                {/* Mostrar errores */}
+                {error && (
+                    <div className={styles.errorBanner}>
+                        <span>⚠️ {error}</span>
+                        <button onClick={() => setError('')} className={styles.errorClose}>×</button>
+                    </div>
+                )}
+
                 {/* Controles principales */}
                 <div className={styles.controls}>
                     <div className={styles.controlsLeft}>
@@ -227,7 +343,7 @@ export default function HonorariosPage() {
                             className={styles.btnActualizar}
                             disabled={cargando}
                         >
-                            🔄 Actualizar
+                            {cargando ? '⏳' : '🔄'} Actualizar Lista
                         </button>
                     </div>
                 </div>
@@ -247,6 +363,7 @@ export default function HonorariosPage() {
                                 onChange={handleInstructorChange}
                                 className={styles.instructorSelect}
                                 disabled={cargando}
+                                value={instructorSeleccionado?.instructorId || 0}
                             >
                                 <option value="0">
                                     {cargando ? '⏳ Cargando instructores...' : '👨‍🏫 Seleccionar instructor'}
@@ -272,23 +389,29 @@ export default function HonorariosPage() {
                                 <div className={styles.instructorInfo}>
                                     <div className={styles.infoRow}>
                                         <span className={styles.infoLabel}>Nombre:</span>
-                                        <span className={styles.infoValue}>{instructorSeleccionado.instructorNombre}</span>
+                                        <span className={styles.infoValue}>
+                                            {instructorSeleccionado.instructorNombre}
+                                        </span>
                                     </div>
                                     <div className={styles.infoRow}>
                                         <span className={styles.infoLabel}>Email:</span>
-                                        <span className={styles.infoValue}>{instructorSeleccionado.instructorEmail}</span>
+                                        <span className={styles.infoValue}>
+                                            {instructorSeleccionado.instructorEmail}
+                                        </span>
                                     </div>
                                     <div className={styles.infoRow}>
-                                        <span className={styles.infoLabel}>Período:</span>
-                                        <span className={styles.infoValue}>{getDescripcionPeriodo()}</span>
+                                        <span className={styles.infoLabel}>Total Cursos:</span>
+                                        <span className={styles.infoValue}>{cursos.length}</span>
                                     </div>
                                     <div className={styles.infoRow}>
-                                        <span className={styles.infoLabel}>Cursos pendientes:</span>
+                                        <span className={styles.infoLabel}>Cursos Pendientes:</span>
                                         <span className={styles.infoValue}>{cursosPendientes.length}</span>
                                     </div>
                                     <div className={styles.infoRow}>
-                                        <span className={styles.infoLabel}>Total pendiente:</span>
-                                        <span className={styles.infoValueHighlight}>${totalPagar.toFixed(2)}</span>
+                                        <span className={styles.infoLabel}>Total a Pagar:</span>
+                                        <span className={styles.infoValueHighlight}>
+                                            {formatCurrency(totalPagar)}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -298,13 +421,13 @@ export default function HonorariosPage() {
                         <div className={styles.statsCard}>
                             <div className={styles.statItem}>
                                 <span className={styles.statNumber}>{instructores.length}</span>
-                                <span className={styles.statLabel}>Instructores</span>
+                                <span className={styles.statLabel}>Instructores Activos</span>
                             </div>
                             <div className={styles.statItem}>
                                 <span className={styles.statNumber}>
-                                    {instructores.reduce((total, instructor) => total + (instructor.cursosCount || 0), 0)}
+                                    {cursos.length}
                                 </span>
-                                <span className={styles.statLabel}>Total Cursos</span>
+                                <span className={styles.statLabel}>Cursos Totales</span>
                             </div>
                         </div>
                     </div>
@@ -327,14 +450,20 @@ export default function HonorariosPage() {
                                     </div>
                                     <div className={styles.instructorStats}>
                                         <div className={styles.statBadge}>
-                                            <span className={styles.statBadgeNumber}>{cursosPendientes.length}</span>
-                                            <span className={styles.statBadgeLabel}>Cursos</span>
+                                            <span className={styles.statBadgeNumber}>{cursos.length}</span>
+                                            <span className={styles.statBadgeLabel}>Total Cursos</span>
                                         </div>
                                         <div className={styles.statBadge}>
                                             <span className={styles.statBadgeNumber}>
-                                                {cursosPendientes.reduce((sum, curso) => sum + (curso.horasImpartidas || 0), 0)}
+                                                {cursos.reduce((sum, curso) => sum + (curso.horasImpartidas || 0), 0)}
                                             </span>
-                                            <span className={styles.statBadgeLabel}>Horas</span>
+                                            <span className={styles.statBadgeLabel}>Horas Totales</span>
+                                        </div>
+                                        <div className={styles.statBadge}>
+                                            <span className={styles.statBadgeNumber}>
+                                                {cursosPendientes.length}
+                                            </span>
+                                            <span className={styles.statBadgeLabel}>Pendientes</span>
                                         </div>
                                     </div>
                                 </div>
@@ -349,7 +478,10 @@ export default function HonorariosPage() {
                                                     type="radio"
                                                     value="semanal"
                                                     checked={periodo === 'semanal'}
-                                                    onChange={(e) => handlePeriodoChange(e.target.value)}
+                                                    onChange={(e) => {
+                                                        setPeriodo(e.target.value);
+                                                        aplicarPeriodo(e.target.value);
+                                                    }}
                                                 />
                                                 <span className={styles.optionText}>
                                                     Semanal
@@ -361,7 +493,10 @@ export default function HonorariosPage() {
                                                     type="radio"
                                                     value="quincenal"
                                                     checked={periodo === 'quincenal'}
-                                                    onChange={(e) => handlePeriodoChange(e.target.value)}
+                                                    onChange={(e) => {
+                                                        setPeriodo(e.target.value);
+                                                        aplicarPeriodo(e.target.value);
+                                                    }}
                                                 />
                                                 <span className={styles.optionText}>
                                                     Quincenal
@@ -373,7 +508,10 @@ export default function HonorariosPage() {
                                                     type="radio"
                                                     value="mensual"
                                                     checked={periodo === 'mensual'}
-                                                    onChange={(e) => handlePeriodoChange(e.target.value)}
+                                                    onChange={(e) => {
+                                                        setPeriodo(e.target.value);
+                                                        aplicarPeriodo(e.target.value);
+                                                    }}
                                                 />
                                                 <span className={styles.optionText}>
                                                     Mensual
@@ -389,7 +527,6 @@ export default function HonorariosPage() {
                                                     type="date"
                                                     value={fechaInicio}
                                                     onChange={(e) => setFechaInicio(e.target.value)}
-                                                    onBlur={actualizarDatos}
                                                     className={styles.fechaField}
                                                 />
                                             </div>
@@ -399,7 +536,6 @@ export default function HonorariosPage() {
                                                     type="date"
                                                     value={fechaFin}
                                                     onChange={(e) => setFechaFin(e.target.value)}
-                                                    onBlur={actualizarDatos}
                                                     className={styles.fechaField}
                                                 />
                                             </div>
@@ -416,39 +552,59 @@ export default function HonorariosPage() {
                                     </div>
                                 </div>
 
-                                {/* Lista de Cursos Pendientes */}
+                                {/* Lista de Cursos */}
                                 <div className={styles.cursosSection}>
                                     <div className={styles.sectionHeader}>
-                                        <h3>Pagos Pendientes</h3>
-                                        <span className={styles.counterBadge}>{cursosPendientes.length}</span>
+                                        <h3>Cursos Impartidos</h3>
+                                        <span className={styles.counterBadge}>{cursos.length}</span>
                                     </div>
                                     
-                                    {cursosPendientes.length > 0 ? (
+                                    {cursos.length > 0 ? (
                                         <div className={styles.tableContainer}>
                                             <table className={styles.cursosTable}>
                                                 <thead>
                                                     <tr>
                                                         <th>Curso</th>
                                                         <th>Fecha</th>
+                                                        <th>Empresa</th>
+                                                        <th>Lugar</th>
                                                         <th>Horas</th>
-                                                        <th>Monto</th>
-                                                        <th>Estatus</th>
+                                                        <th>Precio Curso</th>
+                                                        <th>Pago Instructor</th>
+                                                        <th>Estatus Pago</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {cursosPendientes.map(curso => (
-                                                        <tr key={curso.id}>
+                                                    {cursos.map((curso, index) => (
+                                                        <tr 
+                                                            key={curso.id || `curso-${index}`}
+                                                            className={
+                                                                curso.estatus === 'pendiente' ? styles.filaPendiente : 
+                                                                curso.estatus === 'pagado' ? styles.filaPagado : 
+                                                                styles.filaCancelado
+                                                            }
+                                                        >
                                                             <td className={styles.cursoNombre}>
                                                                 {curso.cursoNombre}
+                                                                {curso.stps && <div className={styles.stps}>{curso.stps}</div>}
                                                             </td>
                                                             <td className={styles.cursoFecha}>
-                                                                {new Date(curso.fechaCurso).toLocaleDateString('es-ES')}
+                                                                {curso.fechaCurso ? new Date(curso.fechaCurso).toLocaleDateString('es-ES') : 'Sin fecha'}
+                                                            </td>
+                                                            <td className={styles.cursoEmpresa}>
+                                                                {curso.empresaNombre || 'Sin empresa'}
+                                                            </td>
+                                                            <td className={styles.cursoLugar}>
+                                                                {curso.lugar || 'Sin lugar'}
                                                             </td>
                                                             <td className={styles.cursoHoras}>
-                                                                {curso.horasImpartidas}
+                                                                {curso.horasImpartidas || 0}h
+                                                            </td>
+                                                            <td className={styles.cursoPrecio}>
+                                                                {formatCurrency(curso.precio || 0)}
                                                             </td>
                                                             <td className={styles.cursoMonto}>
-                                                                ${parseFloat(curso.monto).toFixed(2)}
+                                                                {formatCurrency(curso.monto || 0)}
                                                             </td>
                                                             <td>
                                                                 <span className={`${styles.status} ${
@@ -456,7 +612,7 @@ export default function HonorariosPage() {
                                                                     curso.estatus === 'cancelado' ? styles.cancelado : 
                                                                     styles.pendiente
                                                                 }`}>
-                                                                    {curso.estatus}
+                                                                    {curso.estatus || 'pendiente'}
                                                                 </span>
                                                             </td>
                                                         </tr>
@@ -467,7 +623,7 @@ export default function HonorariosPage() {
                                     ) : (
                                         <div className={styles.noData}>
                                             <div className={styles.noDataIcon}>📭</div>
-                                            <p>No hay pagos pendientes en el período seleccionado</p>
+                                            <p>No hay cursos en el período seleccionado</p>
                                             <p className={styles.noDataSubtitle}>
                                                 Período: {new Date(fechaInicio).toLocaleDateString('es-ES')} - {new Date(fechaFin).toLocaleDateString('es-ES')}
                                             </p>
@@ -480,10 +636,10 @@ export default function HonorariosPage() {
                                     <div className={styles.resumenCard}>
                                         <div className={styles.resumenContent}>
                                             <div className={styles.totalInfo}>
-                                                <span className={styles.totalLabel}>Total a Pagar</span>
-                                                <span className={styles.totalAmount}>${totalPagar.toFixed(2)}</span>
+                                                <span className={styles.totalLabel}>Total a Pagar al Instructor</span>
+                                                <span className={styles.totalAmount}>{formatCurrency(totalPagar)}</span>
                                                 <span className={styles.periodoResumen}>
-                                                    {getDescripcionPeriodo()} • {cursosPendientes.filter(c => c.estatus === 'pendiente').length} pagos
+                                                    {getDescripcionPeriodo()} • {cursosPendientes.length} cursos pendientes • {totalHoras} horas
                                                 </span>
                                             </div>
                                             <button 
@@ -510,7 +666,7 @@ export default function HonorariosPage() {
                             <div className={styles.placeholder}>
                                 <div className={styles.placeholderIcon}>👨‍🏫</div>
                                 <h3>Selecciona un Instructor</h3>
-                                <p>Elige un instructor de la lista para ver sus pagos pendientes y generar recibos</p>
+                                <p>Elige un instructor de la lista para ver sus cursos y generar recibos de pago</p>
                                 <div className={styles.periodoPreview}>
                                     <span className={styles.periodoPreviewLabel}>Período actual:</span>
                                     <span className={styles.periodoPreviewValue}>{getDescripcionPeriodo()}</span>

@@ -1,4 +1,3 @@
-// services/HonorariosService.java
 package com.beyco.app.services;
 
 import com.beyco.app.models.HonorariosInstructorDTO;
@@ -29,7 +28,7 @@ public class HonorariosService {
         List<Usuario> instructores = new ArrayList<>();
         String sql = "SELECT Num_Empleado, Nombre, Apellido_paterno, Apellido_materno, Correo " +
                     "FROM usuarios WHERE Id_Rol = 2 AND Activo = 1 " +
-                    "ORDER BY Nombre, Apellido_paterno";
+                    "ORDER BY Nombre, Apellido_paterno, Apellido_materno";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -51,19 +50,19 @@ public class HonorariosService {
         return instructores;
     }
 
-    // Obtener cursos pendientes de pago por instructor - VERSIÓN SIMPLIFICADA
+    // Obtener cursos pendientes de pago por instructor - ADAPTADO AL MODELO ACTUAL
     public HonorariosInstructorDTO obtenerCursosPendientes(int instructorId, LocalDate fechaInicio, LocalDate fechaFin) {
         HonorariosInstructorDTO honorarios = new HonorariosInstructorDTO();
         List<PagoInstructor> cursosPendientes = new ArrayList<>();
         BigDecimal totalPendiente = BigDecimal.ZERO;
         int totalHoras = 0;
 
-        System.out.println("🔍 Buscando cursos para instructor: " + instructorId);
+        System.out.println("🔍 Buscando cursos pendientes para instructor: " + instructorId);
         System.out.println("📅 Periodo: " + fechaInicio + " a " + fechaFin);
 
-        // Obtener información del instructor
+        // Primero: Obtener información del instructor
         String sqlInstructor = "SELECT Num_Empleado, Nombre, Apellido_paterno, Apellido_materno, Correo " +
-                              "FROM usuarios WHERE Num_Empleado = ?";
+                              "FROM usuarios WHERE Num_Empleado = ? AND Id_Rol = 2 AND Activo = 1";
         
         try (Connection connection = dataSource.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sqlInstructor)) {
@@ -71,6 +70,7 @@ public class HonorariosService {
             pstmt.setInt(1, instructorId);
             try (ResultSet rsInstructor = pstmt.executeQuery()) {
                 if (rsInstructor.next()) {
+                    // Construir nombre completo del instructor
                     String nombreCompleto = rsInstructor.getString("Nombre") + " " + 
                                           rsInstructor.getString("Apellido_paterno") + " " + 
                                           rsInstructor.getString("Apellido_materno");
@@ -79,10 +79,10 @@ public class HonorariosService {
                     honorarios.setInstructorNombre(nombreCompleto.trim());
                     honorarios.setInstructorEmail(rsInstructor.getString("Correo"));
                     
-                    System.out.println("✅ Instructor encontrado: " + nombreCompleto);
+                    System.out.println("✅ Instructor encontrado: " + nombreCompleto + " (ID: " + instructorId + ")");
                 } else {
-                    System.out.println("❌ Instructor no encontrado: " + instructorId);
-                    return honorarios;
+                    System.out.println("❌ Instructor no encontrado o no activo: " + instructorId);
+                    throw new RuntimeException("Instructor no encontrado o no activo: " + instructorId);
                 }
             }
         } catch (SQLException e) {
@@ -90,13 +90,21 @@ public class HonorariosService {
             throw new RuntimeException("Error al obtener información del instructor", e);
         }
 
-        // CONSULTA SIMPLIFICADA: Solo obtener los cursos del instructor en el periodo
+        // CONSULTA CORREGIDA: Obtener cursos que NO tienen pagos registrados
         String sqlCursos = "SELECT c.Id_Curso, c.Nombre_curso, c.Fecha_Imparticion, " +
-                          "cc.Precio, cc.Horas, 'pendiente' as Estatus " +
+                          "cc.Precio, cc.Horas " +
                           "FROM cursos c " +
                           "INNER JOIN catalogo_cursos cc ON c.Clave_STPS = cc.Clave_STPS " +
+                          "INNER JOIN usuarios u ON c.Instructor_Id = u.Num_Empleado " +
                           "WHERE c.Instructor_Id = ? " +
                           "AND c.Fecha_Imparticion BETWEEN ? AND ? " +
+                          "AND NOT EXISTS (" +
+                          "    SELECT 1 FROM pagos_instructores pi " +
+                          "    WHERE pi.Instructor_Id = c.Instructor_Id " +
+                          "    AND pi.Fecha_Pago = c.Fecha_Imparticion " +
+                          "    AND pi.Monto = cc.Precio " +
+                          "    AND pi.Estatus IN ('pagado', 'pendiente')" +
+                          ") " +
                           "ORDER BY c.Fecha_Imparticion DESC";
 
         try (Connection connection = dataSource.getConnection();
@@ -106,32 +114,42 @@ public class HonorariosService {
             pstmt.setDate(2, Date.valueOf(fechaInicio));
             pstmt.setDate(3, Date.valueOf(fechaFin));
             
-            System.out.println("📊 Ejecutando consulta de cursos...");
+            System.out.println("📊 Ejecutando consulta de cursos pendientes...");
             
             try (ResultSet rs = pstmt.executeQuery()) {
                 int count = 0;
                 while (rs.next()) {
                     count++;
                     PagoInstructor curso = new PagoInstructor();
-                    curso.setId(rs.getInt("Id_Curso"));
+                    
+                    // Usar el campo observaciones para almacenar información del curso
+                    String nombreCurso = rs.getString("Nombre_curso");
+                    Date fechaImparticion = rs.getDate("Fecha_Imparticion");
+                    BigDecimal precio = rs.getBigDecimal("Precio");
+                    int horas = rs.getInt("Horas");
+                    
+                    // Configurar el pago con la información del curso
                     curso.setInstructorId(instructorId);
-                    curso.setCursoNombre(rs.getString("Nombre_curso"));
-                    curso.setFechaCurso(rs.getDate("Fecha_Imparticion").toLocalDate());
-                    curso.setMonto(rs.getBigDecimal("Precio"));
-                    curso.setHorasImpartidas(rs.getInt("Horas"));
-                    curso.setEstatus(rs.getString("Estatus"));
-                    curso.setObservaciones("Curso pendiente de pago");
+                    curso.setFechaPago(fechaImparticion != null ? fechaImparticion.toLocalDate() : null);
+                    curso.setMonto(precio);
+                    curso.setHorasImpartidas(horas);
+                    curso.setEstatus("pendiente");
+                    curso.setComprobante("");
+                    curso.setObservaciones("Curso pendiente de pago: " + nombreCurso + " (ID: " + rs.getInt("Id_Curso") + ")");
                     
                     cursosPendientes.add(curso);
                     
                     // Calcular totales
-                    totalPendiente = totalPendiente.add(curso.getMonto());
+                    if (curso.getMonto() != null) {
+                        totalPendiente = totalPendiente.add(curso.getMonto());
+                    }
                     totalHoras += curso.getHorasImpartidas();
                     
-                    System.out.println("📋 Curso " + count + ": " + curso.getCursoNombre() + 
-                                     " - $" + curso.getMonto() + " - " + curso.getFechaCurso());
+                    System.out.println("📋 Curso pendiente " + count + ": " + nombreCurso + 
+                                     " - $" + precio + " - " + fechaImparticion +
+                                     " - Horas: " + horas);
                 }
-                System.out.println("✅ Total cursos encontrados: " + count);
+                System.out.println("✅ Total cursos pendientes encontrados: " + count);
             }
             
             honorarios.setCursosPendientes(cursosPendientes);
@@ -147,7 +165,7 @@ public class HonorariosService {
         return honorarios;
     }
 
-    // Generar recibo de pago
+    // Generar recibo de pago - CORREGIDO
     public boolean generarReciboPago(int instructorId, List<Integer> cursosIds, String periodoPago, 
                                    LocalDate fechaInicioPeriodo, LocalDate fechaFinPeriodo) {
         Connection connection = null;
@@ -161,7 +179,7 @@ public class HonorariosService {
             String sqlInsert = "INSERT INTO pagos_instructores (Instructor_Id, Fecha_Pago, " +
                               "Monto, Horas_Impartidas, Estatus, Comprobante, Observaciones) " +
                               "SELECT c.Instructor_Id, c.Fecha_Imparticion, cc.Precio, cc.Horas, " +
-                              "'pagado', '', 'Pago procesado - Curso: ' || c.Nombre_curso " +
+                              "'pagado', '', CONCAT('Pago procesado - Curso: ', c.Nombre_curso) " +
                               "FROM cursos c " +
                               "INNER JOIN catalogo_cursos cc ON c.Clave_STPS = cc.Clave_STPS " +
                               "WHERE c.Id_Curso = ? AND c.Instructor_Id = ?";
@@ -178,18 +196,19 @@ public class HonorariosService {
                 int exitosos = 0;
                 
                 for (int resultado : resultados) {
-                    if (resultado > 0) {
+                    if (resultado == Statement.SUCCESS_NO_INFO || resultado > 0) {
                         exitosos++;
                     }
                 }
                 
                 System.out.println("✅ Pagos insertados exitosamente: " + exitosos + " de " + cursosIds.size());
                 
-                if (exitosos > 0) {
+                if (exitosos == cursosIds.size()) {
                     connection.commit();
                     return true;
                 } else {
                     connection.rollback();
+                    System.out.println("❌ No se pudieron insertar todos los pagos");
                     return false;
                 }
             }
@@ -217,15 +236,15 @@ public class HonorariosService {
         }
     }
 
-    // Obtener todos los cursos para debugging
+    // Obtener todos los cursos para debugging - ADAPTADO
     public List<PagoInstructor> obtenerTodosLosCursos() {
         List<PagoInstructor> cursos = new ArrayList<>();
         String sql = "SELECT c.Id_Curso, c.Nombre_curso, c.Fecha_Imparticion, " +
-                    "c.Instructor_Id, u.Nombre, u.Apellido_paterno, u.Apellido_materno, " +
-                    "cc.Precio, cc.Horas " +
+                    "c.Instructor_Id, cc.Precio, cc.Horas " +
                     "FROM cursos c " +
                     "INNER JOIN usuarios u ON c.Instructor_Id = u.Num_Empleado " +
                     "INNER JOIN catalogo_cursos cc ON c.Clave_STPS = cc.Clave_STPS " +
+                    "WHERE u.Id_Rol = 2 AND u.Activo = 1 " +
                     "ORDER BY c.Fecha_Imparticion DESC";
 
         try (Connection connection = dataSource.getConnection();
@@ -234,16 +253,17 @@ public class HonorariosService {
             
             while (rs.next()) {
                 PagoInstructor curso = new PagoInstructor();
-                curso.setId(rs.getInt("Id_Curso"));
+                
+                String nombreCurso = rs.getString("Nombre_curso");
+                Date fechaImparticion = rs.getDate("Fecha_Imparticion");
+                
                 curso.setInstructorId(rs.getInt("Instructor_Id"));
-                curso.setInstructorNombre(rs.getString("Nombre") + " " + 
-                                        rs.getString("Apellido_paterno") + " " + 
-                                        rs.getString("Apellido_materno"));
-                curso.setCursoNombre(rs.getString("Nombre_curso"));
-                curso.setFechaCurso(rs.getDate("Fecha_Imparticion").toLocalDate());
+                curso.setFechaPago(fechaImparticion != null ? fechaImparticion.toLocalDate() : null);
                 curso.setMonto(rs.getBigDecimal("Precio"));
                 curso.setHorasImpartidas(rs.getInt("Horas"));
                 curso.setEstatus("pendiente");
+                curso.setComprobante("");
+                curso.setObservaciones("Curso: " + nombreCurso + " (ID: " + rs.getInt("Id_Curso") + ")");
                 
                 cursos.add(curso);
             }
@@ -257,9 +277,9 @@ public class HonorariosService {
     // Obtener todos los pagos existentes (para debugging)
     public List<PagoInstructor> obtenerTodosLosPagos() {
         List<PagoInstructor> pagos = new ArrayList<>();
-        String sql = "SELECT pi.*, u.Nombre, u.Apellido_paterno, u.Apellido_materno " +
-                    "FROM pagos_instructores pi " +
+        String sql = "SELECT pi.* FROM pagos_instructores pi " +
                     "INNER JOIN usuarios u ON pi.Instructor_Id = u.Num_Empleado " +
+                    "WHERE u.Id_Rol = 2 AND u.Activo = 1 " +
                     "ORDER BY pi.Fecha_Pago DESC";
 
         try (Connection connection = dataSource.getConnection();
@@ -270,10 +290,12 @@ public class HonorariosService {
                 PagoInstructor pago = new PagoInstructor();
                 pago.setId(rs.getInt("Id"));
                 pago.setInstructorId(rs.getInt("Instructor_Id"));
-                pago.setInstructorNombre(rs.getString("Nombre") + " " + 
-                                       rs.getString("Apellido_paterno") + " " + 
-                                       rs.getString("Apellido_materno"));
-                pago.setFechaPago(rs.getDate("Fecha_Pago").toLocalDate());
+                
+                Date fechaPago = rs.getDate("Fecha_Pago");
+                if (fechaPago != null) {
+                    pago.setFechaPago(fechaPago.toLocalDate());
+                }
+                
                 pago.setMonto(rs.getBigDecimal("Monto"));
                 pago.setHorasImpartidas(rs.getInt("Horas_Impartidas"));
                 pago.setEstatus(rs.getString("Estatus"));
@@ -295,7 +317,7 @@ public class HonorariosService {
         String sql = "SELECT Num_Empleado, Nombre, Apellido_paterno, Apellido_materno, Correo " +
                     "FROM usuarios WHERE Id_Rol = 2 AND Activo = 1 " +
                     "AND (Nombre LIKE ? OR Apellido_paterno LIKE ? OR Apellido_materno LIKE ? OR Correo LIKE ?) " +
-                    "ORDER BY Nombre, Apellido_paterno";
+                    "ORDER BY Nombre, Apellido_paterno, Apellido_materno";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -324,12 +346,12 @@ public class HonorariosService {
         return instructores;
     }
 
-    // En HonorariosService.java - Agregar este método
+    // Método para crear pago de prueba
     public boolean crearPagoPrueba(int instructorId, LocalDate fechaCurso, BigDecimal monto, 
                                 int horas, String nombreCurso) {
         String sql = "INSERT INTO pagos_instructores (Instructor_Id, Fecha_Pago, Monto, " +
                     "Horas_Impartidas, Estatus, Comprobante, Observaciones) " +
-                    "VALUES (?, ?, ?, ?, 'pendiente', '', 'Curso de prueba: ' || ?)";
+                    "VALUES (?, ?, ?, ?, 'pendiente', '', CONCAT('Curso de prueba: ', ?))";
         
         try (Connection connection = dataSource.getConnection();
             PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -348,5 +370,68 @@ public class HonorariosService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // NUEVO MÉTODO: Verificar si un curso ya ha sido pagado
+    public boolean cursoYaPagado(int cursoId) {
+        String sql = "SELECT COUNT(*) as count FROM pagos_instructores pi " +
+                    "INNER JOIN cursos c ON pi.Instructor_Id = c.Instructor_Id " +
+                    "AND pi.Fecha_Pago = c.Fecha_Imparticion " +
+                    "WHERE c.Id_Curso = ? AND pi.Estatus IN ('pagado', 'pendiente')";
+        
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, cursoId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("count") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("❌ Error al verificar si curso está pagado: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // NUEVO MÉTODO: Obtener cursos por instructor para debugging
+    public List<PagoInstructor> obtenerCursosPorInstructor(int instructorId) {
+        List<PagoInstructor> cursos = new ArrayList<>();
+        String sql = "SELECT c.Id_Curso, c.Nombre_curso, c.Fecha_Imparticion, " +
+                    "c.Instructor_Id, cc.Precio, cc.Horas " +
+                    "FROM cursos c " +
+                    "INNER JOIN usuarios u ON c.Instructor_Id = u.Num_Empleado " +
+                    "INNER JOIN catalogo_cursos cc ON c.Clave_STPS = cc.Clave_STPS " +
+                    "WHERE c.Instructor_Id = ? AND u.Id_Rol = 2 AND u.Activo = 1 " +
+                    "ORDER BY c.Fecha_Imparticion DESC";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, instructorId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    PagoInstructor curso = new PagoInstructor();
+                    
+                    String nombreCurso = rs.getString("Nombre_curso");
+                    Date fechaImparticion = rs.getDate("Fecha_Imparticion");
+                    
+                    curso.setInstructorId(rs.getInt("Instructor_Id"));
+                    curso.setFechaPago(fechaImparticion != null ? fechaImparticion.toLocalDate() : null);
+                    curso.setMonto(rs.getBigDecimal("Precio"));
+                    curso.setHorasImpartidas(rs.getInt("Horas"));
+                    curso.setEstatus("pendiente");
+                    curso.setComprobante("");
+                    curso.setObservaciones("Curso: " + nombreCurso + " (ID: " + rs.getInt("Id_Curso") + ")");
+                    
+                    cursos.add(curso);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al obtener cursos por instructor", e);
+        }
+        return cursos;
     }
 }

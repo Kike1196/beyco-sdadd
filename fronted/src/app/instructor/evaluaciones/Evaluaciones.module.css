@@ -587,4 +587,315 @@
         padding: 0.5rem 1rem;
         font-size: 0.7rem;
     }
+
+    /* 🆕 ESTILOS PARA CONTROLES DE ZOOM Y DESPLAZAMIENTO */
+
+.previewControls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.zoomControls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.zoomBtn {
+    background: #001f3f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.zoomBtn:hover:not(:disabled) {
+    background: #003366;
+    transform: scale(1.1);
+}
+
+.zoomBtn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.zoomLevel {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #000000;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* 🆕 CONTENEDOR MEJORADO PARA IMÁGENES CON DESPLAZAMIENTO */
+.previewImageContainer {
+    position: relative;
+    padding: 1rem;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    max-height: 400px;
+    min-height: 300px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+.imageWrapper {
+    position: absolute;
+    transition: transform 0.1s ease;
+    user-select: none;
+}
+
+.previewImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+    display: block;
+}
+
+/* 🆕 BARRAS DE DESPLAZAMIENTO */
+.scrollbarHorizontal {
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    right: 10px;
+    height: 12px;
+    z-index: 10;
+}
+
+.scrollbarVertical {
+    position: absolute;
+    top: 10px;
+    right: 5px;
+    bottom: 10px;
+    width: 12px;
+    z-index: 10;
+}
+
+.scrollbarInput {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+.scrollbarInput:hover {
+    opacity: 1;
+}
+
+/* Estilos específicos para la barra horizontal */
+.scrollbarHorizontal .scrollbarInput {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+}
+
+.scrollbarHorizontal .scrollbarInput::-webkit-slider-track {
+    background: #e5e7eb;
+    height: 6px;
+    border-radius: 3px;
+}
+
+.scrollbarHorizontal .scrollbarInput::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #001f3f;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    cursor: grab;
+}
+
+.scrollbarHorizontal .scrollbarInput::-webkit-slider-thumb:active {
+    cursor: grabbing;
+}
+
+.scrollbarHorizontal .scrollbarInput::-moz-range-track {
+    background: #e5e7eb;
+    height: 6px;
+    border-radius: 3px;
+    border: none;
+}
+
+.scrollbarHorizontal .scrollbarInput::-moz-range-thumb {
+    background: #001f3f;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    cursor: grab;
+    border: none;
+}
+
+.scrollbarHorizontal .scrollbarInput::-moz-range-thumb:active {
+    cursor: grabbing;
+}
+
+/* Estilos específicos para la barra vertical */
+.scrollbarVertical .scrollbarInput {
+    -webkit-appearance: slider-vertical;
+    writing-mode: bt-lr;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    width: 100%;
+    height: 100%;
+}
+
+.scrollbarVertical .scrollbarInput::-webkit-slider-track {
+    background: #e5e7eb;
+    width: 6px;
+    border-radius: 3px;
+}
+
+.scrollbarVertical .scrollbarInput::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #001f3f;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: grab;
+}
+
+.scrollbarVertical .scrollbarInput::-webkit-slider-thumb:active {
+    cursor: grabbing;
+}
+
+.scrollbarVertical .scrollbarInput::-moz-range-track {
+    background: #e5e7eb;
+    width: 6px;
+    border-radius: 3px;
+    border: none;
+}
+
+.scrollbarVertical .scrollbarInput::-moz-range-thumb {
+    background: #001f3f;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: grab;
+    border: none;
+}
+
+.scrollbarVertical .scrollbarInput::-moz-range-thumb:active {
+    cursor: grabbing;
+}
+
+/* 🆕 INDICADORES DE DESPLAZAMIENTO */
+.scrollIndicators {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 5;
+}
+
+.scrollIndicator {
+    background: rgba(0, 31, 63, 0.8);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* 🆕 INSTRUCCIONES DE USO */
+.zoomInstructions {
+    background: #e3f2fd;
+    border: 1px solid #bbdefb;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-top: 1rem;
+}
+
+.zoomInstructions h5 {
+    margin: 0 0 0.5rem 0;
+    color: #001f3f;
+    font-size: 0.9rem;
+}
+
+.zoomInstructions ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #000000;
+}
+
+.zoomInstructions li {
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+}
+
+/* Responsive para controles de zoom */
+@media (max-width: 768px) {
+    .previewControls {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+    
+    .zoomControls {
+        order: -1;
+    }
+    
+    .previewImageContainer {
+        max-height: 300px;
+        min-height: 200px;
+    }
+    
+    .scrollbarHorizontal {
+        bottom: 3px;
+        left: 5px;
+        right: 5px;
+        height: 10px;
+    }
+    
+    .scrollbarVertical {
+        top: 5px;
+        right: 3px;
+        bottom: 5px;
+        width: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .previewImageContainer {
+        max-height: 250px;
+        min-height: 150px;
+    }
+    
+    .zoomControls {
+        padding: 0.25rem;
+    }
+    
+    .zoomBtn {
+        width: 25px;
+        height: 25px;
+        font-size: 0.7rem;
+    }
+    
+    .zoomLevel {
+        font-size: 0.7rem;
+        min-width: 35px;
+    }
+}
 }

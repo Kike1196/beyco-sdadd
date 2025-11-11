@@ -7,27 +7,25 @@ import java.time.LocalDate;
 public class PagoInstructor {
     private int id;
     private int instructorId;
-    private String instructorNombre;
-    private String cursoNombre; // Este campo vendría de otra tabla o se almacenaría aquí
     private LocalDate fechaPago;
-    private LocalDate fechaCurso; // Fecha en que se impartió el curso
     private BigDecimal monto;
     private int horasImpartidas;
-    private String estatus; // "pendiente", "pagado", "cancelado"
+    private String estatus;
     private String comprobante;
     private String observaciones;
 
     // Constructores
     public PagoInstructor() {}
 
-    public PagoInstructor(int instructorId, String cursoNombre, LocalDate fechaCurso, 
-                         BigDecimal monto, int horasImpartidas, String estatus) {
+    public PagoInstructor(int instructorId, LocalDate fechaPago, BigDecimal monto, 
+                         int horasImpartidas, String estatus, String comprobante, String observaciones) {
         this.instructorId = instructorId;
-        this.cursoNombre = cursoNombre;
-        this.fechaCurso = fechaCurso;
+        this.fechaPago = fechaPago;
         this.monto = monto;
         this.horasImpartidas = horasImpartidas;
         this.estatus = estatus;
+        this.comprobante = comprobante;
+        this.observaciones = observaciones;
     }
 
     // Getters y Setters
@@ -37,17 +35,8 @@ public class PagoInstructor {
     public int getInstructorId() { return instructorId; }
     public void setInstructorId(int instructorId) { this.instructorId = instructorId; }
 
-    public String getInstructorNombre() { return instructorNombre; }
-    public void setInstructorNombre(String instructorNombre) { this.instructorNombre = instructorNombre; }
-
-    public String getCursoNombre() { return cursoNombre; }
-    public void setCursoNombre(String cursoNombre) { this.cursoNombre = cursoNombre; }
-
     public LocalDate getFechaPago() { return fechaPago; }
     public void setFechaPago(LocalDate fechaPago) { this.fechaPago = fechaPago; }
-
-    public LocalDate getFechaCurso() { return fechaCurso; }
-    public void setFechaCurso(LocalDate fechaCurso) { this.fechaCurso = fechaCurso; }
 
     public BigDecimal getMonto() { return monto; }
     public void setMonto(BigDecimal monto) { this.monto = monto; }
@@ -63,4 +52,18 @@ public class PagoInstructor {
 
     public String getObservaciones() { return observaciones; }
     public void setObservaciones(String observaciones) { this.observaciones = observaciones; }
+
+    @Override
+    public String toString() {
+        return "PagoInstructor{" +
+                "id=" + id +
+                ", instructorId=" + instructorId +
+                ", fechaPago=" + fechaPago +
+                ", monto=" + monto +
+                ", horasImpartidas=" + horasImpartidas +
+                ", estatus='" + estatus + '\'' +
+                ", comprobante='" + comprobante + '\'' +
+                ", observaciones='" + observaciones + '\'' +
+                '}';
+    }
 }

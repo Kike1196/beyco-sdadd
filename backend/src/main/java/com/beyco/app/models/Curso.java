@@ -15,18 +15,18 @@ public class Curso {
     private int empresaId;
     private int instructorId;
     private BigDecimal precio;
+    private BigDecimal pago; // NUEVO CAMPO
     private boolean examenPractico;
-
     private BigDecimal costo;
     private String status;
 
-    // Constructor vacío (IMPORTANTE)
+    // Constructor vacío
     public Curso() {
     }
 
-    // Constructor con parámetros
+    // Constructor con parámetros (actualizado)
     public Curso(int id, String nombre, String stps, int horas, LocalDate fechaIngreso, 
-                 String empresa, String instructor, String lugar, BigDecimal precio) {
+                 String empresa, String instructor, String lugar, BigDecimal precio, BigDecimal pago) {
         this.id = id;
         this.nombre = nombre;
         this.stps = stps;
@@ -36,9 +36,10 @@ public class Curso {
         this.instructor = instructor;
         this.lugar = lugar;
         this.precio = precio;
+        this.pago = pago;
     }
 
-    // Getters y setters (todos deben estar)
+    // Getters y setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getNombre() { return nombre; }
@@ -61,12 +62,12 @@ public class Curso {
     public void setInstructorId(int instructorId) { this.instructorId = instructorId; }
     public BigDecimal getPrecio() { return precio; }
     public void setPrecio(BigDecimal precio) { this.precio = precio; }
+    public BigDecimal getPago() { return pago; } // NUEVO GETTER
+    public void setPago(BigDecimal pago) { this.pago = pago; } // NUEVO SETTER
     public boolean getExamenPractico() { return examenPractico; }
     public void setExamenPractico(boolean examenPractico) { this.examenPractico = examenPractico; }
-
     public BigDecimal getCosto() { return costo; }
     public void setCosto(BigDecimal costo) { this.costo = costo; }
-
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 }

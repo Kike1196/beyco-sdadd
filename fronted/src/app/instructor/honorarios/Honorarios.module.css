@@ -601,3 +601,360 @@
         padding: 1.5rem;
     }
 }
+
+/* Estilos adicionales para la versión de instructor */
+
+.instructorInfoCard {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.instructorAvatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.instructorDetails h3 {
+    margin: 0 0 0.5rem 0;
+    color: #001f3f;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.instructorDetails p {
+    margin: 0.25rem 0;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.configSection {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+}
+
+.configSection h3 {
+    margin: 0 0 1rem 0;
+    color: #001f3f;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.configGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.periodoOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.optionLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.optionLabel:hover {
+    border-color: #001f3f;
+    background: white;
+}
+
+.optionLabel input:checked + .optionText {
+    color: #001f3f;
+    font-weight: 600;
+}
+
+.optionText {
+    color: #333;
+    font-weight: 500;
+}
+
+.optionDescription {
+    display: block;
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.25rem;
+    font-weight: normal;
+}
+
+.fechasContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.fechaInput {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.fechaLabel {
+    font-weight: 600;
+    color: #001f3f;
+    font-size: 0.9rem;
+}
+
+.fechaField {
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.fechaField:focus {
+    outline: none;
+    border-color: #001f3f;
+    box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
+}
+
+.fechaActions {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.btnAplicarFechas {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+.btnAplicarFechas:hover:not(:disabled) {
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btnAplicarFechas:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .configGrid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .instructorInfoCard {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+    }
+    
+    .fechaActions {
+        justify-content: stretch;
+    }
+    
+    .btnAplicarFechas {
+        width: 100%;
+    }
+}
+
+/* Estilos adicionales para la versión conectada al backend */
+
+.instructorActions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btnProbarConexion {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.btnProbarConexion:hover {
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+    transform: translateY(-1px);
+}
+
+.detalleCursoInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detalleEmpresa {
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.detalleLugar {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.detalleDatos {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.detalleTipo {
+    font-size: 0.8rem;
+    color: #007bff;
+    font-weight: 600;
+}
+
+.btnActualizar {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btnActualizar:hover:not(:disabled) {
+    background: linear-gradient(135deg, #218838 0%, #1e9c7a 100%);
+    transform: translateY(-2px);
+}
+
+.btnActualizar:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Agregar estos estilos al archivo Honorarios.module.css */
+
+/* Breadcrumb con botón regresar */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón Regresar */
+.btnRegresar {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.btnRegresar:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Botón Regresar en la parte inferior */
+.btnRegresarAbajo {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    margin-right: 1rem;
+}
+
+.btnRegresarAbajo:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Sección de acciones en la parte inferior */
+.actionsSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .actionsSection {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .btnRegresarAbajo {
+        margin-right: 0;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btnActualizar {
+        width: 100%;
+        justify-content: center;
+    }
+}

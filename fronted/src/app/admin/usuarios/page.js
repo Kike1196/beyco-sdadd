@@ -47,7 +47,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
     );
 };
 
-// Función para normalizar nombres de campos según la estructura del backend
+// ✅ FUNCIÓN MEJORADA DE NORMALIZACIÓN
 const normalizeUsuario = (usuario) => {
     const mapRolIdToName = (idRol) => {
         switch (idRol) {
@@ -59,49 +59,208 @@ const normalizeUsuario = (usuario) => {
     };
 
     const mapRolNameToId = (rolName) => {
-        switch (rolName) {
-            case 'Administrador': return 1;
-            case 'Instructor': return 2;
-            case 'Secretaria': return 3;
+        const normalized = rolName?.toLowerCase();
+        switch (normalized) {
+            case 'administrador': return 1;
+            case 'instructor': return 2;
+            case 'secretaria': return 3;
             default: return 4;
         }
+    };
+
+    // Capitalizar primera letra
+    const capitalize = (str) => {
+        if (!str) return '';
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     };
 
     return {
         numEmpleado: usuario.numEmpleado || usuario.Num_Empleado || usuario.id || Math.random().toString(36).substr(2, 9),
         nombre: usuario.nombre || usuario.Nombre || '',
-        apellidoPaterno: usuario.apellidoPaterno || usuario.Apellido_paterno || usuario.paterno || '',
-        apellidoMaterno: usuario.apellidoMaterno || usuario.Apellido_materno || usuario.materno || '',
+        apellidoPaterno: usuario.apellidoPaterno || usuario.Apellido_paterno || usuario.apellido_paterno || usuario.paterno || '',
+        apellidoMaterno: usuario.apellidoMaterno || usuario.Apellido_materno || usuario.apellido_materno || usuario.materno || '',
         correo: usuario.correo || usuario.Correo || usuario.email || '',
         contrasena: usuario.contrasena || usuario.Contrasena || usuario.password || '',
-        idRol: usuario.idRol || usuario.Id_Rol || mapRolNameToId(usuario.rol) || 4,
-        rol: usuario.rol || mapRolIdToName(usuario.idRol) || 'Usuario',
+        idRol: usuario.idRol || usuario.Id_Rol || usuario.id_rol || mapRolNameToId(usuario.rol) || 4,
+        rol: capitalize(usuario.rol) || mapRolIdToName(usuario.idRol || usuario.Id_Rol || usuario.id_rol) || 'Usuario',
         activo: usuario.activo !== undefined ? usuario.activo : 
                 (usuario.Activo !== undefined ? usuario.Activo : true),
-        fechaIngreso: usuario.fechaIngreso || usuario.Fecha_Ingreso || usuario.fechaCreacion || new Date().toISOString().split('T')[0],
-        preguntaRecuperacion: usuario.preguntaRecuperacion || usuario.Pregunta_recuperacion || usuario.pregunta || '',
-        respuestaRecuperacion: usuario.respuestaRecuperacion || usuario.Respuesta_recuperacion || usuario.respuesta || '',
+        fechaIngreso: usuario.fechaIngreso || usuario.Fecha_Ingreso || usuario.fecha_ingreso || usuario.fechaCreacion || new Date().toISOString().split('T')[0],
+        preguntaRecuperacion: usuario.preguntaRecuperacion || usuario.Pregunta_recuperacion || usuario.pregunta_recuperacion || usuario.pregunta || '',
+        respuestaRecuperacion: usuario.respuestaRecuperacion || usuario.Respuesta_recuperacion || usuario.respuesta_recuperacion || usuario.respuesta || '',
         firma: usuario.firma || usuario.Firma || ''
     };
 };
 
-// Función para verificar si es un usuario temporal
-const isTemporaryUser = (usuario) => {
-    if (!usuario || !usuario.numEmpleado) return false;
-    
-    if (typeof usuario.numEmpleado === 'string' && usuario.numEmpleado.includes('new-user-')) {
-        return true;
+// ✅ VALIDACIONES COMPLETAS
+const validaciones = {
+    nombre: (nombre) => {
+        if (!nombre?.trim()) {
+            return { valido: false, mensaje: 'El nombre es obligatorio' };
+        }
+        if (nombre.length < 2) {
+            return { valido: false, mensaje: 'El nombre debe tener al menos 2 caracteres' };
+        }
+        if (nombre.length > 50) {
+            return { valido: false, mensaje: 'El nombre no puede exceder 50 caracteres' };
+        }
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre)) {
+            return { valido: false, mensaje: 'El nombre solo puede contener letras y espacios' };
+        }
+        return { valido: true, mensaje: '' };
+    },
+
+    apellidoPaterno: (apellido) => {
+        if (!apellido?.trim()) {
+            return { valido: false, mensaje: 'El apellido paterno es obligatorio' };
+        }
+        if (apellido.length < 2) {
+            return { valido: false, mensaje: 'El apellido paterno debe tener al menos 2 caracteres' };
+        }
+        if (apellido.length > 30) {
+            return { valido: false, mensaje: 'El apellido paterno no puede exceder 30 caracteres' };
+        }
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/.test(apellido)) {
+            return { valido: false, mensaje: 'El apellido paterno solo puede contener letras' };
+        }
+        return { valido: true, mensaje: '' };
+    },
+
+    apellidoMaterno: (apellido) => {
+        if (apellido && apellido.trim()) {
+            if (apellido.length < 2) {
+                return { valido: false, mensaje: 'El apellido materno debe tener al menos 2 caracteres' };
+            }
+            if (apellido.length > 30) {
+                return { valido: false, mensaje: 'El apellido materno no puede exceder 30 caracteres' };
+            }
+            if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/.test(apellido)) {
+                return { valido: false, mensaje: 'El apellido materno solo puede contener letras' };
+            }
+        }
+        return { valido: true, mensaje: '' };
+    },
+
+    correo: (correo, usuariosExistentes = [], usuarioActual = null) => {
+        if (!correo?.trim()) {
+            return { valido: false, mensaje: 'El correo electrónico es obligatorio' };
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(correo)) {
+            return { valido: false, mensaje: 'El formato del correo electrónico no es válido' };
+        }
+        
+        if (correo.length > 100) {
+            return { valido: false, mensaje: 'El correo electrónico no puede exceder 100 caracteres' };
+        }
+
+        const correoDuplicado = usuariosExistentes.some(usuario => 
+            usuario.correo.toLowerCase() === correo.toLowerCase() && 
+            usuario.numEmpleado !== usuarioActual?.numEmpleado
+        );
+        
+        if (correoDuplicado) {
+            return { valido: false, mensaje: 'El correo electrónico ya está registrado' };
+        }
+
+        return { valido: true, mensaje: '' };
+    },
+
+    contrasena: (contrasena, esNuevoUsuario = false) => {
+        if (esNuevoUsuario && !contrasena?.trim()) {
+            return { valido: false, mensaje: 'La contraseña es obligatoria para nuevos usuarios' };
+        }
+        
+        if (contrasena && contrasena.trim()) {
+            if (contrasena.length < 6) {
+                return { valido: false, mensaje: 'La contraseña debe tener al menos 6 caracteres' };
+            }
+            if (contrasena.length > 50) {
+                return { valido: false, mensaje: 'La contraseña no puede exceder 50 caracteres' };
+            }
+        }
+        
+        return { valido: true, mensaje: '' };
+    },
+
+    rol: (rol) => {
+        if (!rol) {
+            return { valido: false, mensaje: 'El rol es obligatorio' };
+        }
+        const rolesPermitidos = ['Administrador', 'Instructor', 'Secretaria'];
+        if (!rolesPermitidos.includes(rol)) {
+            return { valido: false, mensaje: 'El rol seleccionado no es válido' };
+        }
+        return { valido: true, mensaje: '' };
+    },
+
+    fechaIngreso: (fecha) => {
+        if (!fecha) {
+            return { valido: false, mensaje: 'La fecha de ingreso es obligatoria' };
+        }
+        
+        const fechaIngreso = new Date(fecha);
+        const fechaActual = new Date();
+        const fechaMinima = new Date('2000-01-01');
+        
+        if (fechaIngreso > fechaActual) {
+            return { valido: false, mensaje: 'La fecha de ingreso no puede ser futura' };
+        }
+        
+        if (fechaIngreso < fechaMinima) {
+            return { valido: false, mensaje: 'La fecha de ingreso no puede ser anterior al año 2000' };
+        }
+        
+        return { valido: true, mensaje: '' };
+    },
+
+    preguntaRecuperacion: (pregunta) => {
+        if (!pregunta?.trim()) {
+            return { valido: false, mensaje: 'La pregunta de seguridad es obligatoria' };
+        }
+        if (pregunta.length < 10) {
+            return { valido: false, mensaje: 'La pregunta de seguridad debe tener al menos 10 caracteres' };
+        }
+        if (pregunta.length > 100) {
+            return { valido: false, mensaje: 'La pregunta de seguridad no puede exceder 100 caracteres' };
+        }
+        return { valido: true, mensaje: '' };
+    },
+
+    respuestaRecuperacion: (respuesta) => {
+        if (!respuesta?.trim()) {
+            return { valido: false, mensaje: 'La respuesta de seguridad es obligatoria' };
+        }
+        if (respuesta.length < 3) {
+            return { valido: false, mensaje: 'La respuesta de seguridad debe tener al menos 3 caracteres' };
+        }
+        if (respuesta.length > 50) {
+            return { valido: false, mensaje: 'La respuesta de seguridad no puede exceder 50 caracteres' };
+        }
+        return { valido: true, mensaje: '' };
+    },
+
+    firma: (archivo) => {
+        if (archivo && archivo.trim()) {
+            const extensionesPermitidas = ['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.doc', '.docx'];
+            const extension = archivo.toLowerCase().substring(archivo.lastIndexOf('.'));
+            
+            if (!extensionesPermitidas.includes(extension)) {
+                return { 
+                    valido: false, 
+                    mensaje: `Tipo de archivo no permitido. Formatos aceptados: ${extensionesPermitidas.join(', ')}` 
+                };
+            }
+            
+            if (archivo.length > 200) {
+                return { valido: false, mensaje: 'El nombre del archivo es demasiado largo' };
+            }
+        }
+        return { valido: true, mensaje: '' };
     }
-    
-    if (typeof usuario.numEmpleado === 'number') {
-        return false;
-    }
-    
-    const numEmpleadoStr = String(usuario.numEmpleado);
-    return numEmpleadoStr.includes('new-user-') || numEmpleadoStr.length > 10;
 };
 
-// ✅ COMPONENTE PRINCIPAL CORREGIDO
 export default function UsuariosPage() {
     const [usuarios, setUsuarios] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -119,6 +278,7 @@ export default function UsuariosPage() {
         onConfirm: () => {},
     });
     const [formErrors, setFormErrors] = useState({});
+    const [touchedFields, setTouchedFields] = useState({});
 
     const showNotification = (message, type = 'error') => {
         setNotification({ show: true, message, type });
@@ -128,16 +288,27 @@ export default function UsuariosPage() {
         setNotification({ show: false, message: '', type: '' });
     };
 
-    // Función para navegar al dashboard
     const handleAtrasClick = () => {
-        router.push('/admin');
+        if (isEditing || isAdding) {
+            showConfirmation(
+                "Salir sin guardar",
+                "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?",
+                () => {
+                    router.push('/admin');
+                }
+            );
+        } else {
+            router.push('/admin');
+        }
     };
 
-    // Cargar usuarios desde la base de datos
+    // ✅ CARGA DE USUARIOS MEJORADA
     useEffect(() => {
         const loadUsuarios = async () => {
             try {
                 setLoading(true);
+                console.log('🔄 Cargando usuarios...');
+                
                 const response = await fetch('http://localhost:8080/api/usuarios', {
                     method: 'GET',
                     headers: {
@@ -150,42 +321,36 @@ export default function UsuariosPage() {
                 }
                 
                 const result = await response.json();
+                console.log('📦 Respuesta del backend:', result);
                 
-                let data;
-                if (result.success && Array.isArray(result.data)) {
+                // ✅ EXTRAER USUARIOS DE LA RESPUESTA
+                let data = [];
+                if (result.success && Array.isArray(result.usuarios)) {
+                    data = result.usuarios;
+                    console.log('✅ Encontrados en result.usuarios');
+                } else if (Array.isArray(result.usuarios)) {
+                    data = result.usuarios;
+                    console.log('✅ Encontrados en result.usuarios (sin success)');
+                } else if (result.success && Array.isArray(result.data)) {
                     data = result.data;
+                    console.log('✅ Encontrados en result.data');
                 } else if (Array.isArray(result)) {
                     data = result;
-                } else {
-                    data = [];
+                    console.log('✅ Array directo');
                 }
                 
+                console.log('📊 Total usuarios:', data.length);
+                
                 const normalizedData = data.map(normalizeUsuario);
+                console.log('✨ Usuarios normalizados:', normalizedData.length);
+                
                 setUsuarios(normalizedData);
+                showNotification(`${normalizedData.length} usuarios cargados correctamente`, 'success');
                 
             } catch (error) {
-                console.error("Error cargando usuarios:", error);
+                console.error("❌ Error cargando usuarios:", error);
                 showNotification("Error al cargar los usuarios: " + error.message, 'error');
-                
-                // Datos de fallback
-                const fallbackData = [
-                    {
-                        numEmpleado: 1,
-                        nombre: 'Armando',
-                        apellidoPaterno: 'Becerra',
-                        apellidoMaterno: 'Campos',
-                        correo: 'armando.becerra@beyco.com',
-                        contrasena: 'Ingeniería2C',
-                        idRol: 2,
-                        rol: 'Instructor',
-                        activo: true,
-                        preguntaRecuperacion: '¿Cuál es tu color favorito?',
-                        respuestaRecuperacion: 'Azul',
-                        fechaIngreso: '2023-01-15',
-                        firma: 'firma_armando.png'
-                    }
-                ].map(normalizeUsuario);
-                setUsuarios(fallbackData);
+                setUsuarios([]);
             } finally {
                 setLoading(false);
             }
@@ -193,9 +358,38 @@ export default function UsuariosPage() {
         loadUsuarios();
     }, []);
 
+    const validateField = (name, value) => {
+        switch (name) {
+            case 'nombre':
+                return validaciones.nombre(value);
+            case 'apellidoPaterno':
+                return validaciones.apellidoPaterno(value);
+            case 'apellidoMaterno':
+                return validaciones.apellidoMaterno(value);
+            case 'correo':
+                return validaciones.correo(value, usuarios, selectedUsuario);
+            case 'contrasena':
+                return validaciones.contrasena(value, isAdding);
+            case 'rol':
+                return validaciones.rol(value);
+            case 'fechaIngreso':
+                return validaciones.fechaIngreso(value);
+            case 'preguntaRecuperacion':
+                return validaciones.preguntaRecuperacion(value);
+            case 'respuestaRecuperacion':
+                return validaciones.respuestaRecuperacion(value);
+            case 'firma':
+                return validaciones.firma(value);
+            default:
+                return { valido: true, mensaje: '' };
+        }
+    };
+
     const handleSelectUsuario = (usuario) => {
-        // Prevenir selección si estamos en modo edición o agregando
-        if (isAdding || isEditing) return;
+        if (isAdding || isEditing) {
+            showNotification("Termina la edición actual antes de seleccionar otro usuario", 'warning');
+            return;
+        }
         
         setSelectedUsuario(usuario);
         setIsEditing(false);
@@ -212,9 +406,15 @@ export default function UsuariosPage() {
             firma: usuario.firma || ''
         });
         setFormErrors({});
+        setTouchedFields({});
     };
 
     const handleAgregarClick = () => {
+        if (isEditing) {
+            showNotification("Termina la edición actual antes de agregar un nuevo usuario", 'warning');
+            return;
+        }
+
         const newUser = {
             numEmpleado: 'new-user-' + Date.now(),
             nombre: '',
@@ -247,14 +447,16 @@ export default function UsuariosPage() {
             firma: ''
         });
         setFormErrors({});
+        setTouchedFields({});
         
-        // Scroll a la parte superior de la tabla para ver la nueva fila
         setTimeout(() => {
             const tableContainer = document.querySelector(`.${styles.tableContainer}`);
             if (tableContainer) {
                 tableContainer.scrollTop = 0;
             }
         }, 100);
+
+        showNotification("Modo de agregar usuario activado. Completa todos los campos obligatorios.", 'info');
     };
 
     const handleModificarClick = () => {
@@ -262,9 +464,17 @@ export default function UsuariosPage() {
             showNotification("Selecciona un usuario para modificar.", 'warning');
             return;
         }
+
+        if (selectedUsuario.numEmpleado.toString().includes('new-user-')) {
+            showNotification("No puedes modificar un usuario que no ha sido guardado", 'error');
+            return;
+        }
+
         setIsEditing(true);
         setIsAdding(false);
         setFormErrors({});
+        setTouchedFields({});
+        showNotification("Modo de edición activado. Modifica los campos necesarios.", 'info');
     };
 
     const handleCancelarClick = () => {
@@ -278,6 +488,7 @@ export default function UsuariosPage() {
                     setSelectedUsuario(null);
                     setUsuarioData({});
                     setFormErrors({});
+                    setTouchedFields({});
                     closeConfirmation();
                     showNotification("Edición cancelada", 'info');
                 }
@@ -286,55 +497,55 @@ export default function UsuariosPage() {
             setSelectedUsuario(null);
             setUsuarioData({});
             setFormErrors({});
+            setTouchedFields({});
             showNotification("Selección limpiada", 'info');
         }
     };
 
     const validateForm = () => {
         const errors = {};
-        
-        if (!usuarioData.nombre?.trim()) {
-            errors.nombre = "El nombre es obligatorio";
+        let hasErrors = false;
+
+        const camposObligatorios = [
+            'nombre', 'apellidoPaterno', 'correo', 'rol', 'fechaIngreso', 
+            'preguntaRecuperacion', 'respuestaRecuperacion'
+        ];
+
+        camposObligatorios.forEach(campo => {
+            const validacion = validateField(campo, usuarioData[campo]);
+            if (!validacion.valido) {
+                errors[campo] = validacion.mensaje;
+                hasErrors = true;
+            }
+        });
+
+        if (isAdding) {
+            const validacionContrasena = validateField('contrasena', usuarioData.contrasena);
+            if (!validacionContrasena.valido) {
+                errors.contrasena = validacionContrasena.mensaje;
+                hasErrors = true;
+            }
         }
-        
-        if (!usuarioData.apellidoPaterno?.trim()) {
-            errors.apellidoPaterno = "El apellido paterno es obligatorio";
-        }
-        
-        if (!usuarioData.correo?.trim()) {
-            errors.correo = "El correo electrónico es obligatorio";
-        } else if (!/\S+@\S+\.\S+/.test(usuarioData.correo)) {
-            errors.correo = "El formato del correo electrónico no es válido";
-        }
-        
-        if (!usuarioData.rol) {
-            errors.rol = "El rol es obligatorio";
-        }
-        
-        if (isAdding && !usuarioData.contrasena?.trim()) {
-            errors.contrasena = "La contraseña es obligatoria para nuevos usuarios";
-        }
-        
-        if (!usuarioData.fechaIngreso) {
-            errors.fechaIngreso = "La fecha de ingreso es obligatoria";
-        }
-        
-        if (!usuarioData.preguntaRecuperacion?.trim()) {
-            errors.preguntaRecuperacion = "La pregunta de seguridad es obligatoria";
-        }
-        
-        if (!usuarioData.respuestaRecuperacion?.trim()) {
-            errors.respuestaRecuperacion = "La respuesta de seguridad es obligatoria";
-        }
-        
+
+        const camposOpcionales = ['apellidoMaterno', 'firma'];
+        camposOpcionales.forEach(campo => {
+            if (usuarioData[campo]) {
+                const validacion = validateField(campo, usuarioData[campo]);
+                if (!validacion.valido) {
+                    errors[campo] = validacion.mensaje;
+                    hasErrors = true;
+                }
+            }
+        });
+
         setFormErrors(errors);
-        
-        if (Object.keys(errors).length > 0) {
+
+        if (hasErrors) {
             const firstError = Object.values(errors)[0];
-            showNotification(firstError, 'error');
+            showNotification(`Error de validación: ${firstError}`, 'error');
             return false;
         }
-        
+
         return true;
     };
 
@@ -354,7 +565,7 @@ export default function UsuariosPage() {
         }
 
         try {
-            const usuarioTemporal = isTemporaryUser(selectedUsuario);
+            const usuarioTemporal = selectedUsuario.numEmpleado.toString().includes('new-user-');
             
             const dataToSend = {
                 nombre: usuarioData.nombre.trim(),
@@ -399,7 +610,11 @@ export default function UsuariosPage() {
                 if (reloadResponse.ok) {
                     const result = await reloadResponse.json();
                     let data = [];
-                    if (result.success && Array.isArray(result.data)) {
+                    if (result.success && Array.isArray(result.usuarios)) {
+                        data = result.usuarios;
+                    } else if (Array.isArray(result.usuarios)) {
+                        data = result.usuarios;
+                    } else if (result.success && Array.isArray(result.data)) {
                         data = result.data;
                     } else if (Array.isArray(result)) {
                         data = result;
@@ -409,13 +624,15 @@ export default function UsuariosPage() {
                 }
                 
             } else {
-                throw new Error(`Error ${response.status}`);
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Error ${response.status}`);
             }
             
             setIsEditing(false);
             setIsAdding(false);
             setSelectedUsuario(null);
             setFormErrors({});
+            setTouchedFields({});
             
         } catch (error) {
             console.error('Error al guardar:', error);
@@ -435,59 +652,50 @@ export default function UsuariosPage() {
         }
     };
 
-    const handleToggleStatus = async () => {
-        if (!selectedUsuario) {
-            showNotification("Selecciona un usuario para cambiar su estado.", 'warning');
-            return;
-        }
-
-        try {
-            const nuevoEstado = !selectedUsuario.activo;
-            
-            // Actualizar localmente primero
-            setUsuarios(prev => prev.map(u => 
-                u.numEmpleado === selectedUsuario.numEmpleado 
-                ? { ...u, activo: nuevoEstado }
-                : u
-            ));
-            setSelectedUsuario(prev => ({ ...prev, activo: nuevoEstado }));
-            
-            const newStatus = nuevoEstado ? 'activado' : 'desactivado';
-            showNotification(`Usuario ${newStatus} correctamente.`, 'success');
-            
-        } catch (error) {
-            console.error('Error cambiando estado:', error);
-            showNotification('Error al cambiar estado del usuario: ' + error.message, 'error');
-        }
-    };
-
-    const handleCambiarContraseña = () => {
-        if (!selectedUsuario) {
-            showNotification("Selecciona un usuario para cambiar la contraseña.", 'warning');
-            return;
-        }
-        setIsEditing(true);
-        setUsuarioData(prev => ({ ...prev, contrasena: '' }));
-        showNotification("Modo de cambio de contraseña activado. Completa la nueva contraseña y guarda.", 'info');
-    };
-
-    const handleAddSignature = () => {
-        if (!selectedUsuario) {
-            showNotification("Selecciona un usuario para agregar firma.", 'warning');
-            return;
-        }
+    const handleToggleStatus = (usuario, e) => {
+        e.stopPropagation();
         
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*,.pdf';
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                setUsuarioData(prev => ({ ...prev, firma: file.name }));
-                showNotification(`Firma ${file.name} agregada para ${selectedUsuario.nombre}.`, 'success');
+        if (!usuario) return;
+
+        if (usuario.rol === 'Administrador' && usuario.activo) {
+            const administradoresActivos = usuarios.filter(u => 
+                u.rol === 'Administrador' && u.activo && u.numEmpleado !== usuario.numEmpleado
+            ).length;
+            
+            if (administradoresActivos === 0) {
+                showNotification("No puedes desactivar el único administrador activo del sistema", 'error');
+                return;
             }
-        };
-        input.click();
+        }
+
+        showConfirmation(
+            "Cambiar Estado",
+            `¿Estás seguro de que quieres ${usuario.activo ? 'desactivar' : 'activar'} a ${usuario.nombre}?`,
+            async () => {
+                try {
+                    const nuevoEstado = !usuario.activo;
+                    
+                    setUsuarios(prev => prev.map(u => 
+                        u.numEmpleado === usuario.numEmpleado 
+                        ? { ...u, activo: nuevoEstado }
+                        : u
+                    ));
+                    
+                    if (selectedUsuario?.numEmpleado === usuario.numEmpleado) {
+                        setSelectedUsuario(prev => ({ ...prev, activo: nuevoEstado }));
+                    }
+                    
+                    const newStatus = nuevoEstado ? 'activado' : 'desactivado';
+                    showNotification(`Usuario ${newStatus} correctamente.`, 'success');
+                    
+                } catch (error) {
+                    console.error('Error cambiando estado:', error);
+                    showNotification('Error al cambiar estado del usuario: ' + error.message, 'error');
+                } finally {
+                    closeConfirmation();
+                }
+            }
+        );
     };
 
     const showConfirmation = (title, message, onConfirm) => {
@@ -501,11 +709,61 @@ export default function UsuariosPage() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUsuarioData(prev => ({ ...prev, [name]: value }));
-        if (formErrors[name]) {
+        
+        setTouchedFields(prev => ({ ...prev, [name]: true }));
+        
+        if (touchedFields[name]) {
+            const validacion = validateField(name, value);
+            if (!validacion.valido) {
+                setFormErrors(prev => ({ ...prev, [name]: validacion.mensaje }));
+            } else {
+                setFormErrors(prev => ({ ...prev, [name]: '' }));
+            }
+        }
+        
+        e.stopPropagation();
+    };
+
+    const handleInputBlur = (e) => {
+        const { name, value } = e.target;
+        setTouchedFields(prev => ({ ...prev, [name]: true }));
+        
+        const validacion = validateField(name, value);
+        if (!validacion.valido) {
+            setFormErrors(prev => ({ ...prev, [name]: validacion.mensaje }));
+        } else {
             setFormErrors(prev => ({ ...prev, [name]: '' }));
         }
-        // Prevenir la propagación del evento
-        e.stopPropagation();
+    };
+
+    const handleAddSignature = () => {
+        if (!selectedUsuario) {
+            showNotification("Selecciona un usuario para agregar firma.", 'warning');
+            return;
+        }
+        
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*,.pdf,.doc,.docx';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification("El archivo es demasiado grande. El tamaño máximo permitido es 5MB.", 'error');
+                    return;
+                }
+                
+                const validacion = validaciones.firma(file.name);
+                if (!validacion.valido) {
+                    showNotification(validacion.mensaje, 'error');
+                    return;
+                }
+                
+                setUsuarioData(prev => ({ ...prev, firma: file.name }));
+                showNotification(`Firma ${file.name} agregada correctamente para ${selectedUsuario.nombre}.`, 'success');
+            }
+        };
+        input.click();
     };
 
     const filteredUsuarios = useMemo(() => 
@@ -515,6 +773,10 @@ export default function UsuariosPage() {
 
     const usuariosActivos = usuarios.filter(u => u.activo).length;
     const usuariosInactivos = usuarios.filter(u => !u.activo).length;
+
+    const handleToggleShowInactive = () => {
+        setShowInactive(!showInactive);
+    };
 
     return (
         <div className={styles.pageContainer}>
@@ -534,16 +796,25 @@ export default function UsuariosPage() {
                 message={confirmation.message}
             />
 
-            <header className={styles.header}>
+            <header className={styles.header}>  
                 <div className={styles.titleSection}>
                     <div className={styles.headerTop}>
-                        <h1>Usuarios</h1>
+                        <h1>Gestión de usuarios</h1>
                     </div>
-                    <div className={`${styles.modoInfo} ${usuarios.some(u => isTemporaryUser(u)) ? styles.warning : ''}`}>
-                        {usuarios.some(u => isTemporaryUser(u)) 
-                            ? '' 
-                            : 'Bienvenido al panel de administración de usuarios'
-                        }
+                    <div className={styles.modoInfo}>
+                        {(isEditing || isAdding) && (
+                            <span className={styles.warningText}>
+                                ⚠ {isAdding ? 'Agregando nuevo usuario' : 'Editando usuario'} - Recuerda guardar los cambios
+                            </span>
+                        )}
+                    </div>
+                </div>
+                
+                <div className={styles.logoSection}>
+                    <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
+                    <div className={styles.logoText}>
+                        <span className={styles.logoTitle}></span>
+                        <span className={styles.logoSubtitle}></span>
                     </div>
                 </div>
             </header>
@@ -551,10 +822,22 @@ export default function UsuariosPage() {
             <main className={styles.mainContent}>
                 <div className={styles.statsSection}>
                     <div className={styles.statsHeader}>
-                        <h2>Todos {usuarios.length}</h2>
+                        <h2>Total: {usuarios.length}</h2>
                         <div className={styles.statsDetails}>
-                            <span className={styles.statActive}>Activos: {usuariosActivos}</span>
-                            <span className={styles.statInactive}>Inactivos: {usuariosInactivos}</span>
+                            <span 
+                                className={`${styles.statActive} ${!showInactive ? styles.statSelected : ''}`}
+                                onClick={handleToggleShowInactive}
+                                style={{cursor: 'pointer'}}
+                            >
+                                Activos: {usuariosActivos}
+                            </span>
+                            <span 
+                                className={`${styles.statInactive} ${showInactive ? styles.statSelected : ''}`}
+                                onClick={handleToggleShowInactive}
+                                style={{cursor: 'pointer'}}
+                            >
+                                Inactivos: {usuariosInactivos}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -565,11 +848,20 @@ export default function UsuariosPage() {
                     ) : (
                         <span>Mostrando solo usuarios activos</span>
                     )}
+                    {(isEditing || isAdding) && (
+                        <span className={styles.editingWarning}>
+                            • Modo edición activo
+                        </span>
+                    )}
                 </div>
 
                 <div className={styles.tableContainer}>
                     {loading ? (
                         <p className={styles.loading}>Cargando usuarios...</p>
+                    ) : usuarios.length === 0 ? (
+                        <div style={{textAlign: 'center', padding: '3rem'}}>
+                            <p style={{fontSize: '1.2rem', color: '#dc3545'}}>No hay usuarios registrados</p>
+                        </div>
                     ) : (
                         <table className={styles.usuariosTable}>
                             <thead>
@@ -584,7 +876,6 @@ export default function UsuariosPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {/* ✅ NUEVO: Mostrar fila de agregar cuando esté en modo agregar */}
                                 {isAdding && (
                                     <tr className={`${styles.selectedRow} ${styles.editingRow}`}>
                                         <td>
@@ -594,8 +885,9 @@ export default function UsuariosPage() {
                                                     name="nombre"
                                                     value={usuarioData.nombre || ''}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleInputBlur}
                                                     className={`${styles.editInput} ${formErrors.nombre ? styles.inputError : ''}`}
-                                                    placeholder="Nombre"
+                                                    placeholder="Nombre *"
                                                     onClick={(e) => e.stopPropagation()}
                                                 />
                                                 {formErrors.nombre && <span className={styles.errorText}>{formErrors.nombre}</span>}
@@ -608,8 +900,9 @@ export default function UsuariosPage() {
                                                     name="apellidoPaterno"
                                                     value={usuarioData.apellidoPaterno || ''}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleInputBlur}
                                                     className={`${styles.editInput} ${formErrors.apellidoPaterno ? styles.inputError : ''}`}
-                                                    placeholder="Apellido Paterno"
+                                                    placeholder="Apellido Paterno *"
                                                     onClick={(e) => e.stopPropagation()}
                                                 />
                                                 {formErrors.apellidoPaterno && <span className={styles.errorText}>{formErrors.apellidoPaterno}</span>}
@@ -622,10 +915,12 @@ export default function UsuariosPage() {
                                                     name="apellidoMaterno"
                                                     value={usuarioData.apellidoMaterno || ''}
                                                     onChange={handleInputChange}
-                                                    className={styles.editInput}
+                                                    onBlur={handleInputBlur}
+                                                    className={`${styles.editInput} ${formErrors.apellidoMaterno ? styles.inputError : ''}`}
                                                     placeholder="Apellido Materno"
                                                     onClick={(e) => e.stopPropagation()}
                                                 />
+                                                {formErrors.apellidoMaterno && <span className={styles.errorText}>{formErrors.apellidoMaterno}</span>}
                                             </div>
                                         </td>
                                         <td>
@@ -635,8 +930,9 @@ export default function UsuariosPage() {
                                                     name="correo"
                                                     value={usuarioData.correo || ''}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleInputBlur}
                                                     className={`${styles.editInput} ${formErrors.correo ? styles.inputError : ''}`}
-                                                    placeholder="correo@ejemplo.com"
+                                                    placeholder="correo@ejemplo.com *"
                                                     onClick={(e) => e.stopPropagation()}
                                                 />
                                                 {formErrors.correo && <span className={styles.errorText}>{formErrors.correo}</span>}
@@ -648,10 +944,11 @@ export default function UsuariosPage() {
                                                     name="rol"
                                                     value={usuarioData.rol || ''}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleInputBlur}
                                                     className={`${styles.editSelect} ${formErrors.rol ? styles.inputError : ''}`}
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    <option value="">Seleccionar rol</option>
+                                                    <option value="">Seleccionar rol *</option>
                                                     <option value="Administrador">Administrador</option>
                                                     <option value="Instructor">Instructor</option>
                                                     <option value="Secretaria">Secretaria</option>
@@ -671,6 +968,7 @@ export default function UsuariosPage() {
                                                     name="fechaIngreso"
                                                     value={usuarioData.fechaIngreso || ''}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleInputBlur}
                                                     className={`${styles.editInput} ${formErrors.fechaIngreso ? styles.inputError : ''}`}
                                                     onClick={(e) => e.stopPropagation()}
                                                 />
@@ -680,14 +978,12 @@ export default function UsuariosPage() {
                                     </tr>
                                 )}
                                 
-                                {/* Usuarios existentes */}
                                 {filteredUsuarios.map(usuario => (
                                     <tr 
                                         key={usuario.numEmpleado}
                                         onClick={() => handleSelectUsuario(usuario)}
                                         className={`${selectedUsuario?.numEmpleado === usuario.numEmpleado ? styles.selectedRow : ''} ${!usuario.activo ? styles.inactiveRow : ''} ${isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? styles.editingRow : ''}`}
                                     >
-                                        {/* Nombre */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
                                                 <div onClick={(e) => e.stopPropagation()}>
@@ -696,8 +992,9 @@ export default function UsuariosPage() {
                                                         name="nombre"
                                                         value={usuarioData.nombre || ''}
                                                         onChange={handleInputChange}
+                                                        onBlur={handleInputBlur}
                                                         className={`${styles.editInput} ${formErrors.nombre ? styles.inputError : ''}`}
-                                                        placeholder="Nombre"
+                                                        placeholder="Nombre *"
                                                         onClick={(e) => e.stopPropagation()}
                                                     />
                                                     {formErrors.nombre && <span className={styles.errorText}>{formErrors.nombre}</span>}
@@ -707,7 +1004,6 @@ export default function UsuariosPage() {
                                             )}
                                         </td>
 
-                                        {/* Apellido Paterno */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
                                                 <div onClick={(e) => e.stopPropagation()}>
@@ -716,8 +1012,9 @@ export default function UsuariosPage() {
                                                         name="apellidoPaterno"
                                                         value={usuarioData.apellidoPaterno || ''}
                                                         onChange={handleInputChange}
+                                                        onBlur={handleInputBlur}
                                                         className={`${styles.editInput} ${formErrors.apellidoPaterno ? styles.inputError : ''}`}
-                                                        placeholder="Apellido Paterno"
+                                                        placeholder="Apellido Paterno *"
                                                         onClick={(e) => e.stopPropagation()}
                                                     />
                                                     {formErrors.apellidoPaterno && <span className={styles.errorText}>{formErrors.apellidoPaterno}</span>}
@@ -727,7 +1024,6 @@ export default function UsuariosPage() {
                                             )}
                                         </td>
 
-                                        {/* Apellido Materno */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
                                                 <div onClick={(e) => e.stopPropagation()}>
@@ -736,17 +1032,18 @@ export default function UsuariosPage() {
                                                         name="apellidoMaterno"
                                                         value={usuarioData.apellidoMaterno || ''}
                                                         onChange={handleInputChange}
-                                                        className={styles.editInput}
+                                                        onBlur={handleInputBlur}
+                                                        className={`${styles.editInput} ${formErrors.apellidoMaterno ? styles.inputError : ''}`}
                                                         placeholder="Apellido Materno"
                                                         onClick={(e) => e.stopPropagation()}
                                                     />
+                                                    {formErrors.apellidoMaterno && <span className={styles.errorText}>{formErrors.apellidoMaterno}</span>}
                                                 </div>
                                             ) : (
                                                 usuario.apellidoMaterno
                                             )}
                                         </td>
 
-                                        {/* Correo */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
                                                 <div onClick={(e) => e.stopPropagation()}>
@@ -755,8 +1052,9 @@ export default function UsuariosPage() {
                                                         name="correo"
                                                         value={usuarioData.correo || ''}
                                                         onChange={handleInputChange}
+                                                        onBlur={handleInputBlur}
                                                         className={`${styles.editInput} ${formErrors.correo ? styles.inputError : ''}`}
-                                                        placeholder="correo@ejemplo.com"
+                                                        placeholder="correo@ejemplo.com *"
                                                         onClick={(e) => e.stopPropagation()}
                                                     />
                                                     {formErrors.correo && <span className={styles.errorText}>{formErrors.correo}</span>}
@@ -766,7 +1064,6 @@ export default function UsuariosPage() {
                                             )}
                                         </td>
 
-                                        {/* Rol */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
                                                 <div onClick={(e) => e.stopPropagation()}>
@@ -774,10 +1071,11 @@ export default function UsuariosPage() {
                                                         name="rol"
                                                         value={usuarioData.rol || ''}
                                                         onChange={handleInputChange}
+                                                        onBlur={handleInputBlur}
                                                         className={`${styles.editSelect} ${formErrors.rol ? styles.inputError : ''}`}
                                                         onClick={(e) => e.stopPropagation()}
                                                     >
-                                                        <option value="">Seleccionar rol</option>
+                                                        <option value="">Seleccionar rol *</option>
                                                         <option value="Administrador">Administrador</option>
                                                         <option value="Instructor">Instructor</option>
                                                         <option value="Secretaria">Secretaria</option>
@@ -791,14 +1089,16 @@ export default function UsuariosPage() {
                                             )}
                                         </td>
 
-                                        {/* Estado */}
                                         <td>
-                                            <span className={`${styles.estado} ${usuario.activo ? styles.activo : styles.inactivo}`}>
+                                            <span 
+                                                className={`${styles.estado} ${usuario.activo ? styles.activo : styles.inactivo} ${styles.clickableEstado}`}
+                                                onClick={(e) => handleToggleStatus(usuario, e)}
+                                                title={`Clic para ${usuario.activo ? 'desactivar' : 'activar'}`}
+                                            >
                                                 {usuario.activo ? '☑ Activo' : '☐ Inactivo'}
                                             </span>
                                         </td>
 
-                                        {/* Fecha Ingreso */}
                                         <td>
                                             {isEditing && selectedUsuario?.numEmpleado === usuario.numEmpleado ? (
                                                 <div onClick={(e) => e.stopPropagation()}>
@@ -807,6 +1107,7 @@ export default function UsuariosPage() {
                                                         name="fechaIngreso"
                                                         value={usuarioData.fechaIngreso || ''}
                                                         onChange={handleInputChange}
+                                                        onBlur={handleInputBlur}
                                                         className={`${styles.editInput} ${formErrors.fechaIngreso ? styles.inputError : ''}`}
                                                         onClick={(e) => e.stopPropagation()}
                                                     />
@@ -823,12 +1124,10 @@ export default function UsuariosPage() {
                     )}
                 </div>
 
-                {/* ✅ CORREGIDO: Campos adicionales para edición - DENTRO del componente */}
                 {(isEditing || isAdding) && selectedUsuario && (
                     <div className={styles.additionalFields}>
-                        <h3>Información Adicional</h3>
+                        <h3>Información Adicional {isAdding && '(Nuevo Usuario)'}</h3>
                         <div className={styles.formGrid}>
-                            {/* Contraseña */}
                             <div className={styles.formGroup}>
                                 <label>Contraseña {isAdding ? '(Obligatoria)' : '(Opcional - dejar vacío para no cambiar)'}</label>
                                 <input
@@ -836,21 +1135,27 @@ export default function UsuariosPage() {
                                     name="contrasena"
                                     value={usuarioData.contrasena || ''}
                                     onChange={handleInputChange}
+                                    onBlur={handleInputBlur}
                                     className={`${styles.editInput} ${formErrors.contrasena ? styles.inputError : ''}`}
                                     placeholder="Nueva contraseña"
                                     onClick={(e) => e.stopPropagation()}
                                 />
                                 {formErrors.contrasena && <span className={styles.errorText}>{formErrors.contrasena}</span>}
+                                {!formErrors.contrasena && (
+                                    <span className={styles.helperText}>
+                                        Mínimo 6 caracteres
+                                    </span>
+                                )}
                             </div>
 
-                            {/* Pregunta de Seguridad */}
                             <div className={styles.formGroup}>
-                                <label>Pregunta de Seguridad</label>
+                                <label>Pregunta de Seguridad *</label>
                                 <input
                                     type="text"
                                     name="preguntaRecuperacion"
                                     value={usuarioData.preguntaRecuperacion || ''}
                                     onChange={handleInputChange}
+                                    onBlur={handleInputBlur}
                                     className={`${styles.editInput} ${formErrors.preguntaRecuperacion ? styles.inputError : ''}`}
                                     placeholder="Ej: ¿Cuál es tu color favorito?"
                                     onClick={(e) => e.stopPropagation()}
@@ -858,14 +1163,14 @@ export default function UsuariosPage() {
                                 {formErrors.preguntaRecuperacion && <span className={styles.errorText}>{formErrors.preguntaRecuperacion}</span>}
                             </div>
 
-                            {/* Respuesta de Seguridad */}
                             <div className={styles.formGroup}>
-                                <label>Respuesta de Seguridad</label>
+                                <label>Respuesta de Seguridad *</label>
                                 <input
                                     type="text"
                                     name="respuestaRecuperacion"
                                     value={usuarioData.respuestaRecuperacion || ''}
                                     onChange={handleInputChange}
+                                    onBlur={handleInputBlur}
                                     className={`${styles.editInput} ${formErrors.respuestaRecuperacion ? styles.inputError : ''}`}
                                     placeholder="Respuesta a la pregunta"
                                     onClick={(e) => e.stopPropagation()}
@@ -873,9 +1178,8 @@ export default function UsuariosPage() {
                                 {formErrors.respuestaRecuperacion && <span className={styles.errorText}>{formErrors.respuestaRecuperacion}</span>}
                             </div>
 
-                            {/* Firma */}
                             <div className={styles.formGroup}>
-                                <label>Firma Digital</label>
+                                <label>Firma Digital (Opcional)</label>
                                 <div className={styles.signatureSection}>
                                     <button 
                                         type="button" 
@@ -888,8 +1192,22 @@ export default function UsuariosPage() {
                                         📎 Agregar Firma
                                     </button>
                                     {usuarioData.firma && (
-                                        <span className={styles.fileName}>{usuarioData.firma}</span>
+                                        <div>
+                                            <span className={styles.fileName}>{usuarioData.firma}</span>
+                                            <button 
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setUsuarioData(prev => ({ ...prev, firma: '' }));
+                                                    showNotification("Firma removida", 'info');
+                                                }}
+                                                className={styles.btnRemoverFirma}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
                                     )}
+                                    {formErrors.firma && <span className={styles.errorText}>{formErrors.firma}</span>}
                                 </div>
                             </div>
                         </div>
@@ -901,21 +1219,12 @@ export default function UsuariosPage() {
                         <button onClick={handleAgregarClick} className={styles.btnAgregar}>
                             Agregar
                         </button>
-                        <button onClick={handleModificarClick} className={styles.btnModificar}>
-                            Modificar
-                        </button>
                         <button 
-                            onClick={handleToggleStatus} 
-                            className={selectedUsuario?.activo ? styles.btnDesactivar : styles.btnActivar}
+                            onClick={handleModificarClick} 
+                            className={styles.btnModificar}
                             disabled={!selectedUsuario}
                         >
-                            {selectedUsuario?.activo ? 'Desactivar' : 'Activar'}
-                        </button>
-                        <button 
-                            onClick={() => setShowInactive(!showInactive)} 
-                            className={styles.btnOcultar}
-                        >
-                            {showInactive ? 'Ocultar Inactivos' : 'Mostrar Inactivos'}
+                            Modificar
                         </button>
                         <button 
                             onClick={handleGuardarClick} 

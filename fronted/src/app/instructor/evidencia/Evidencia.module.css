@@ -529,6 +529,31 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
+/* Modal con desplazamiento */
+.modalWithScroll {
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modalWithScroll::-webkit-scrollbar {
+    width: 12px;
+}
+
+.modalWithScroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 6px;
+}
+
+.modalWithScroll::-webkit-scrollbar-thumb {
+    background: #001f3f;
+    border-radius: 6px;
+    border: 2px solid #f1f1f1;
+}
+
+.modalWithScroll::-webkit-scrollbar-thumb:hover {
+    background: #003366;
+}
+
 .modalHeader {
     display: flex;
     justify-content: space-between;
@@ -536,6 +561,7 @@
     padding: 1.5rem 2rem;
     border-bottom: 1px solid #e5e7eb;
     background: #f8f9fa;
+    flex-shrink: 0;
 }
 
 .modalHeader h3 {
@@ -583,6 +609,7 @@
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
+    flex-shrink: 0;
 }
 
 .btnCerrar, .btnCancelar {
@@ -716,56 +743,552 @@
     font-size: 0.85rem;
 }
 
-.archivosSeleccionados {
-    background: #f8f9fa;
+/* ESTILOS MEJORADOS PARA PREVISUALIZACIÓN */
+
+.previsualizacionSection {
+    margin-top: 1.5rem;
     padding: 1.5rem;
+    background: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e5e7eb;
-    margin-top: 1rem;
 }
 
-.archivosSeleccionados h4 {
+.previsualizacionTitle {
     margin: 0 0 1rem 0;
     color: #000000;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
-.archivoItem {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
+.previsualizacionGrid {
+    display: grid;
+    gap: 1rem;
+}
+
+.previewItem {
     background: white;
-    border-radius: 6px;
     border: 1px solid #e5e7eb;
-    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.archivoItem:last-child {
-    margin-bottom: 0;
-}
-
-.archivoIcon {
-    font-size: 1.2rem;
-    color: #000000;
-}
-
-.archivoInfo {
+.previewHeader {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-.archivoNombre {
+.previewType {
     font-weight: 600;
     color: #000000;
+    font-size: 0.9rem;
+}
+
+.previewControls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.zoomControls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.zoomBtn {
+    background: #001f3f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.zoomBtn:hover:not(:disabled) {
+    background: #003366;
+    transform: scale(1.1);
+}
+
+.zoomBtn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.zoomLevel {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #000000;
+    min-width: 40px;
+    text-align: center;
+}
+
+.previewRemove {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+}
+
+.previewRemove:hover {
+    background: #c82333;
+}
+
+/* CONTENEDORES PARA IMÁGENES CON ZOOM */
+.previewImageContainer {
+    position: relative;
+    padding: 1rem;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    max-height: 400px;
+    min-height: 300px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+.imageWrapper {
+    position: relative;
+    transition: transform 0.1s ease;
+    user-select: none;
+    transform-origin: center center;
+}
+
+.previewImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+    display: block;
+}
+
+.previewVideoContainer {
+    padding: 1rem;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    max-height: 300px;
+}
+
+.previewVideo {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 4px;
+}
+
+.previewPdf {
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pdfIcon {
+    font-size: 3rem;
+}
+
+.pdfText {
+    color: #000000;
+    font-weight: 500;
+}
+
+.pdfLink {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.pdfLink:hover {
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+}
+
+.previewUnknown {
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.unknownIcon {
+    font-size: 2rem;
+}
+
+.previewInfo {
+    padding: 1rem;
+    background: white;
+    border-top: 1px solid #f3f4f6;
+}
+
+.previewName {
+    display: block;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 0.25rem;
     word-break: break-all;
 }
 
-.archivoTamaño {
-    color: #000000;
+.previewSize {
     font-size: 0.8rem;
+    color: #000000;
+    margin-right: 1rem;
+}
+
+.previewDimensions {
+    font-size: 0.8rem;
+    color: #007bff;
+    font-style: italic;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+.previewTypeInfo {
+    font-size: 0.8rem;
+    color: #000000;
+}
+
+/* INSTRUCCIONES DE USO */
+.zoomInstructions {
+    background: #e3f2fd;
+    border: 1px solid #bbdefb;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-top: 1rem;
+}
+
+.zoomInstructions h5 {
+    margin: 0 0 0.5rem 0;
+    color: #001f3f;
+    font-size: 0.9rem;
+}
+
+.zoomInstructions ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #000000;
+}
+
+.zoomInstructions li {
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+}
+
+/* ESTILOS PARA PREVISUALIZACIÓN DE IMÁGENES GUARDADAS */
+.archivoAcciones {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btnPrevisualizar {
+    background: #17a2b8;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btnPrevisualizar:hover {
+    background: #138496;
+}
+
+.btnDescargar {
+    background: #28a745;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btnDescargar:hover {
+    background: #218838;
+}
+
+.btnEliminar {
+    background: #dc3545;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btnEliminar:hover:not(:disabled) {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.btnEliminar:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.imagePreviewOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1003;
+    padding: 2rem;
+}
+
+.imagePreviewContent {
+    background: white;
+    border-radius: 12px;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.imagePreviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8f9fa;
+    flex-shrink: 0;
+}
+
+.imagePreviewHeader h4 {
+    margin: 0;
+    color: #000000;
+    font-size: 1.1rem;
+}
+
+.imagePreviewClose {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #000000;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.imagePreviewClose:hover {
+    color: #000000;
+    background: #e5e7eb;
+    border-radius: 50%;
+}
+
+.imagePreviewBody {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f8f9fa;
+    overflow: auto;
+    max-height: 60vh;
+}
+
+.fullSizeImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.imageError {
+    text-align: center;
+    padding: 2rem;
+}
+
+.errorIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.imagePreviewFooter {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.imagePreviewFooter p {
+    margin: 0;
+    color: #000000;
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.previewActions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ESTILOS PARA MODAL DE CONFIRMACIÓN DE ELIMINACIÓN */
+.confirmDeleteOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1004;
+    padding: 1rem;
+}
+
+.confirmDeleteModal {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease-out;
+}
+
+.confirmDeleteHeader {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff3cd;
+    border-radius: 12px 12px 0 0;
+}
+
+.confirmDeleteHeader h4 {
+    margin: 0;
+    color: #856404;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.confirmDeleteBody {
+    padding: 1.5rem;
+}
+
+.confirmDeleteBody p {
+    margin: 0 0 1rem 0;
+    color: #000000;
+    line-height: 1.5;
+}
+
+.evidenciaInfo {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 3px solid #dc3545;
+    margin-bottom: 1rem;
+    color: #000000;
+}
+
+.warningText {
+    color: #dc3545 !important;
+    font-weight: 600;
+    text-align: center;
+    background: #f8d7da;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #f5c6cb;
+}
+
+.confirmDeleteFooter {
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btnCancelarDelete {
+    background: #6c757d;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btnCancelarDelete:hover:not(:disabled) {
+    background: #5a6268;
+}
+
+.btnConfirmarDelete {
+    background: #dc3545;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btnConfirmarDelete:hover:not(:disabled) {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.btnConfirmarDelete:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
 }
 
 /* Lista de Evidencias */
@@ -832,10 +1355,54 @@
     font-size: 0.8rem;
 }
 
+.evidenciaEstatus {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.estatusPendiente {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.estatusAprobada {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.estatusRechazada {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
 .evidenciaDescripcion {
     margin: 0 0 1rem 0;
     color: #000000;
     line-height: 1.5;
+}
+
+.evidenciaObservaciones {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 6px;
+    border-left: 3px solid #17a2b8;
+}
+
+.evidenciaObservaciones strong {
+    color: #000000;
+}
+
+.evidenciaObservaciones p {
+    margin: 0.5rem 0 0 0;
+    color: #000000;
 }
 
 .evidenciaArchivos {
@@ -848,40 +1415,10 @@
     color: #000000;
 }
 
-.evidenciaArchivos ul {
-    margin: 0;
-    padding-left: 1.5rem;
-}
-
-.evidenciaArchivos li {
-    margin-bottom: 0.25rem;
-    color: #000000;
-}
-
-.evidenciaFooter {
+.archivoInfo {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.subidoPor {
-    color: #000000;
-    font-size: 0.8rem;
-}
-
-.btnDescargar {
-    background: #17a2b8;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.btnDescargar:hover {
-    background: #138496;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .noEvidencias {
@@ -897,6 +1434,15 @@
 
 .noEvidencias p {
     color: #000000;
+}
+
+.errorMessage {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 1rem;
 }
 
 /* Responsive */
@@ -954,18 +1500,57 @@
         padding: 1rem;
     }
     
-    .evidenciaFooter {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
-    }
-    
-    .btnDescargar {
-        width: 100%;
-    }
-    
-    .fileInputContainer {
+    .previsualizacionSection {
         padding: 1rem;
+    }
+    
+    .previewImageContainer,
+    .previewVideoContainer {
+        max-height: 300px;
+        min-height: 200px;
+    }
+    
+    .previewImage,
+    .previewVideo {
+        max-height: 150px;
+    }
+    
+    .previewPdf,
+    .previewUnknown {
+        padding: 1.5rem;
+    }
+    
+    .imagePreviewOverlay {
+        padding: 1rem;
+    }
+    
+    .imagePreviewBody {
+        padding: 1rem;
+        max-height: 50vh;
+    }
+    
+    .archivoAcciones {
+        flex-direction: column;
+    }
+    
+    .previewControls {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+    
+    .zoomControls {
+        order: -1;
+    }
+    
+    .confirmDeleteFooter {
+        flex-direction: column;
+    }
+    
+    .btnCancelarDelete,
+    .btnConfirmarDelete {
+        width: 100%;
+        text-align: center;
     }
 }
 
@@ -997,4 +1582,104 @@
         padding: 0.6rem 1.2rem;
         font-size: 0.9rem;
     }
+
+    .modalFooter {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .btnCerrar, .btnCancelar, .btnSubir {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .previewImageContainer,
+    .previewVideoContainer {
+        max-height: 250px;
+        min-height: 150px;
+    }
+    
+    .previewImage,
+    .previewVideo {
+        max-height: 120px;
+    }
+    
+    .pdfIcon {
+        font-size: 2rem;
+    }
+    
+    .previewPdf,
+    .previewUnknown {
+        padding: 1rem;
+    }
+    
+    .archivoAcciones {
+        flex-direction: column;
+    }
+    
+    .btnPrevisualizar,
+    .btnDescargar,
+    .btnEliminar {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .imagePreviewFooter {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .imagePreviewFooter p {
+        margin-right: 0;
+        text-align: center;
+    }
+    
+    .previewActions {
+        flex-direction: column;
+    }
+    
+    .previewActions .btnDescargar,
+    .previewActions .btnEliminar {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .zoomControls {
+        padding: 0.25rem;
+    }
+    
+    .zoomBtn {
+        width: 25px;
+        height: 25px;
+        font-size: 0.7rem;
+    }
+    
+    .zoomLevel {
+        font-size: 0.7rem;
+        min-width: 35px;
+    }
+}
+
+/* 🆕 ESTILOS PARA NOTIFICACIONES LOCALES */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 🆕 ESTILOS PARA INFORMACIÓN DE DEBUG */
+.debugInfo {
+    background: #e9ecef;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: #6c757d;
 }

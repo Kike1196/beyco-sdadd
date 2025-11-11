@@ -9,50 +9,10 @@ export default function HistorialCursosPage() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterBy, setFilterBy] = useState('nombre');
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-    const [selectedMonth, setSelectedMonth] = useState('all'); // 'all' para todos los meses
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
     const [error, setError] = useState(null);
     const router = useRouter();
-
-    // Nombres de los meses
-    const meses = [
-        { value: 'all', label: 'Todos los meses' },
-        { value: '0', label: 'Enero' },
-        { value: '1', label: 'Febrero' },
-        { value: '2', label: 'Marzo' },
-        { value: '3', label: 'Abril' },
-        { value: '4', label: 'Mayo' },
-        { value: '5', label: 'Junio' },
-        { value: '6', label: 'Julio' },
-        { value: '7', label: 'Agosto' },
-        { value: '8', label: 'Septiembre' },
-        { value: '9', label: 'Octubre' },
-        { value: '10', label: 'Noviembre' },
-        { value: '11', label: 'Diciembre' }
-    ];
-
-    // Función para calcular precios basados en el tipo de curso
-    const calcularPrecioPorCurso = (nombreCurso, stps) => {
-        if (!nombreCurso) return 1400.00;
-        
-        const cursoLower = nombreCurso.toLowerCase();
-        
-        if (cursoLower.includes('seguridad industrial')) {
-            return 1400.00;
-        } else if (cursoLower.includes('alturas') || cursoLower.includes('nom-659') || cursoLower.includes('nom 609')) {
-            return 1600.00;
-        } else if (cursoLower.includes('confinados') || cursoLower.includes('nom-523') || cursoLower.includes('nom 523')) {
-            return 1800.00;
-        } else if (cursoLower.includes('manejo de materiales') || cursoLower.includes('residuos peligrosos')) {
-            return 2000.00;
-        } else if (cursoLower.includes('comunicación') || cursoLower.includes('comunicacion') || cursoLower.includes('comunicativa')) {
-            return 1200.00;
-        } else if (cursoLower.includes('manejo de estrés') || cursoLower.includes('estres')) {
-            return 1100.00;
-        } else {
-            return 1500.00;
-        }
-    };
 
     // Función para calcular el estado del curso basado en la fecha
     const calcularEstadoCurso = (fecha) => {
@@ -77,71 +37,58 @@ export default function HistorialCursosPage() {
                 
                 console.log("🔍 Cargando historial de cursos...");
                 
-                const testUrl = 'http://localhost:8080/api/historial/cursos';
-                console.log("📡 Intentando conectar a:", testUrl);
+                // Intentar cargar desde el endpoint de cursos regular
+                const cursosUrl = 'http://localhost:8080/api/cursos';
+                console.log("📡 Intentando conectar a:", cursosUrl);
                 
-                const cursosRes = await fetch(testUrl);
+                const cursosRes = await fetch(cursosUrl);
                 console.log("📊 Status respuesta:", cursosRes.status);
                 
                 if (cursosRes.ok) {
                     const data = await cursosRes.json();
-                    console.log("✅ Cursos cargados desde historial:", data.length);
+                    console.log("✅ Cursos cargados:", data.length);
+                    console.log("💰 Datos de pagos recibidos:", data.map(c => ({
+                        id: c.id,
+                        nombre: c.nombre,
+                        pago: c.pago,
+                        precio: c.precio
+                    })));
                     
                     const cursosEnriquecidos = data.map(curso => {
-                        const precioCalculado = calcularPrecioPorCurso(curso.nombre, curso.stps);
-                        
-                        return {
-                            ...curso,
-                            fecha: curso.fechaIngreso || curso.fecha,
-                            costo: curso.precio || precioCalculado,
-                            status: calcularEstadoCurso(curso.fechaIngreso || curso.fecha)
-                        };
-                    });
-                    
-                    setCursos(cursosEnriquecidos);
-                } else {
-                    console.warn("⚠️ Endpoint de historial no disponible, intentando con cursos regulares");
-                    await loadCursosFromRegularEndpoint();
-                }
-                
-            } catch (error) {
-                console.error("❌ Error con endpoint de historial:", error);
-                await loadCursosFromRegularEndpoint();
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        const loadCursosFromRegularEndpoint = async () => {
-            try {
-                console.log("🔄 Intentando cargar desde endpoint regular...");
-                const cursosUrl = 'http://localhost:8080/api/cursos';
-                const cursosRes = await fetch(cursosUrl);
-                
-                if (cursosRes.ok) {
-                    const data = await cursosRes.json();
-                    console.log("✅ Cursos cargados desde endpoint regular:", data.length);
-                    
-                    const cursosEnriquecidos = data.map(curso => {
-                        const precioCalculado = calcularPrecioPorCurso(curso.nombre, curso.stps);
+                        // USAR EL PAGO REAL DEL BACKEND, si no existe usar precio, si no existe usar 0
+                        const pagoReal = curso.pago !== null && curso.pago !== undefined ? 
+                            parseFloat(curso.pago) : 
+                            (curso.precio !== null && curso.precio !== undefined ? 
+                                parseFloat(curso.precio) : 0);
                         
                         return {
                             ...curso,
                             fecha: curso.fechaIngreso,
-                            costo: curso.precio || precioCalculado,
-                            status: calcularEstadoCurso(curso.fechaIngreso)
+                            costo: pagoReal, // USAR PAGO REAL
+                            status: calcularEstadoCurso(curso.fechaIngreso),
+                            pago: pagoReal // Mantener también en campo pago para referencia
                         };
                     });
                     
                     setCursos(cursosEnriquecidos);
+                    
+                    // Establecer fechas por defecto (últimos 6 meses)
+                    const end = new Date();
+                    const start = new Date();
+                    start.setMonth(end.getMonth() - 6);
+                    
+                    setStartDate(start.toISOString().split('T')[0]);
+                    setEndDate(end.toISOString().split('T')[0]);
+                    
                 } else {
                     throw new Error(`Error ${cursosRes.status} al cargar cursos`);
                 }
+                
             } catch (error) {
                 console.error("❌ Error cargando cursos:", error);
                 setError(`Error al cargar cursos: ${error.message}`);
                 
-                // Datos de prueba de emergencia
+                // Datos de prueba de emergencia con pagos reales
                 const datosEmergencia = [
                     {
                         id: 1,
@@ -154,6 +101,7 @@ export default function HistorialCursosPage() {
                         empresa: "Aceros del Norte y Ensambles SAPI",
                         lugar: "Planta de Matamoros",
                         precio: 1400.00,
+                        pago: 1400.00, // PAGO REAL
                         costo: 1400.00,
                         status: "Finalizado"
                     },
@@ -168,6 +116,7 @@ export default function HistorialCursosPage() {
                         empresa: "Aceros del Norte y Ensambles SAPI",
                         lugar: "Parque de Ensambles, Ramos Arizpe",
                         precio: 1600.00,
+                        pago: 1600.00, // PAGO REAL
                         costo: 1600.00,
                         status: "Programado"
                     },
@@ -182,6 +131,7 @@ export default function HistorialCursosPage() {
                         empresa: "Aceros del Norte y Ensambles SAPI",
                         lugar: "Almacenes Principales, Saltillo",
                         precio: 1400.00,
+                        pago: 1400.00, // PAGO REAL
                         costo: 1400.00,
                         status: "Programado"
                     },
@@ -196,105 +146,48 @@ export default function HistorialCursosPage() {
                         empresa: "Aceros del Norte y Ensambles SAPI",
                         lugar: "Coahuila",
                         precio: 1800.00,
+                        pago: 1800.00, // PAGO REAL
                         costo: 1800.00,
                         status: "Programado"
-                    },
-                    {
-                        id: 5,
-                        nombre: "Trabajo en Espacios Confinados (NOM-523)",
-                        stps: "BETCO-NOM33-2916",
-                        horas: 8,
-                        fechaIngreso: "2025-11-09",
-                        fecha: "2025-11-09",
-                        instructor: "Silvia",
-                        empresa: "Logistica Industrial del Norte S.A.",
-                        lugar: "Planta de Matamoros, Ramos Arizpe",
-                        precio: 1800.00,
-                        costo: 1800.00,
-                        status: "Programado"
-                    },
-                    {
-                        id: 6,
-                        nombre: "Manejo de Estrés y Carga Mental",
-                        stps: "BET-MEA-007",
-                        horas: 8,
-                        fechaIngreso: "2025-10-21",
-                        fecha: "2025-10-21",
-                        instructor: "Silvia",
-                        empresa: "Manufacturas Coahuilenses S.A.",
-                        lugar: "Coahuila",
-                        precio: 1100.00,
-                        costo: 1100.00,
-                        status: "Finalizado"
-                    },
-                    {
-                        id: 7,
-                        nombre: "Comunicación Asertiva",
-                        stps: "BET-COM-005",
-                        horas: 8,
-                        fechaIngreso: "2025-10-21",
-                        fecha: "2025-10-21",
-                        instructor: "Ana",
-                        empresa: "Autopartes Ensambladas de México",
-                        lugar: "Coahuila",
-                        precio: 1200.00,
-                        costo: 1200.00,
-                        status: "Finalizado"
                     }
                 ];
                 setCursos(datosEmergencia);
+                
+                // Establecer fechas por defecto para datos de emergencia
+                setStartDate('2025-01-01');
+                setEndDate('2025-12-31');
+            } finally {
+                setLoading(false);
             }
         };
 
         loadCursos();
     }, []);
 
-    // ✅ NUEVO: Filtrar cursos por año Y mes
-    const cursosFiltradosPorPeriodo = useMemo(() => {
+    // ✅ MODIFICADO: Filtrar cursos por rango de fechas
+    const cursosFiltradosPorFecha = useMemo(() => {
+        if (!startDate || !endDate) return cursos;
+        
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999); // Incluir todo el día final
+        
         return cursos.filter(curso => {
             if (!curso.fecha) return false;
             
             const fechaCurso = new Date(curso.fecha);
-            const cursoYear = fechaCurso.getFullYear();
-            const cursoMonth = fechaCurso.getMonth();
-            
-            // Filtrar por año
-            if (cursoYear !== selectedYear) return false;
-            
-            // Filtrar por mes (si no es 'all')
-            if (selectedMonth !== 'all' && cursoMonth !== parseInt(selectedMonth)) {
-                return false;
-            }
-            
-            return true;
+            return fechaCurso >= start && fechaCurso <= end;
         });
-    }, [cursos, selectedYear, selectedMonth]);
+    }, [cursos, startDate, endDate]);
 
     // Filtrar cursos por búsqueda
     const filteredCursos = useMemo(() => {
-        return cursosFiltradosPorPeriodo.filter(curso => {
+        return cursosFiltradosPorFecha.filter(curso => {
             if (!searchTerm) return true;
             const fieldValue = curso[filterBy]?.toString().toLowerCase();
             return fieldValue?.includes(searchTerm.toLowerCase());
         });
-    }, [cursosFiltradosPorPeriodo, searchTerm, filterBy]);
-
-    // ✅ CORREGIDO: Generar rango de años desde 2020 hasta año actual + 2
-    const añosDisponibles = useMemo(() => {
-        const currentYear = new Date().getFullYear();
-        const startYear = 2020; // Año inicial
-        const endYear = currentYear + 2; // Año actual + 2 años futuros
-        
-        const años = [];
-        for (let year = endYear; year >= startYear; year--) {
-            años.push(year);
-        }
-        
-        return años;
-    }, []);
-
-    // ✅ CORREGIDO: Todos los meses siempre disponibles
-    const mesesDisponibles = meses;
+    }, [cursosFiltradosPorFecha, searchTerm, filterBy]);
 
     const getBadgeClass = (status) => {
         if (!status) return styles.badgeDefault;
@@ -359,7 +252,7 @@ export default function HistorialCursosPage() {
             'Instructor': curso.instructor || 'No asignado',
             'Empresa': curso.empresa || 'Sin empresa',
             'Lugar': curso.lugar || 'Sin lugar',
-            'Precio': curso.costo || 0,
+            'Pago': curso.costo || 0, // USAR PAGO REAL
             'Estado': getStatusTexto(curso.status)
         }));
         
@@ -371,7 +264,7 @@ export default function HistorialCursosPage() {
         const csvRows = dataForExport.map(row => 
             headers.map(header => {
                 const value = row[header];
-                if (header === 'Precio' || header === 'Horas') {
+                if (header === 'Pago' || header === 'Horas') {
                     return value;
                 }
                 return `"${String(value).replace(/"/g, '""')}"`;
@@ -383,9 +276,10 @@ export default function HistorialCursosPage() {
         const link = document.createElement("a");
         
         const url = URL.createObjectURL(blob);
-        const mesLabel = selectedMonth === 'all' ? 'todos' : meses.find(m => m.value === selectedMonth)?.label.toLowerCase();
+        const fechaInicio = startDate ? new Date(startDate).toLocaleDateString('es-ES') : 'inicio';
+        const fechaFin = endDate ? new Date(endDate).toLocaleDateString('es-ES') : 'fin';
         link.setAttribute("href", url);
-        link.setAttribute("download", `historial_cursos_${selectedYear}_${mesLabel}.csv`);
+        link.setAttribute("download", `historial_cursos_${fechaInicio}_a_${fechaFin}.csv`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
@@ -398,17 +292,18 @@ export default function HistorialCursosPage() {
         console.log("📈 Generando reporte PDF...");
         
         const reportData = {
-            totalCursos: cursosFiltradosPorPeriodo.length,
-            cursosActivos: cursosFiltradosPorPeriodo.filter(c => c.status?.toLowerCase() === 'activo').length,
-            cursosFinalizados: cursosFiltradosPorPeriodo.filter(c => c.status?.toLowerCase() === 'finalizado').length,
-            cursosProgramados: cursosFiltradosPorPeriodo.filter(c => c.status?.toLowerCase() === 'programado').length,
-            horasTotales: cursosFiltradosPorPeriodo.reduce((sum, curso) => sum + (curso.horas || 0), 0),
-            ingresosTotales: cursosFiltradosPorPeriodo.reduce((sum, curso) => sum + (parseFloat(curso.costo) || 0), 0),
-            empresasUnicas: [...new Set(cursosFiltradosPorPeriodo.map(c => c.empresa))].length,
-            instructoresUnicos: [...new Set(cursosFiltradosPorPeriodo.map(c => c.instructor))].length
+            totalCursos: cursosFiltradosPorFecha.length,
+            cursosActivos: cursosFiltradosPorFecha.filter(c => c.status?.toLowerCase() === 'activo').length,
+            cursosFinalizados: cursosFiltradosPorFecha.filter(c => c.status?.toLowerCase() === 'finalizado').length,
+            cursosProgramados: cursosFiltradosPorFecha.filter(c => c.status?.toLowerCase() === 'programado').length,
+            horasTotales: cursosFiltradosPorFecha.reduce((sum, curso) => sum + (curso.horas || 0), 0),
+            ingresosTotales: cursosFiltradosPorFecha.reduce((sum, curso) => sum + (parseFloat(curso.costo) || 0), 0),
+            empresasUnicas: [...new Set(cursosFiltradosPorFecha.map(c => c.empresa))].length,
+            instructoresUnicos: [...new Set(cursosFiltradosPorFecha.map(c => c.instructor))].length
         };
 
-        const mesTexto = selectedMonth === 'all' ? 'Todos los meses' : meses.find(m => m.value === selectedMonth)?.label;
+        const fechaInicioTexto = startDate ? formatDate(startDate) : 'No definida';
+        const fechaFinTexto = endDate ? formatDate(endDate) : 'No definida';
 
         const htmlContent = `
             <!DOCTYPE html>
@@ -454,6 +349,15 @@ export default function HistorialCursosPage() {
                         font-size: 16px;
                         opacity: 0.9;
                         margin-top: 5px;
+                    }
+                    .period-info {
+                        background: #e3f2fd;
+                        padding: 15px;
+                        border-radius: 8px;
+                        margin-bottom: 20px;
+                        text-align: center;
+                        font-weight: bold;
+                        color: #004085;
                     }
                     .stats-grid {
                         display: grid;
@@ -593,7 +497,11 @@ export default function HistorialCursosPage() {
                 <div class="report-container">
                     <div class="header">
                         <h1>BEYCO CONSULTORES</h1>
-                        <div class="subtitle">Reporte de Cursos - ${selectedYear} - ${mesTexto}</div>
+                        <div class="subtitle">Reporte de Cursos - Historial</div>
+                    </div>
+                    
+                    <div class="period-info">
+                        📅 Período: ${fechaInicioTexto} - ${fechaFinTexto}
                     </div>
                     
                     <div class="stats-grid">
@@ -626,17 +534,6 @@ export default function HistorialCursosPage() {
                         </div>
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                        <div class="stat-card" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
-                            <span class="stat-number">${reportData.empresasUnicas}</span>
-                            <div class="stat-label">EMPRESAS</div>
-                        </div>
-                        <div class="stat-card" style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);">
-                            <span class="stat-number">${reportData.instructoresUnicos}</span>
-                            <div class="stat-label">INSTRUCTORES</div>
-                        </div>
-                    </div>
-                    
                     <div class="section-title">📊 DETALLES DE CURSOS</div>
                     <table class="details-table">
                         <thead>
@@ -647,7 +544,7 @@ export default function HistorialCursosPage() {
                                 <th>Fecha</th>
                                 <th>Instructor</th>
                                 <th>Empresa</th>
-                                <th>Precio</th>
+                                <th>Pago</th>
                                 <th>Estado</th>
                             </tr>
                         </thead>
@@ -671,26 +568,6 @@ export default function HistorialCursosPage() {
                         </tbody>
                     </table>
                     
-                    <div class="section-title">📈 ESTADÍSTICAS AVANZADAS</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px;">
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                            <strong>Promedio de horas por curso:</strong><br>
-                            ${(reportData.horasTotales / reportData.totalCursos || 0).toFixed(1)} horas
-                        </div>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                            <strong>Ingreso promedio por curso:</strong><br>
-                            ${formatCurrency(reportData.ingresosTotales / reportData.totalCursos || 0)}
-                        </div>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                            <strong>Ingreso por hora:</strong><br>
-                            ${formatCurrency(reportData.ingresosTotales / reportData.horasTotales || 0)}
-                        </div>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                            <strong>Eficiencia del programa:</strong><br>
-                            ${((reportData.cursosFinalizados / reportData.totalCursos) * 100 || 0).toFixed(1)}%
-                        </div>
-                    </div>
-                    
                     <div class="footer">
                         <strong>BEYCO Consultores - Sistema de Gestión de Cursos</strong><br>
                         Reporte generado el ${new Date().toLocaleDateString('es-ES', { 
@@ -700,7 +577,7 @@ export default function HistorialCursosPage() {
                             hour: '2-digit',
                             minute: '2-digit'
                         })}<br>
-                        ${filteredCursos.length} cursos mostrados de ${cursosFiltradosPorPeriodo.length} totales
+                        ${filteredCursos.length} cursos mostrados de ${cursosFiltradosPorFecha.length} totales
                     </div>
                 </div>
             </body>
@@ -737,6 +614,16 @@ export default function HistorialCursosPage() {
             document.body.removeChild(notification);
         }, 5000);
     };
+
+    // Calcular estadísticas para mostrar
+    const estadisticas = useMemo(() => ({
+        totalCursos: cursosFiltradosPorFecha.length,
+        cursosFinalizados: cursosFiltradosPorFecha.filter(c => c.status?.toLowerCase() === 'finalizado').length,
+        cursosActivos: cursosFiltradosPorFecha.filter(c => c.status?.toLowerCase() === 'activo').length,
+        cursosProgramados: cursosFiltradosPorFecha.filter(c => c.status?.toLowerCase() === 'programado').length,
+        ingresosTotales: cursosFiltradosPorFecha.reduce((sum, curso) => sum + (parseFloat(curso.costo) || 0), 0),
+        horasTotales: cursosFiltradosPorFecha.reduce((sum, curso) => sum + (curso.horas || 0), 0)
+    }), [cursosFiltradosPorFecha]);
 
     if (loading) {
         return (
@@ -836,29 +723,23 @@ export default function HistorialCursosPage() {
 
                     <div className={styles.filterSection}>
                         <div className={styles.periodFilter}>
-                            <div className={styles.yearFilter}>
-                                <label>Año:</label>
-                                <select 
-                                    value={selectedYear} 
-                                    onChange={(e) => setSelectedYear(Number(e.target.value))}
-                                    className={styles.yearSelect}
-                                >
-                                    {añosDisponibles.map(year => (
-                                        <option key={year} value={year}>{year}</option>
-                                    ))}
-                                </select>
+                            <div className={styles.dateFilter}>
+                                <label>Fecha Inicio:</label>
+                                <input 
+                                    type="date" 
+                                    value={startDate} 
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    className={styles.dateInput}
+                                />
                             </div>
-                            <div className={styles.monthFilter}>
-                                <label>Mes:</label>
-                                <select 
-                                    value={selectedMonth} 
-                                    onChange={(e) => setSelectedMonth(e.target.value)}
-                                    className={styles.monthSelect}
-                                >
-                                    {mesesDisponibles.map(mes => (
-                                        <option key={mes.value} value={mes.value}>{mes.label}</option>
-                                    ))}
-                                </select>
+                            <div className={styles.dateFilter}>
+                                <label>Fecha Fin:</label>
+                                <input 
+                                    type="date" 
+                                    value={endDate} 
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    className={styles.dateInput}
+                                />
                             </div>
                         </div>
 
@@ -887,34 +768,23 @@ export default function HistorialCursosPage() {
                 <div className={styles.stats}>
                     <div className={styles.statCard}>
                         <h3>Total Cursos</h3>
-                        <span className={styles.statNumber}>{cursosFiltradosPorPeriodo.length}</span>
-                        <p className={styles.statSubtitle}>
-                            {selectedMonth === 'all' 
-                                ? `Año ${selectedYear}` 
-                                : `${meses.find(m => m.value === selectedMonth)?.label} ${selectedYear}`
-                            }
-                        </p>
+                        <span className={styles.statNumber}>{estadisticas.totalCursos}</span>
+                        <p className={styles.statSubtitle}>En período</p>
                     </div>
                     <div className={styles.statCard}>
                         <h3>Finalizados</h3>
-                        <span className={styles.statNumber}>
-                            {cursosFiltradosPorPeriodo.filter(c => c.status?.toLowerCase() === 'finalizado').length}
-                        </span>
+                        <span className={styles.statNumber}>{estadisticas.cursosFinalizados}</span>
                         <p className={styles.statSubtitle}>Completados</p>
                     </div>
                     <div className={styles.statCard}>
                         <h3>Activos</h3>
-                        <span className={styles.statNumber}>
-                            {cursosFiltradosPorPeriodo.filter(c => c.status?.toLowerCase() === 'activo').length}
-                        </span>
+                        <span className={styles.statNumber}>{estadisticas.cursosActivos}</span>
                         <p className={styles.statSubtitle}>En progreso</p>
                     </div>
                     <div className={styles.statCard}>
-                        <h3>Programados</h3>
-                        <span className={styles.statNumber}>
-                            {cursosFiltradosPorPeriodo.filter(c => c.status?.toLowerCase() === 'programado').length}
-                        </span>
-                        <p className={styles.statSubtitle}>Próximos</p>
+                        <h3>Ingresos</h3>
+                        <span className={styles.statNumber}>{formatCurrency(estadisticas.ingresosTotales)}</span>
+                        <p className={styles.statSubtitle}>Total</p>
                     </div>
                 </div>
 
@@ -930,7 +800,7 @@ export default function HistorialCursosPage() {
                                 <th>Instructor</th>
                                 <th>Empresa</th>
                                 <th>Lugar</th>
-                                <th>Precio</th>
+                                <th>Pago</th>
                                 <th>Estado</th>
                             </tr>
                         </thead>
@@ -958,7 +828,7 @@ export default function HistorialCursosPage() {
                                     <td colSpan="9" className={styles.noData}>
                                         {searchTerm ? 
                                             `No se encontraron cursos que coincidan con "${searchTerm}"` : 
-                                            'No se encontraron cursos para los filtros seleccionados'
+                                            'No se encontraron cursos para el período seleccionado'
                                         }
                                     </td>
                                 </tr>
@@ -970,10 +840,9 @@ export default function HistorialCursosPage() {
                 {/* Pie de página informativo */}
                 <div className={styles.footerInfo}>
                     <p>
-                        Mostrando <strong>{filteredCursos.length}</strong> de <strong>{cursosFiltradosPorPeriodo.length}</strong> cursos 
-                        {selectedMonth === 'all' 
-                            ? ` para el año ${selectedYear}` 
-                            : ` para ${meses.find(m => m.value === selectedMonth)?.label} de ${selectedYear}`
+                        Mostrando <strong>{filteredCursos.length}</strong> de <strong>{cursosFiltradosPorFecha.length}</strong> cursos 
+                        {startDate && endDate && 
+                            ` para el período ${formatDate(startDate)} - ${formatDate(endDate)}`
                         }
                         {searchTerm && ` • Filtrado por: "${searchTerm}"`}
                     </p>

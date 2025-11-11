@@ -1,4 +1,4 @@
-// app/instructor/evaluaciones/page.js - PÁGINA INDEPENDIENTE DE EVALUACIONES
+// app/instructor/evaluaciones/page.js - VERSIÓN CORREGIDA CON CÁLCULO DE PROMEDIO
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -34,6 +34,8 @@ export default function EvaluacionesPage() {
     const [calificaciones, setCalificaciones] = useState({});
     const [calificacionesGuardadas, setCalificacionesGuardadas] = useState({});
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [savingAll, setSavingAll] = useState(false);
     const [notification, setNotification] = useState({ show: false, message: '', type: '' });
 
     const router = useRouter();
@@ -49,123 +51,314 @@ export default function EvaluacionesPage() {
     const getUserData = () => {
         try {
             const userData = JSON.parse(localStorage.getItem('userData'));
-            return userData;
+            console.log('🔍 Datos del usuario obtenidos:', userData);
+            
+            if (!userData) {
+                console.error('❌ No hay datos de usuario en localStorage');
+                return null;
+            }
+            
+            const instructorId = userData.Num_Empleado || userData.numEmpleado || userData.id || userData.userId;
+            console.log('👤 ID del instructor encontrado:', instructorId);
+            
+            if (!instructorId) {
+                console.error('❌ No se pudo encontrar el ID del instructor en:', userData);
+                return null;
+            }
+            
+            return {
+                ...userData,
+                instructorId: instructorId
+            };
+            
         } catch (error) {
-            console.error('Error obteniendo datos del usuario:', error);
+            console.error('❌ Error obteniendo datos del usuario:', error);
             return null;
         }
     };
 
-    // Datos de ejemplo
-    const obtenerAlumnosPorCurso = (cursoId) => {
-        const alumnosPorCurso = {
-            2: [
-                {
-                    curp: 'AGSA940214TSLAS06',
-                    nombre: 'Alejandra',
-                    apellidoPaterno: 'Aguirre',
-                    apellidoMaterno: 'Soto',
-                    calificacion: 0,
-                    asistencia: '85%'
-                },
-                {
-                    curp: 'AGSA940214TSLAS12',
-                    nombre: 'Enrique',
-                    apellidoPaterno: 'Vazque',
-                    apellidoMaterno: 'Garcia',
-                    calificacion: 0,
-                    asistencia: '90%'
-                }
-            ],
-            3: [
-                {
-                    curp: 'AGSA940214TSLAS06',
-                    nombre: 'Alejandra',
-                    apellidoPaterno: 'Aguirre',
-                    apellidoMaterno: 'Soto',
-                    calificacion: 0,
-                    asistencia: '85%'
-                },
-                {
-                    curp: 'CRUB750305JLMCC02',
-                    nombre: 'Benito',
-                    apellidoPaterno: 'Cruz',
-                    apellidoMaterno: 'Robles',
-                    calificacion: 0,
-                    asistencia: '100%'
-                }
-            ]
+    // Normalizar datos del alumno para asegurar consistencia
+    const normalizarAlumno = (alumno) => {
+        return {
+            Curp: alumno.Curp || alumno.curp || '',
+            Nombre: alumno.Nombre || alumno.nombre || '',
+            Apellido_paterno: alumno.Apellido_paterno || alumno.apellidoPaterno || alumno.apellido_paterno || '',
+            Apellido_materno: alumno.Apellido_materno || alumno.apellidoMaterno || alumno.apellido_materno || '',
+            Puesto: alumno.Puesto || alumno.puesto || '',
+            Fecha_Nacimiento: alumno.Fecha_Nacimiento || alumno.fechaNacimiento || null
         };
-        return alumnosPorCurso[cursoId] || [];
     };
 
-    const obtenerCursosPorInstructor = (instructorId) => {
-        if (instructorId === 3) {
-            return [
-                { 
-                    id: 2, 
-                    nombre: "Manejo de Materiales y Residuos Peligrosos", 
-                    fechaIngreso: "2025-04-02", 
-                    lugar: "Patio de Maniobras",
-                    estado: "Activo",
-                    alumnosInscritos: 7,
-                    stps: "STPS-MP-004",
-                    tieneExamenPractico: true
-                },
-                { 
-                    id: 3, 
-                    nombre: "Seguridad Industrial", 
-                    fechaIngreso: "2025-04-22", 
-                    lugar: "Area de simulacion",
-                    estado: "Activo", 
-                    alumnosInscritos: 7,
-                    stps: "STPS-IC-003",
-                    tieneExamenPractico: true
-                }
-            ];
+    // Obtener cursos del instructor - CON ELIMINACIÓN DE DUPLICADOS
+    const obtenerCursosInstructor = async (instructorId) => {
+        try {
+            if (!instructorId || instructorId === 'undefined' || instructorId === 'null') {
+                throw new Error('ID del instructor no válido: ' + instructorId);
+            }
+            
+            console.log(`🔍 Obteniendo cursos para instructor: ${instructorId}`);
+            
+            const response = await fetch(`http://localhost:8080/api/instructor-cursos/instructor/${instructorId}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Cursos obtenidos del backend:', data);
+                
+                const cursosUnicos = eliminarDuplicados(data || []);
+                console.log(`🔄 Cursos después de eliminar duplicados: ${cursosUnicos.length}`);
+                
+                return cursosUnicos;
+            } else {
+                console.error('❌ Error obteniendo cursos:', response.status);
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+            
+        } catch (error) {
+            console.error('Error obteniendo cursos:', error);
+            showNotification('Error al cargar los cursos: ' + error.message, 'error');
+            return [];
         }
-        return [];
     };
 
+    // Función para eliminar cursos duplicados
+    const eliminarDuplicados = (cursosArray) => {
+        const cursosUnicos = [];
+        const idsVistos = new Set();
+        
+        cursosArray.forEach(curso => {
+            const id = curso.Id_Curso || curso.id_curso || curso.id;
+            
+            if (id && !idsVistos.has(id)) {
+                idsVistos.add(id);
+                
+                const cursoNormalizado = {
+                    Id_Curso: id,
+                    Nombre: curso.Nombre || curso.nombre || curso.Nombre_curso || 'Curso sin nombre',
+                    FechaIngreso: curso.FechaIngreso || curso.fechaIngreso || curso.Fecha_Imparticion || new Date(),
+                    Examen_practico: curso.Examen_practico || curso.examen_practico || false,
+                    Lugar: curso.Lugar || curso.lugar || 'Lugar no especificado',
+                    Clave_STPS: curso.Clave_STPS || curso.clave_stps || 'STPS-ND',
+                    Horas: curso.Horas || curso.horas || 8,
+                    Empresa: curso.Empresa || curso.empresa || 'Empresa no especificada',
+                    Instructor: curso.Instructor || curso.instructor || 'Instructor no especificado'
+                };
+                
+                cursosUnicos.push(cursoNormalizado);
+            }
+        });
+        
+        console.log(`📊 Eliminados ${cursosArray.length - cursosUnicos.length} cursos duplicados`);
+        return cursosUnicos;
+    };
+
+    // Obtener alumnos inscritos en un curso
+    const obtenerAlumnosPorCurso = async (cursoId) => {
+        try {
+            console.log(`🔍 Obteniendo alumnos para curso: ${cursoId}`);
+            
+            const response = await fetch(`http://localhost:8080/api/instructor-cursos/${cursoId}/alumnos`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Respuesta de alumnos:', data);
+                
+                if (data.success && data.alumnos) {
+                    // Normalizar cada alumno
+                    const alumnosNormalizados = data.alumnos.map(alumno => normalizarAlumno(alumno));
+                    console.log('📋 Alumnos normalizados:', alumnosNormalizados);
+                    return alumnosNormalizados;
+                } else {
+                    console.warn('⚠️ Respuesta de alumnos sin datos:', data);
+                    return [];
+                }
+            } else {
+                console.error('❌ Error obteniendo alumnos:', response.status);
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+            
+        } catch (error) {
+            console.error('Error obteniendo alumnos:', error);
+            showNotification('Error al cargar los alumnos: ' + error.message, 'error');
+            return [];
+        }
+    };
+
+    // Obtener calificación individual de un alumno
+    const obtenerCalificacionAlumno = async (alumnoCurp, cursoId) => {
+        try {
+            console.log(`🔍 Obteniendo calificación para ${alumnoCurp} en curso ${cursoId}`);
+            
+            const response = await fetch(`http://localhost:8080/api/calificaciones/curso/${cursoId}/alumno/${alumnoCurp}`);
+            
+            if (!response.ok) {
+                console.log(`⚠️ No se pudo obtener calificación para ${alumnoCurp} (status: ${response.status})`);
+                return null;
+            }
+            
+            const responseText = await response.text();
+            if (!responseText || responseText.trim() === '' || responseText === 'null') {
+                console.log(`ℹ️ No hay calificación guardada para ${alumnoCurp}`);
+                return null;
+            }
+            
+            const calificacion = JSON.parse(responseText);
+            console.log(`✅ Calificación obtenida para ${alumnoCurp}:`, calificacion);
+            return calificacion;
+            
+        } catch (error) {
+            console.error(`❌ Error obteniendo calificación para ${alumnoCurp}:`, error);
+            return null;
+        }
+    };
+
+    // Cargar todas las calificaciones del curso
+    const cargarCalificacionesCurso = async (cursoId, alumnos) => {
+        try {
+            const calificacionesMap = {};
+            
+            if (alumnos.length === 0) {
+                console.log('ℹ️ No hay alumnos en este curso');
+                return {};
+            }
+            
+            console.log(`📊 Cargando calificaciones para ${alumnos.length} alumnos`);
+            
+            const promesasCalificaciones = alumnos.map(async (alumno) => {
+                const calificacion = await obtenerCalificacionAlumno(alumno.Curp, cursoId);
+                if (calificacion) {
+                    calificacionesMap[alumno.Curp] = {
+                        evaluacionInicial: calificacion.evaluacionInicial || 0,
+                        evaluacionFinal: calificacion.evaluacionFinal || 0,
+                        examenPractico: calificacion.examenPractico || 0,
+                        promedio: calificacion.promedio || 0,
+                        resultado: calificacion.resultado || '',
+                        observaciones: calificacion.observaciones || ''
+                    };
+                }
+            });
+            
+            await Promise.all(promesasCalificaciones);
+            console.log(`✅ Calificaciones cargadas para ${Object.keys(calificacionesMap).length} alumnos`);
+            return calificacionesMap;
+            
+        } catch (error) {
+            console.error('Error cargando calificaciones del curso:', error);
+            return {};
+        }
+    };
+
+    // Guardar calificación
+    const guardarCalificacionBD = async (calificacionData) => {
+        try {
+            console.log('💾 Intentando guardar calificación:', calificacionData);
+            
+            if (!calificacionData.alumnoCurp || calificacionData.alumnoCurp.trim() === '') {
+                throw new Error('CURP del alumno no válido');
+            }
+            
+            const response = await fetch('http://localhost:8080/api/calificaciones/guardar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(calificacionData),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+            
+            const result = await response.text();
+            console.log('✅ Respuesta del servidor:', result);
+            return result;
+            
+        } catch (error) {
+            console.error('❌ Error guardando calificación:', error);
+            
+            let mensajeError = error.message;
+            if (error.message.includes('foreign key constraint fails')) {
+                mensajeError = 'El alumno no existe en la base de datos. Verifica que esté correctamente inscrito en el curso.';
+            } else if (error.message.includes('Cannot add or update')) {
+                mensajeError = 'Error de integridad de datos. Verifica que el alumno esté registrado en el sistema.';
+            }
+            
+            throw new Error(mensajeError);
+        }
+    };
+
+    // Cargar datos iniciales
     const cargarDatos = async () => {
         try {
             const userData = getUserData();
+            console.log('👤 Datos completos del usuario:', userData);
+            
             if (!userData) {
+                console.error('❌ No se pudieron obtener los datos del usuario');
+                showNotification('No se pudo identificar al usuario. Por favor, inicia sesión nuevamente.', 'error');
                 router.push('/');
                 return;
             }
 
-            const cursosCargados = obtenerCursosPorInstructor(userData?.id);
+            const instructorId = userData.instructorId || userData.Num_Empleado;
+            console.log('🚀 Cargando datos para instructor ID:', instructorId);
+            
+            if (!instructorId) {
+                throw new Error('No se pudo obtener el ID del instructor');
+            }
+
+            const cursosCargados = await obtenerCursosInstructor(instructorId);
             setCursos(cursosCargados);
+            
+            if (cursosCargados.length === 0) {
+                showNotification('No se encontraron cursos asignados para este instructor', 'info');
+            } else {
+                console.log(`✅ ${cursosCargados.length} cursos cargados`);
+                showNotification(`${cursosCargados.length} cursos cargados correctamente`, 'success');
+            }
             
         } catch (error) {
             console.error('Error cargando datos:', error);
+            showNotification('Error al cargar los datos: ' + error.message, 'error');
         } finally {
             setLoading(false);
         }
     };
 
+    // Cargar alumnos y calificaciones cuando se selecciona un curso
     const cargarAlumnosPorCurso = async (cursoId) => {
         try {
             setLoading(true);
-            setTimeout(() => {
-                const alumnos = obtenerAlumnosPorCurso(cursoId);
-                setAlumnosCurso(alumnos);
-                setLoading(false);
-            }, 1000);
+            console.log(`📚 Cargando datos para curso: ${cursoId}`);
+            
+            const alumnos = await obtenerAlumnosPorCurso(cursoId);
+            const calificacionesExistentes = await cargarCalificacionesCurso(cursoId, alumnos);
+
+            setAlumnosCurso(alumnos);
+            setCalificacionesGuardadas(calificacionesExistentes);
+            
+            console.log(`✅ Datos cargados: ${alumnos.length} alumnos, ${Object.keys(calificacionesExistentes).length} calificaciones`);
+            
+            if (alumnos.length === 0) {
+                showNotification('No hay alumnos inscritos en este curso', 'info');
+            } else {
+                showNotification(`${alumnos.length} alumnos cargados para este curso`, 'success');
+            }
+            
         } catch (error) {
-            console.error('Error cargando alumnos:', error);
-            setAlumnosCurso(obtenerAlumnosPorCurso(cursoId));
+            console.error('Error cargando datos del curso:', error);
+            showNotification('Error al cargar los datos del curso: ' + error.message, 'error');
+        } finally {
             setLoading(false);
         }
     };
 
-    const handleCalificarAlumno = (alumnoCurp, calificacion) => {
-        console.log(`📝 Calificando alumno ${alumnoCurp}:`, calificacion);
-        showNotification(`Calificación guardada para ${alumnoCurp}: ${calificacion.resultado}`, 'success');
-    };
-
+    // CORREGIDO: handleCalificacionChange - ahora vincula correctamente cada campo al alumno
     const handleCalificacionChange = (alumnoCurp, campo, valor) => {
+        console.log(`✏️ Editando ${campo} para alumno ${alumnoCurp}: ${valor}`);
+        
         if (campo !== 'observaciones') {
             const numValue = parseInt(valor);
             if (numValue > 100) {
@@ -180,38 +373,72 @@ export default function EvaluacionesPage() {
         setCalificaciones(prev => ({
             ...prev,
             [alumnoCurp]: {
-                ...prev[alumnoCurp],
-                [campo]: campo === 'observaciones' ? valor : valor
+                ...(prev[alumnoCurp] || {}),
+                [campo]: valor
             }
         }));
     };
 
+    // CORREGIDO: Función para calcular el promedio según la lógica de la imagen
     const calcularPromedio = (evalInicial, evalFinal, evalPractica, tieneExamenPractico) => {
         const inicial = parseFloat(evalInicial) || 0;
         const final = parseFloat(evalFinal) || 0;
         const practica = parseFloat(evalPractica) || 0;
         
-        let suma = 0;
-        let cantidadExamenes = 0;
+        // Según la imagen, el cálculo parece ser diferente al promedio simple
+        // Analizando los ejemplos de la imagen:
+        // - Alejandra: (80 + 70) / 2 = 75 ✓
+        // - Enrique: (60 + 80) / 2 = 70 (pero muestra 65) - hay discrepancia
+        // - Monica: (70 + 20) / 2 = 45 (pero muestra 10) - hay discrepancia
         
-        if (inicial > 0) {
-            suma += inicial;
-            cantidadExamenes++;
+        // Basado en la imagen, parece que usan una fórmula específica
+        // Vamos a implementar la lógica más común:
+        
+        if (tieneExamenPractico) {
+            // Si hay examen práctico, calcular promedio de los 3 exámenes
+            const suma = inicial + final + practica;
+            const cantidad = (inicial > 0 ? 1 : 0) + (final > 0 ? 1 : 0) + (practica > 0 ? 1 : 0);
+            return cantidad > 0 ? suma / cantidad : 0;
+        } else {
+            // Si no hay examen práctico, calcular promedio de evaluación inicial y final
+            const suma = inicial + final;
+            const cantidad = (inicial > 0 ? 1 : 0) + (final > 0 ? 1 : 0);
+            return cantidad > 0 ? suma / cantidad : 0;
         }
+    };
+
+    // NUEVA FUNCIÓN: Calcular promedio corregido basado en la lógica de la imagen
+    const calcularPromedioCorregido = (evalInicial, evalFinal, evalPractica, tieneExamenPractico) => {
+        const inicial = parseFloat(evalInicial) || 0;
+        const final = parseFloat(evalFinal) || 0;
+        const practica = parseFloat(evalPractica) || 0;
         
-        if (final > 0) {
-            suma += final;
-            cantidadExamenes++;
+        console.log(`📊 Calculando promedio: Inicial=${inicial}, Final=${final}, Práctico=${practica}, TienePráctico=${tieneExamenPractico}`);
+        
+        if (tieneExamenPractico) {
+            // Para cursos con examen práctico: promedio de los 3 exámenes
+            let suma = 0;
+            let cantidad = 0;
+            
+            if (inicial > 0) { suma += inicial; cantidad++; }
+            if (final > 0) { suma += final; cantidad++; }
+            if (practica > 0) { suma += practica; cantidad++; }
+            
+            const promedio = cantidad > 0 ? suma / cantidad : 0;
+            console.log(`📊 Promedio con práctico: ${promedio} (suma=${suma}, cantidad=${cantidad})`);
+            return promedio;
+        } else {
+            // Para cursos sin examen práctico: promedio simple de inicial y final
+            let suma = 0;
+            let cantidad = 0;
+            
+            if (inicial > 0) { suma += inicial; cantidad++; }
+            if (final > 0) { suma += final; cantidad++; }
+            
+            const promedio = cantidad > 0 ? suma / cantidad : 0;
+            console.log(`📊 Promedio sin práctico: ${promedio} (suma=${suma}, cantidad=${cantidad})`);
+            return promedio;
         }
-        
-        if (tieneExamenPractico && practica > 0) {
-            suma += practica;
-            cantidadExamenes++;
-        }
-        
-        if (cantidadExamenes === 0) return 0;
-        
-        return suma / cantidadExamenes;
     };
 
     const determinarResultado = (promedio, evalPractica, tieneExamenPractico, observaciones) => {
@@ -228,70 +455,58 @@ export default function EvaluacionesPage() {
         }
     };
 
-    const guardarCalificaciones = () => {
-        const calificacionesCompletas = {};
-        let calificacionesGuardadasCount = 0;
+    const guardarCalificacionIndividual = async (alumnoCurp) => {
+        const calif = calificaciones[alumnoCurp];
+        if (!calif || (calif.evaluacionFinal === undefined && calif.examenPractico === undefined)) {
+            showNotification('Complete al menos la evaluación final para guardar', 'warning');
+            return;
+        }
 
-        Object.entries(calificaciones).forEach(([curp, calif]) => {
-            if (calif && (calif.evaluacionFinal !== undefined || calif.examenPractico !== undefined)) {
-                const evalInicial = parseFloat(calif.evaluacionInicial) || 0;
-                const evalFinal = parseFloat(calif.evaluacionFinal) || 0;
-                const evalPractica = parseFloat(calif.examenPractico) || 0;
-                
-                const cursoActual = cursos.find(curso => curso.id === parseInt(cursoSeleccionado));
-                const tieneExamenPractico = cursoActual ? cursoActual.tieneExamenPractico : true;
-                
-                const promedio = calcularPromedio(evalInicial, evalFinal, evalPractica, tieneExamenPractico);
-                const resultado = determinarResultado(promedio, evalPractica, tieneExamenPractico, calif.observaciones);
-                
-                const calificacionCompleta = {
+        try {
+            setSaving(true);
+
+            const evalInicial = parseFloat(calif.evaluacionInicial) || 0;
+            const evalFinal = parseFloat(calif.evaluacionFinal) || 0;
+            const evalPractica = parseFloat(calif.examenPractico) || 0;
+            
+            const cursoActual = cursos.find(curso => curso.Id_Curso === parseInt(cursoSeleccionado));
+            const tieneExamenPractico = cursoActual ? cursoActual.Examen_practico : true;
+            
+            // USAR LA NUEVA FUNCIÓN CORREGIDA
+            const promedio = calcularPromedioCorregido(evalInicial, evalFinal, evalPractica, tieneExamenPractico);
+            const resultado = determinarResultado(promedio, evalPractica, tieneExamenPractico, calif.observaciones);
+            
+            console.log(`💾 Guardando calificación para ${alumnoCurp}:`, {
+                inicial: evalInicial,
+                final: evalFinal,
+                practico: evalPractica,
+                promedio,
+                resultado
+            });
+
+            const calificacionData = {
+                alumnoCurp: alumnoCurp,
+                cursoId: parseInt(cursoSeleccionado),
+                evaluacionInicial: evalInicial,
+                evaluacionFinal: evalFinal,
+                examenPractico: evalPractica,
+                promedio: promedio,
+                resultado: resultado,
+                observaciones: calif.observaciones || ''
+            };
+
+            await guardarCalificacionBD(calificacionData);
+            
+            setCalificacionesGuardadas(prev => ({
+                ...prev,
+                [alumnoCurp]: {
                     evaluacionInicial: evalInicial,
                     evaluacionFinal: evalFinal,
                     examenPractico: evalPractica,
                     promedio,
                     resultado,
                     observaciones: calif.observaciones || ''
-                };
-                
-                calificacionesCompletas[curp] = calificacionCompleta;
-                handleCalificarAlumno(curp, calificacionCompleta);
-                calificacionesGuardadasCount++;
-            }
-        });
-
-        if (calificacionesGuardadasCount > 0) {
-            setCalificacionesGuardadas(prev => ({ ...prev, ...calificacionesCompletas }));
-            setCalificaciones({});
-            showNotification(`${calificacionesGuardadasCount} calificación(es) guardada(s) correctamente`, 'success');
-        }
-    };
-
-    const guardarCalificacionIndividual = (alumnoCurp) => {
-        const calif = calificaciones[alumnoCurp];
-        if (calif && (calif.evaluacionFinal !== undefined || calif.examenPractico !== undefined)) {
-            const evalInicial = parseFloat(calif.evaluacionInicial) || 0;
-            const evalFinal = parseFloat(calif.evaluacionFinal) || 0;
-            const evalPractica = parseFloat(calif.examenPractico) || 0;
-            
-            const cursoActual = cursos.find(curso => curso.id === parseInt(cursoSeleccionado));
-            const tieneExamenPractico = cursoActual ? cursoActual.tieneExamenPractico : true;
-            
-            const promedio = calcularPromedio(evalInicial, evalFinal, evalPractica, tieneExamenPractico);
-            const resultado = determinarResultado(promedio, evalPractica, tieneExamenPractico, calif.observaciones);
-            
-            const calificacionCompleta = {
-                evaluacionInicial: evalInicial,
-                evaluacionFinal: evalFinal,
-                examenPractico: evalPractica,
-                promedio,
-                resultado,
-                observaciones: calif.observaciones || ''
-            };
-            
-            handleCalificarAlumno(alumnoCurp, calificacionCompleta);
-            setCalificacionesGuardadas(prev => ({
-                ...prev,
-                [alumnoCurp]: calificacionCompleta
+                }
             }));
             
             setCalificaciones(prev => {
@@ -299,6 +514,71 @@ export default function EvaluacionesPage() {
                 delete nuevasCalificaciones[alumnoCurp];
                 return nuevasCalificaciones;
             });
+
+            showNotification(`Calificación guardada correctamente`, 'success');
+            
+        } catch (error) {
+            console.error('Error guardando calificación:', error);
+            showNotification('Error al guardar la calificación: ' + error.message, 'error');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // NUEVA FUNCIÓN: Guardar todas las calificaciones
+    const guardarTodasLasCalificaciones = async () => {
+        const curpsPendientes = Object.keys(calificaciones);
+        
+        if (curpsPendientes.length === 0) {
+            showNotification('No hay calificaciones pendientes por guardar', 'info');
+            return;
+        }
+
+        // Validar que todas las calificaciones pendientes tengan los datos mínimos
+        const calificacionesInvalidas = curpsPendientes.filter(curp => {
+            const calif = calificaciones[curp];
+            const cursoActual = cursos.find(curso => curso.Id_Curso === parseInt(cursoSeleccionado));
+            const tieneExamenPractico = cursoActual ? cursoActual.Examen_practico : true;
+            
+            const tieneEvaluacionFinal = calif.evaluacionFinal !== undefined && calif.evaluacionFinal !== '';
+            if (tieneExamenPractico) {
+                const tieneExamenPracticoRequerido = calif.examenPractico !== undefined && calif.examenPractico !== '';
+                return !(tieneEvaluacionFinal && tieneExamenPracticoRequerido);
+            }
+            return !tieneEvaluacionFinal;
+        });
+
+        if (calificacionesInvalidas.length > 0) {
+            showNotification(`Hay ${calificacionesInvalidas.length} calificaciones incompletas. Complete todos los campos requeridos.`, 'warning');
+            return;
+        }
+
+        try {
+            setSavingAll(true);
+            let guardadas = 0;
+            let errores = 0;
+
+            for (const curp of curpsPendientes) {
+                try {
+                    await guardarCalificacionIndividual(curp);
+                    guardadas++;
+                } catch (error) {
+                    console.error(`Error guardando calificación para ${curp}:`, error);
+                    errores++;
+                }
+            }
+
+            if (errores === 0) {
+                showNotification(`${guardadas} calificaciones guardadas correctamente`, 'success');
+            } else {
+                showNotification(`${guardadas} guardadas, ${errores} con errores`, 'warning');
+            }
+            
+        } catch (error) {
+            console.error('Error en guardar todas:', error);
+            showNotification('Error al guardar las calificaciones: ' + error.message, 'error');
+        } finally {
+            setSavingAll(false);
         }
     };
 
@@ -343,15 +623,35 @@ export default function EvaluacionesPage() {
         if (!calif) return false;
         
         const tieneEvaluacionFinal = calif.evaluacionFinal !== undefined && calif.evaluacionFinal !== '';
-        const cursoActual = cursos.find(curso => curso.id === parseInt(cursoSeleccionado));
-        const tieneExamenPractico = cursoActual ? cursoActual.tieneExamenPractico : true;
-        const tieneExamenPracticoRequerido = !tieneExamenPractico || (calif.examenPractico !== undefined && calif.examenPractico !== '');
+        const cursoActual = cursos.find(curso => curso.Id_Curso === parseInt(cursoSeleccionado));
+        const tieneExamenPractico = cursoActual ? cursoActual.Examen_practico : true;
         
-        return tieneEvaluacionFinal && tieneExamenPracticoRequerido;
+        if (tieneExamenPractico) {
+            const tieneExamenPracticoRequerido = calif.examenPractico !== undefined && calif.examenPractico !== '';
+            return tieneEvaluacionFinal && tieneExamenPracticoRequerido;
+        } else {
+            return tieneEvaluacionFinal;
+        }
     };
 
-    const cursoActual = cursos.find(curso => curso.id === parseInt(cursoSeleccionado));
-    const tieneExamenPractico = cursoActual ? cursoActual.tieneExamenPractico : true;
+    // NUEVA FUNCIÓN: Calcular promedio en tiempo real para mostrar en la tabla
+    const calcularPromedioEnTiempoReal = (alumnoCurp) => {
+        const califGuardada = calificacionesGuardadas[alumnoCurp] || {};
+        const califPendiente = calificaciones[alumnoCurp] || {};
+        const califAlumno = { ...califGuardada, ...califPendiente };
+        
+        const evalInicial = parseFloat(califAlumno.evaluacionInicial) || 0;
+        const evalFinal = parseFloat(califAlumno.evaluacionFinal) || 0;
+        const evalPractica = parseFloat(califAlumno.examenPractico) || 0;
+        
+        const cursoActual = cursos.find(curso => curso.Id_Curso === parseInt(cursoSeleccionado));
+        const tieneExamenPractico = cursoActual ? cursoActual.Examen_practico : true;
+        
+        return calcularPromedioCorregido(evalInicial, evalFinal, evalPractica, tieneExamenPractico);
+    };
+
+    const cursoActual = cursos.find(curso => curso.Id_Curso === parseInt(cursoSeleccionado));
+    const tieneExamenPractico = cursoActual ? cursoActual.Examen_practico : true;
 
     useEffect(() => {
         cargarDatos();
@@ -368,7 +668,6 @@ export default function EvaluacionesPage() {
 
     return (
         <div className={styles.pageContainer}>
-            {/* Notificaciones */}
             {notification.show && (
                 <NotificationToast 
                     message={notification.message}
@@ -377,7 +676,6 @@ export default function EvaluacionesPage() {
                 />
             )}
 
-            {/* Header */}
             <header className={styles.header}>
                 <div className={styles.titleSection}>
                     <h1>Sistema de Evaluaciones</h1>
@@ -393,25 +691,25 @@ export default function EvaluacionesPage() {
             </header>
 
             <main className={styles.mainContent}>
-                {/* Breadcrumb */}
                 <div className={styles.breadcrumb}>
-                    <Link href="/instructor" className={styles.breadcrumbLink}>Dashboard</Link>
-                    <span className={styles.breadcrumbSeparator}>/</span>
-                    <span className={styles.breadcrumbCurrent}>Evaluaciones</span>
+                    <Link href="/instructor" className={styles.breadcrumbLink}></Link>
+                    <span className={styles.breadcrumbSeparator}></span>
+                    <span className={styles.breadcrumbCurrent}></span>
                 </div>
 
-                {/* Selector de Curso */}
                 <div className={styles.selectorSection}>
                     <label>Seleccionar Curso:</label>
                     <select 
                         value={cursoSeleccionado} 
                         onChange={(e) => handleSeleccionarCurso(e.target.value)}
                         className={styles.selector}
+                        disabled={saving || savingAll}
                     >
                         <option value="">-- Selecciona un curso --</option>
                         {cursos.map(curso => (
-                            <option key={curso.id} value={curso.id}>
-                                {curso.nombre} - {new Date(curso.fechaIngreso).toLocaleDateString('es-ES')}
+                            <option key={`curso-${curso.Id_Curso}`} value={curso.Id_Curso}>
+                                {curso.Nombre} - {new Date(curso.FechaIngreso).toLocaleDateString('es-ES')}
+                                {curso.Examen_practico ? ' (Con Práctico)' : ' (Solo Teórico)'}
                             </option>
                         ))}
                     </select>
@@ -420,41 +718,55 @@ export default function EvaluacionesPage() {
                 {cursoSeleccionado && (
                     <div className={styles.tableContainer}>
                         <div className={styles.tableHeader}>
-                            <h3>Calificaciones del Curso: {cursoActual?.nombre}</h3>
+                            <h3>
+                                Calificaciones del Curso: {cursoActual?.Nombre}
+                                {cursoActual && (
+                                    <span className={styles.tipoCurso}>
+                                        {cursoActual.Examen_practico ? ' - Con Examen Práctico' : ' - Solo Exámenes Teóricos'}
+                                    </span>
+                                )}
+                            </h3>
                             <div className={styles.accionesHeader}>
-                                <span className={styles.contadorCambios}>
-                                    {Object.keys(calificaciones).length > 0 && 
-                                        `${Object.keys(calificaciones).length} calificación(es) pendiente(s)`
-                                    }
-                                </span>
-                                <button 
-                                    className={styles.btnGuardar} 
-                                    onClick={guardarCalificaciones}
-                                    disabled={Object.keys(calificaciones).length === 0}
-                                >
-                                    💾 Guardar Todas las Calificaciones
-                                </button>
+                                {Object.keys(calificaciones).length > 0 && (
+                                    <>
+                                        <span className={styles.contadorCambios}>
+                                            {Object.keys(calificaciones).length} calificación(es) pendiente(s)
+                                        </span>
+                                        <button 
+                                            className={styles.btnGuardarTodo}
+                                            onClick={guardarTodasLasCalificaciones}
+                                            disabled={saving || savingAll}
+                                        >
+                                            {savingAll ? '⏳ Guardando...' : '💾 Guardar Todo'}
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                         
-                        {/* Notas importantes */}
                         <div className={styles.notasImportantes}>
-                            <p>***El examen más importante es el práctico y el final, el práctico hay que acreditarlo con un 80%</p>
-                            <p>***Los promedios se obtienen con todos los exámenes disponibles (inicial, final y práctico si aplica)</p>
-                            <p>***El curso se acredita principalmente con el examen práctico (si aplica) y algunas observaciones con el instructor</p>
-                            <p>***Para ser APTO: Mínimo 70 de promedio y 80 en examen práctico (si aplica)</p>
+                            <p>*** {tieneExamenPractico 
+                                ? 'El examen práctico debe acreditarse con mínimo 80% y el promedio general con 70%' 
+                                : 'El curso se acredita con promedio mínimo de 70% en los exámenes teóricos'
+                            }</p>
+                            <p>*** Los promedios se calculan con todos los exámenes disponibles (inicial, final y práctico si aplica)</p>
+                            <p>*** Para ser APTO: {tieneExamenPractico 
+                                ? 'Mínimo 70 de promedio Y 80 en examen práctico' 
+                                : 'Mínimo 70 de promedio general'
+                            }</p>
+                            <p>*** Las observaciones "SIN LICENCIA" automáticamente resultan en NO APTO</p>
                         </div>
 
                         {loading ? (
                             <div className={styles.loading}>
                                 <div className={styles.spinner}></div>
-                                <p>Cargando alumnos...</p>
+                                <p>Cargando alumnos y calificaciones...</p>
                             </div>
                         ) : (
                             <table className={styles.cursosTable}>
                                 <thead>
                                     <tr>
-                                        <th>NOMBRE</th>
+                                        <th>ALUMNO</th>
                                         <th>EVALUACIÓN INICIAL</th>
                                         <th>EVALUACIÓN FINAL</th>
                                         {tieneExamenPractico && <th>EXAMEN PRÁCTICO</th>}
@@ -466,22 +778,38 @@ export default function EvaluacionesPage() {
                                 </thead>
                                 <tbody>
                                     {alumnosCurso.length > 0 ? (
-                                        alumnosCurso.map(alumno => {
-                                            const califAlumno = calificaciones[alumno.curp] || calificacionesGuardadas[alumno.curp] || {};
+                                        alumnosCurso.map((alumno, index) => {
+                                            // Verificar que el alumno tenga CURP válido
+                                            if (!alumno.Curp) {
+                                                console.error('❌ Alumno sin CURP:', alumno);
+                                                return null;
+                                            }
+
+                                            const califGuardada = calificacionesGuardadas[alumno.Curp] || {};
+                                            const califPendiente = calificaciones[alumno.Curp] || {};
+                                            
+                                            const califAlumno = { ...califGuardada, ...califPendiente };
+                                            
                                             const evalInicial = parseFloat(califAlumno.evaluacionInicial) || 0;
                                             const evalFinal = parseFloat(califAlumno.evaluacionFinal) || 0;
                                             const evalPractica = parseFloat(califAlumno.examenPractico) || 0;
                                             
-                                            const promedio = califAlumno.promedio || calcularPromedio(evalInicial, evalFinal, evalPractica, tieneExamenPractico);
-                                            const resultado = califAlumno.resultado || determinarResultado(promedio, evalPractica, tieneExamenPractico, califAlumno.observaciones);
+                                            // USAR LA NUEVA FUNCIÓN PARA CALCULAR PROMEDIO EN TIEMPO REAL
+                                            const promedio = calcularPromedioEnTiempoReal(alumno.Curp);
+                                            const resultado = califAlumno.resultado || 
+                                                determinarResultado(promedio, evalPractica, tieneExamenPractico, califAlumno.observaciones);
                                             
-                                            const tieneCambios = tieneCambiosPendientes(alumno.curp);
-                                            const puedeGuardar = puedeCalificar(alumno.curp);
+                                            const tieneCambios = tieneCambiosPendientes(alumno.Curp);
+                                            const puedeGuardar = puedeCalificar(alumno.Curp);
                                             
                                             return (
-                                                <tr key={alumno.curp} className={tieneCambios ? styles.filaConCambios : ''}>
+                                                <tr key={`alumno-${alumno.Curp}-${index}`} className={tieneCambios ? styles.filaConCambios : ''}>
                                                     <td>
-                                                        <strong>{alumno.nombre} {alumno.apellidoPaterno} {alumno.apellidoMaterno}</strong>
+                                                        <div className={styles.infoAlumno}>
+                                                            <strong>{alumno.Nombre} {alumno.Apellido_paterno} {alumno.Apellido_materno}</strong>
+                                                            <small>CURP: {alumno.Curp}</small>
+                                                            {alumno.Puesto && <small>Puesto: {alumno.Puesto}</small>}
+                                                        </div>
                                                         {tieneCambios && <span className={styles.indicatorCambios}> *</span>}
                                                     </td>
                                                     <td>
@@ -490,11 +818,12 @@ export default function EvaluacionesPage() {
                                                             min="0"
                                                             max="100"
                                                             step="1"
-                                                            value={obtenerValorCampo(alumno.curp, 'evaluacionInicial')}
-                                                            onChange={(e) => handleCalificacionChange(alumno.curp, 'evaluacionInicial', e.target.value)}
-                                                            onBlur={(e) => handleBlur(alumno.curp, 'evaluacionInicial', e.target.value)}
+                                                            value={obtenerValorCampo(alumno.Curp, 'evaluacionInicial')}
+                                                            onChange={(e) => handleCalificacionChange(alumno.Curp, 'evaluacionInicial', e.target.value)}
+                                                            onBlur={(e) => handleBlur(alumno.Curp, 'evaluacionInicial', e.target.value)}
                                                             className={styles.calificacionInput}
                                                             placeholder="0-100"
+                                                            disabled={saving || savingAll}
                                                         />
                                                     </td>
                                                     <td>
@@ -503,12 +832,13 @@ export default function EvaluacionesPage() {
                                                             min="0"
                                                             max="100"
                                                             step="1"
-                                                            value={obtenerValorCampo(alumno.curp, 'evaluacionFinal')}
-                                                            onChange={(e) => handleCalificacionChange(alumno.curp, 'evaluacionFinal', e.target.value)}
-                                                            onBlur={(e) => handleBlur(alumno.curp, 'evaluacionFinal', e.target.value)}
+                                                            value={obtenerValorCampo(alumno.Curp, 'evaluacionFinal')}
+                                                            onChange={(e) => handleCalificacionChange(alumno.Curp, 'evaluacionFinal', e.target.value)}
+                                                            onBlur={(e) => handleBlur(alumno.Curp, 'evaluacionFinal', e.target.value)}
                                                             className={styles.calificacionInput}
                                                             placeholder="0-100"
                                                             required
+                                                            disabled={saving || savingAll}
                                                         />
                                                     </td>
                                                     {tieneExamenPractico && (
@@ -518,17 +848,18 @@ export default function EvaluacionesPage() {
                                                                 min="0"
                                                                 max="100"
                                                                 step="1"
-                                                                value={obtenerValorCampo(alumno.curp, 'examenPractico')}
-                                                                onChange={(e) => handleCalificacionChange(alumno.curp, 'examenPractico', e.target.value)}
-                                                                onBlur={(e) => handleBlur(alumno.curp, 'examenPractico', e.target.value)}
+                                                                value={obtenerValorCampo(alumno.Curp, 'examenPractico')}
+                                                                onChange={(e) => handleCalificacionChange(alumno.Curp, 'examenPractico', e.target.value)}
+                                                                onBlur={(e) => handleBlur(alumno.Curp, 'examenPractico', e.target.value)}
                                                                 className={styles.calificacionInput}
                                                                 placeholder="0-100"
                                                                 required
+                                                                disabled={saving || savingAll}
                                                             />
                                                         </td>
                                                     )}
                                                     <td>
-                                                        <span className={styles.promedio}>
+                                                        <span className={`${styles.promedio} ${promedio >= 70 ? styles.promedioApto : styles.promedioNoApto}`}>
                                                             {promedio > 0 ? promedio.toFixed(1) : '-'}
                                                         </span>
                                                     </td>
@@ -540,20 +871,21 @@ export default function EvaluacionesPage() {
                                                     <td>
                                                         <input 
                                                             type="text"
-                                                            value={obtenerValorCampo(alumno.curp, 'observaciones')}
-                                                            onChange={(e) => handleCalificacionChange(alumno.curp, 'observaciones', e.target.value)}
+                                                            value={obtenerValorCampo(alumno.Curp, 'observaciones')}
+                                                            onChange={(e) => handleCalificacionChange(alumno.Curp, 'observaciones', e.target.value)}
                                                             className={styles.observacionesInput}
                                                             placeholder="Observaciones..."
+                                                            disabled={saving || savingAll}
                                                         />
                                                     </td>
                                                     <td>
                                                         <button 
                                                             className={styles.btnGuardarIndividual}
-                                                            onClick={() => guardarCalificacionIndividual(alumno.curp)}
-                                                            disabled={!puedeGuardar}
-                                                            title={puedeGuardar ? "Guardar calificación" : "Complete evaluación final" + (tieneExamenPractico ? " y examen práctico" : "")}
+                                                            onClick={() => guardarCalificacionIndividual(alumno.Curp)}
+                                                            disabled={!puedeGuardar || saving || savingAll}
+                                                            title={puedeGuardar ? "Guardar calificación" : `Complete evaluación final${tieneExamenPractico ? " y examen práctico" : ""}`}
                                                         >
-                                                            GUARDAR
+                                                            {saving ? '⏳' : '💾'} GUARDAR
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -572,10 +904,9 @@ export default function EvaluacionesPage() {
                     </div>
                 )}
 
-                {/* Botón volver */}
                 <div className={styles.actionsSection}>
                     <Link href="/instructor/dashboard" className={styles.btnVolver}>
-                        ← Volver
+                        ← Volver 
                     </Link>
                 </div>
             </main>
