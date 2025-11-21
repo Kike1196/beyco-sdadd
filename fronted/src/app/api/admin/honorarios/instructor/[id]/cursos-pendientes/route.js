@@ -26,83 +26,34 @@ async function query(sql, params) {
 export async function GET(request, { params }) {
     try {
         const { id } = params;
-        const { searchParams } = new URL(request.url);
-        const fechaInicio = searchParams.get('fechaInicio');
-        const fechaFin = searchParams.get('fechaFin');
         
-        console.log(`🔍 Buscando cursos para instructor ${id}`);
+        console.log(`🔍 Buscando cursos para INSCRIPCIÓN del instructor ${id}`);
         
-        // Verificar que el instructor existe
-        const instructores = await query(
-            'SELECT * FROM usuarios WHERE Num_Empleado = ? AND Id_Rol = 2 AND Activo = 1',
-            [id]
-        );
-        
-        if (instructores.length === 0) {
-            console.log(`❌ Instructor ${id} no encontrado`);
-            return NextResponse.json({
-                success: false,
-                error: 'Instructor no encontrado'
-            }, { status: 404 });
-        }
-        
-        const instructor = instructores[0];
-        console.log(`✅ Instructor encontrado: ${instructor.Nombre} ${instructor.Apellido_paterno}`);
-        
-        // Obtener cursos del instructor con nombres de columnas CORRECTOS
-        let sql = `
+        // Consulta ESPECÍFICA para inscripción - solo cursos futuros
+        const cursos = await query(`
             SELECT 
                 c.Id_Curso as id,
-                c.Nombre_curso as cursoNombre,
-                c.Clave_STPS as stps,
-                8 as horasImpartidas,  -- Valor por defecto
-                c.Fecha_Imparticion as fechaCurso,
-                c.Pago as monto,
-                'pendiente' as estatus,
+                c.Nombre_curso as nombre,
+                c.Fecha_Imparticion as fechaIngreso,
                 c.Lugar as lugar,
-                e.Nombre as empresaNombre
+                e.Nombre as empresa,
+                c.Instructor_Id as instructorId,
+                cat.Examen_practico as examen_practico,
+                cat.Horas as horas,
+                c.Clave_STPS as stps
             FROM cursos c
-            LEFT JOIN empresas e ON c.Empresa_Id = e.Id
+            LEFT JOIN empresas e ON c.Empresa_Id = e.Id_Empresa
+            LEFT JOIN catalogo_cursos cat ON c.Clave_STPS = cat.Clave_STPS
             WHERE c.Instructor_Id = ?
-        `;
+            AND c.Fecha_Imparticion >= CURDATE()  // Solo cursos futuros
+            ORDER BY c.Fecha_Imparticion ASC
+        `, [id]);
         
-        const queryParams = [id];
-        
-        if (fechaInicio && fechaFin) {
-            sql += ' AND c.Fecha_Imparticion BETWEEN ? AND ?';
-            queryParams.push(fechaInicio, fechaFin);
-        }
-        
-        sql += ' ORDER BY c.Fecha_Imparticion DESC';
-        
-        console.log(`📊 Consulta SQL: ${sql}`);
-        
-        const cursos = await query(sql, queryParams);
-        
-        console.log(`✅ Cursos encontrados: ${cursos.length}`);
-        
-        // Calcular total pendiente
-        const totalPendiente = cursos.reduce((total, curso) => {
-            return total + parseFloat(curso.monto || 0);
-        }, 0);
-        
-        const responseData = {
-            instructorId: parseInt(id),
-            instructorNombre: `${instructor.Nombre} ${instructor.Apellido_paterno} ${instructor.Apellido_materno}`,
-            instructorEmail: instructor.Correo,
-            instructorEspecialidad: 'Instructor',
-            cursosPendientes: cursos,
-            totalPendiente: totalPendiente,
-            totalCursos: cursos.length,
-            cursosPendientesCount: cursos.length,
-            periodo: { fechaInicio, fechaFin }
-        };
-        
-        console.log(`💰 Total pendiente: $${totalPendiente}`);
+        console.log(`✅ Cursos para inscripción: ${cursos.length}`);
         
         return NextResponse.json({
             success: true,
-            data: responseData
+            cursos: cursos  // Key específica para inscripción
         });
         
     } catch (error) {

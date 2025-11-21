@@ -1,4 +1,4 @@
-/* app/admin/honorarios/recibo/Recibo.module.css */
+/* app/admin/honorarios/reporte-general/ReporteGeneral.module.css */
 .pageContainer {
     background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
     min-height: 100vh;
@@ -118,13 +118,13 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Contenedor del recibo */
-.reciboContainer {
-    max-width: 900px;
+/* Contenedor del reporte */
+.reporteContainer {
+    max-width: 1200px;
     margin: 0 auto;
 }
 
-.recibo {
+.reporte {
     background: white;
     border-radius: 12px;
     overflow: hidden;
@@ -132,8 +132,8 @@
     border: 2px solid #e9ecef;
 }
 
-/* Encabezado del recibo */
-.reciboHeader {
+/* Encabezado del reporte */
+.reporteHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -148,13 +148,13 @@
     gap: 1rem;
 }
 
-.reciboLogo {
-    height: 60px;
+.reporteLogo {
+    height: 70px;
     border-radius: 6px;
 }
 
 .companyText h1 {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: bold;
     color: white;
     margin: 0;
@@ -162,7 +162,7 @@
 }
 
 .companyText h2 {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     color: #28a745;
     margin: 0.25rem 0 0 0;
     font-weight: 600;
@@ -171,10 +171,10 @@
 .companyText p {
     color: #e0e0e0;
     margin: 0.25rem 0 0 0;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
 }
 
-.reciboInfo {
+.reporteInfo {
     text-align: right;
 }
 
@@ -200,54 +200,139 @@
     font-size: 0.9rem;
 }
 
-/* Título del recibo */
-.reciboTitle {
+/* Título del reporte */
+.reporteTitle {
     text-align: center;
-    padding: 1rem 2rem;
+    padding: 1.5rem 2rem;
     background: linear-gradient(135deg, #00264d 0%, #001f3f 100%);
     color: white;
     border-bottom: 2px solid #28a745;
 }
 
-.reciboTitle h2 {
-    font-size: 1.4rem;
+.reporteTitle h2 {
+    font-size: 1.6rem;
     font-weight: 700;
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-/* Información del instructor */
-.instructorInfo {
-    padding: 1rem 2rem;
+.reporteTitle p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+/* Sección de período */
+.periodoSection {
+    padding: 1.5rem 2rem;
     border-bottom: 1px solid #e9ecef;
     background: #f8f9fa;
 }
 
-.infoGrid {
+.periodoGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
-.infoItem {
+.periodoItem {
     display: flex;
     justify-content: space-between;
-    padding: 0.5rem 0.75rem;
+    padding: 1rem;
     background: white;
-    border-radius: 6px;
-    border-left: 3px solid #001f3f;
-    font-size: 0.85rem;
+    border-radius: 8px;
+    border-left: 4px solid #001f3f;
+    font-size: 0.9rem;
 }
 
-.infoItem strong {
+.periodoItem strong {
     color: #001f3f;
     font-weight: 600;
 }
 
-.infoItem span:last-child {
+.periodoItem span {
     color: #333;
     font-weight: 500;
+}
+
+/* Resumen general */
+.resumenGeneral {
+    padding: 2rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.resumenGeneral h3 {
+    color: #001f3f;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.resumenGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.resumenCard {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+    gap: 1rem;
+}
+
+.resumenTotal {
+    background: linear-gradient(135deg, #001f3f 0%, #00264d 100%);
+    color: white;
+}
+
+.resumenIcon {
+    font-size: 2rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 50%;
+}
+
+.resumenTotal .resumenIcon {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.resumenContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.resumenNumber {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #001f3f;
+    line-height: 1;
+}
+
+.resumenTotal .resumenNumber {
+    color: white;
+}
+
+.resumenLabel {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.resumenTotal .resumenLabel {
+    color: #e0e0e0;
 }
 
 /* Estados de carga y error */
@@ -319,7 +404,7 @@
         justify-content: center;
     }
     
-    .reciboHeader {
+    .reporteHeader {
         flex-direction: column;
         text-align: center;
         gap: 1rem;
@@ -330,11 +415,21 @@
         justify-content: center;
     }
     
-    .reciboInfo {
+    .reporteInfo {
         text-align: center;
     }
     
-    .infoGrid {
-        grid-template-columns: 1fr;
+    .resumenGrid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    
+    .periodoGrid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .resumenGrid {
+        grid-template-columns: 1fr !important;
     }
 }

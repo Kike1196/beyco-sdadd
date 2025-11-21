@@ -756,3 +756,44 @@
         padding: 1rem;
     }
 }
+
+/* Agrega estos estilos a tu archivo Cursos.module.css existente */
+
+.pagoInput {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #000000;
+    background: white;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    color: #155724;
+    background: #d4edda;
+}
+
+.pagoInput:focus {
+    outline: none;
+    border-color: #001f3f;
+    box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
+}
+
+/* Estilo para indicar que el campo se llena automáticamente */
+.pagoInput[readonly] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    color: #495057;
+    border-color: #ced4da;
+}
+
+/* Mejora el estilo del campo cuando está en modo edición */
+.editingRow .pagoInput {
+    background: #fff3cd;
+    border-color: #ffeaa7;
+}
+
+.editingRow .pagoInput[readonly] {
+    background: #f8f9fa;
+    color: #6c757d;
+}

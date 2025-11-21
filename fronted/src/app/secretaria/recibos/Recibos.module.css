@@ -1,35 +1,20 @@
 .pageContainer {
     background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
     min-height: 100vh;
+    padding: 0;
     font-family: 'Inter', sans-serif;
 }
 
+/* Header con azul oscuro */
 .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background: rgba(0, 31, 63, 0.95);
     color: white;
     padding: 1.5rem 2.5rem;
     border-bottom: 3px solid #28a745;
-}
-
-.headerContent {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.backButton {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.backButton:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateX(-5px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .titleSection h1 {
@@ -46,9 +31,33 @@
     color: #e0e0e0;
 }
 
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .logo {
-    height: 60px;
+    height: 80px;
     border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.logoText {
+    display: flex;
+    flex-direction: column;
+}
+
+.logoTitle {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.logoSubtitle {
+    font-size: 1rem;
+    color: #28a745;
+    font-weight: 600;
 }
 
 .mainContent {
@@ -57,186 +66,916 @@
     min-height: calc(100vh - 120px);
 }
 
+/* Banner de error */
+.errorBanner {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    animation: slideIn 0.3s ease-out;
+}
+
+.errorClose {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.errorClose:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Controles */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+}
+
+.controlsLeft, .controlsRight {
+    display: flex;
+    gap: 1rem;
+}
+
+.btnAtras {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btnAtras:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.btnActualizar {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btnActualizar:hover:not(:disabled) {
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btnActualizar:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Grid principal */
 .contentGrid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 400px 1fr;
     gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-.formSection {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
-}
-
-.formSection h2 {
-    color: #001f3f;
-    margin: 0 0 1.5rem 0;
-    text-align: center;
-}
-
-.receiptForm {
+/* Panel de selección */
+.selectionPanel {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.formGroup {
+.panelHeader {
+    background: linear-gradient(135deg, #001f3f 0%, #00264d 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.2);
+}
+
+.panelHeader h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.headerDivider {
+    height: 3px;
+    background: linear-gradient(90deg, #28a745, transparent);
+    margin-top: 0.75rem;
+    border-radius: 2px;
+}
+
+.selectContainer {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+}
+
+.selectLabel {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: #001f3f;
+    font-size: 1rem;
+}
+
+.instructorSelect {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.instructorSelect:focus {
+    outline: none;
+    border-color: #001f3f;
+    box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
+}
+
+.instructorSelect:disabled {
+    background: #f8f9fa;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Tarjeta de instructor */
+.instructorCard {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+    overflow: hidden;
+}
+
+.cardHeader {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1.25rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.cardHeader h3 {
+    margin: 0;
+    color: #001f3f;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.statusIndicator {
+    width: 8px;
+    height: 8px;
+    background: #28a745;
+    border-radius: 50%;
+    margin-top: 0.5rem;
+}
+
+.instructorInfo {
+    padding: 1.25rem;
+}
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.infoRow:last-child {
+    border-bottom: none;
+}
+
+.infoLabel {
+    color: #666;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.infoValue {
+    color: #333;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.infoValueHighlight {
+    color: #28a745;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+/* Tarjeta de estadísticas */
+.statsCard {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.statItem {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #001f3f;
+}
+
+.statNumber {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #001f3f;
+    margin-bottom: 0.25rem;
+}
+
+.statLabel {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Panel de detalles */
+.detailsPanel {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+    padding: 2rem;
+}
+
+/* Encabezado del instructor */
+.instructorHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.instructorTitle h2 {
+    margin: 0;
+    color: #001f3f;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.instructorTitle p {
+    margin: 0.5rem 0 0 0;
+    color: #666;
+    font-size: 1rem;
+}
+
+.periodoInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.periodoBadge {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.fechasInfo {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.instructorStats {
+    display: flex;
+    gap: 1rem;
+}
+
+.statBadge {
+    background: linear-gradient(135deg, #001f3f 0%, #00264d 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.statBadgeNumber {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.statBadgeLabel {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+/* Sección de configuración */
+.configSection {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+}
+
+.configSection h3 {
+    margin: 0 0 1rem 0;
+    color: #001f3f;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.configGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.periodoOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.optionLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.optionLabel:hover {
+    border-color: #001f3f;
+}
+
+.optionLabel input:checked + .optionText {
+    color: #001f3f;
+    font-weight: 600;
+}
+
+.optionText {
+    color: #333;
+    font-weight: 500;
+}
+
+.optionDescription {
+    display: block;
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.25rem;
+    font-weight: normal;
+}
+
+.fechasContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.fechaInput {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.formGroup label {
+.fechaLabel {
     font-weight: 600;
     color: #001f3f;
     font-size: 0.9rem;
 }
 
-.formGroup input,
-.formGroup select {
-    padding: 0.75rem 1rem;
+.fechaField {
+    padding: 0.75rem;
     border: 2px solid #e9ecef;
     border-radius: 8px;
     font-size: 1rem;
+    color: #333;
     transition: all 0.3s ease;
 }
 
-.formGroup input:focus,
-.formGroup select:focus {
+.fechaField:focus {
     outline: none;
     border-color: #001f3f;
     box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
+}
+
+.fechaActions {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.btnAplicarFechas {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+.btnAplicarFechas:hover:not(:disabled) {
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btnAplicarFechas:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Sección de cursos */
+.cursosSection {
+    margin-bottom: 2rem;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.sectionHeader h3 {
+    margin: 0;
+    color: #001f3f;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.counterBadge {
+    background: #001f3f;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.tableContainer {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 31, 63, 0.1);
+}
+
+.cursosTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.cursosTable th {
+    background: linear-gradient(135deg, #001f3f 0%, #00264d 100%);
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid #dee2e6;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cursosTable td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e9ecef;
+    vertical-align: top;
+    background: white;
+}
+
+/* Estilos para las filas de la tabla */
+.filaPendiente {
+    background-color: #fff3cd !important;
+}
+
+.filaPagado {
+    background-color: #d1edff !important;
+}
+
+.filaCancelado {
+    background-color: #f8d7da !important;
+}
+
+.cursoNombre {
+    font-weight: 500;
+    color: #333;
+}
+
+.stps {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.cursoFecha, .cursoHoras {
+    text-align: center;
+    color: #666;
+    font-weight: 500;
+}
+
+.cursoEmpresa, .cursoLugar {
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.cursoHoras {
+    text-align: center;
+    font-weight: 600;
+    color: #001f3f;
+}
+
+.cursoMonto {
+    text-align: right;
+    font-weight: 700;
+    color: #28a745;
+    font-size: 0.95rem;
+}
+
+.cursoPrecio {
+    text-align: right;
+    font-weight: 700;
+    color:#28a745;
+    font-size: 0.95rem;
+}
+
+/* Estados */
+.status {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px;
+    letter-spacing: 0.5px;
+}
+
+.pendiente {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+    border: 1px solid #ffd43b;
+}
+
+.pagado {
+    background: linear-gradient(135deg, #d1edff 0%, #b8daff 100%);
+    color: #004085;
+    border: 1px solid #9ec5fe;
+}
+
+.cancelado {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 1px solid #f1aeb5;
+}
+
+/* Sin datos */
+.noData {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+.noDataIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.noData p {
+    margin: 0;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.noDataSubtitle {
+    margin-top: 0.5rem !important;
+    font-size: 0.9rem !important;
+    opacity: 0.7;
+}
+
+/* Sección de resumen */
+.resumenSection {
+    margin-top: 2rem;
+}
+
+.resumenCard {
+    background: linear-gradient(135deg, #001f3f 0%, #00264d 100%);
+    color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.3);
+}
+
+.resumenContent {
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.totalInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.totalLabel {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.totalAmount {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.periodoResumen {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+    font-weight: 500;
 }
 
 .generateButton {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
     border: none;
-    padding: 1rem 2rem;
+    padding: 1.25rem 2rem;
     border-radius: 8px;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 1.1rem;
-    margin-top: 1rem;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
-.generateButton:hover {
-    background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+.generateButton:hover:not(:disabled) {
+    background: linear-gradient(135deg, #218838 0%, #1e9c7a 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
 }
 
-.statsSection {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
+.generateButton:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-.financialStats {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
-}
-
-.financialStats h3 {
-    color: #001f3f;
-    margin: 0 0 1.5rem 0;
+.resumenFooter {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem 2rem;
     text-align: center;
 }
 
-.statItem {
-    text-align: center;
-    padding: 1.5rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    border: 2px solid #e9ecef;
-    transition: all 0.3s ease;
-}
-
-.statItem:hover {
-    border-color: #001f3f;
-    transform: translateY(-2px);
-}
-
-.statValue {
-    display: block;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #001f3f;
-}
-
-.statLabel {
-    display: block;
-    color: #666;
+.footerText {
     font-size: 0.9rem;
-    margin-top: 0.5rem;
+    opacity: 0.8;
 }
 
-.recentReceipts {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
+/* Placeholder */
+.placeholder {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
 }
 
-.recentReceipts h4 {
-    color: #001f3f;
+.placeholderIcon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.placeholder h3 {
     margin: 0 0 1rem 0;
+    color: #001f3f;
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 
-.receiptsList {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+.placeholder p {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.5;
 }
 
-.receiptItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.periodoPreview {
+    margin-top: 1rem;
     padding: 1rem;
     background: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e9ecef;
 }
 
-.receiptInfo {
-    display: flex;
-    flex-direction: column;
-}
-
-.receiptInfo strong {
+.periodoPreviewLabel {
+    font-weight: 600;
     color: #001f3f;
+    margin-right: 0.5rem;
 }
 
-.receiptInfo span {
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.receiptDate {
-    color: #999;
-    font-size: 0.8rem;
+.periodoPreviewValue {
+    color: #28a745;
+    font-weight: 600;
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+    .contentGrid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .selectionPanel {
+        order: 2;
+    }
+    
+    .detailsPanel {
+        order: 1;
+    }
+}
+
 @media (max-width: 768px) {
-    .headerContent {
+    .pageContainer {
+        padding: 0;
+    }
+    
+    .header {
         flex-direction: column;
-        gap: 1rem;
         text-align: center;
+        gap: 1rem;
+        padding: 1rem;
     }
     
     .mainContent {
         padding: 1rem;
     }
     
-    .contentGrid {
+    .controls {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .controlsLeft, .controlsRight {
+        justify-content: center;
+    }
+    
+    .instructorHeader {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .instructorStats {
+        justify-content: center;
+    }
+    
+    .configGrid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .resumenContent {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .cursosTable {
+        font-size: 0.8rem;
+    }
+    
+    .cursosTable th,
+    .cursosTable td {
+        padding: 0.5rem;
+    }
+    
+    .periodoInfo {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .fechaActions {
+        justify-content: stretch;
+    }
+    
+    .btnAplicarFechas {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .titleSection h1 {
+        font-size: 1.8rem;
+    }
+    
+    .logo {
+        height: 60px;
+    }
+    
+    .logoTitle {
+        font-size: 1.5rem;
+    }
+    
+    .selectionPanel,
+    .detailsPanel {
+        padding: 1rem;
+    }
+    
+    .instructorSelect {
+        padding: 0.75rem;
+    }
+    
+    .totalAmount {
+        font-size: 2rem;
+    }
+    
+    .generateButton {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
     }
 }

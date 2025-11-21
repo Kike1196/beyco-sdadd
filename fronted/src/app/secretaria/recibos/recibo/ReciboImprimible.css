@@ -1,0 +1,365 @@
+/* app/secretaria/recibos/recibo/ReciboImprimible.css */
+.recibo-imprimible {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: white;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+/* Encabezado del recibo */
+.recibo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15mm 20mm 10mm 20mm;
+    background: #001f3f;
+    color: white;
+}
+
+.company-logo {
+    display: flex;
+    align-items: center;
+    gap: 5mm;
+}
+
+.recibo-logo {
+    height: 25mm;
+    border-radius: 2mm;
+}
+
+.company-text h1 {
+    font-size: 16pt;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+    line-height: 1;
+}
+
+.company-text h2 {
+    font-size: 12pt;
+    color: #28a745;
+    margin: 1mm 0 0 0;
+    font-weight: 600;
+}
+
+.company-text p {
+    color: #e0e0e0;
+    margin: 1mm 0 0 0;
+    font-size: 8pt;
+}
+
+.recibo-info {
+    text-align: right;
+}
+
+.folio, .fecha {
+    margin-bottom: 2mm;
+}
+
+.folio-label, .fecha-label {
+    font-weight: 600;
+    color: #e0e0e0;
+    margin-right: 2mm;
+    font-size: 9pt;
+}
+
+.folio-value {
+    font-weight: bold;
+    color: white;
+    font-size: 11pt;
+}
+
+.fecha-value {
+    color: #e0e0e0;
+    font-size: 9pt;
+}
+
+/* Título del recibo */
+.recibo-title {
+    text-align: center;
+    padding: 5mm 20mm;
+    background: #00264d;
+    color: white;
+    border-bottom: 1mm solid #28a745;
+}
+
+.recibo-title h2 {
+    font-size: 14pt;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Información del instructor */
+.instructor-section {
+    padding: 8mm 20mm;
+    border-bottom: 0.5mm solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3mm;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 2mm 3mm;
+    background: white;
+    border-radius: 1mm;
+    border-left: 1mm solid #001f3f;
+    font-size: 9pt;
+}
+
+.info-item strong {
+    color: #001f3f;
+    font-weight: 600;
+}
+
+.info-item span:last-child {
+    color: #333;
+    font-weight: 500;
+}
+
+/* Tabla de cursos */
+.cursos-section {
+    padding: 8mm 20mm;
+}
+
+.cursos-section h3 {
+    color: #001f3f;
+    font-size: 11pt;
+    margin-bottom: 4mm;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.table-container {
+    border: 0.5mm solid #e9ecef;
+    border-radius: 1mm;
+    overflow: hidden;
+}
+
+.cursos-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+}
+
+.cursos-table th {
+    background: #001f3f;
+    color: white;
+    padding: 2mm;
+    text-align: left;
+    font-weight: 600;
+    border: 0.3mm solid #dee2e6;
+    font-size: 7pt;
+    text-transform: uppercase;
+}
+
+.cursos-table td {
+    padding: 2mm;
+    border: 0.3mm solid #e9ecef;
+    vertical-align: top;
+    background: white;
+}
+
+.curso-nombre {
+    font-weight: 500;
+    color: #333;
+}
+
+.stps {
+    font-size: 6pt;
+    color: #666;
+    margin-top: 0.5mm;
+}
+
+.curso-fecha, .curso-horas {
+    text-align: center;
+    color: #666;
+    font-weight: 500;
+}
+
+.curso-empresa {
+    font-size: 7pt;
+    color: #555;
+}
+
+.curso-monto {
+    text-align: right;
+    font-weight: 700;
+    color: #28a745;
+}
+
+/* Resumen de pago */
+.resumen-section {
+    padding: 8mm 20mm;
+    background: #f8f9fa;
+    border-top: 0.5mm solid #e9ecef;
+}
+
+.resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3mm;
+}
+
+.resumen-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3mm;
+    background: white;
+    border-radius: 1mm;
+    text-align: center;
+    border: 0.3mm solid #e9ecef;
+    font-size: 8pt;
+}
+
+.resumen-item span:first-child {
+    color: #666;
+    font-size: 7pt;
+    margin-bottom: 1mm;
+}
+
+.resumen-item strong {
+    color: #001f3f;
+    font-size: 9pt;
+    font-weight: 700;
+}
+
+.total {
+    background: #001f3f;
+    color: white;
+    grid-column: 1 / -1;
+}
+
+.total span:first-child {
+    color: white;
+    font-weight: 600;
+}
+
+.total-amount {
+    color: white !important;
+    font-size: 14pt !important;
+}
+
+.status {
+    padding: 1mm 2mm;
+    border-radius: 2mm;
+    font-size: 6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.pendiente {
+    background: #fff3cd;
+    color: #856404;
+    border: 0.3mm solid #ffd43b;
+}
+
+/* Observaciones */
+.observaciones {
+    padding: 5mm 20mm;
+    background: #e7f3ff;
+    border-top: 0.5mm solid #b3d7ff;
+}
+
+.observaciones p {
+    margin: 0;
+    color: #333;
+    font-size: 8pt;
+}
+
+.observaciones strong {
+    color: #001f3f;
+}
+
+/* Firmas */
+.firmas-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10mm;
+    padding: 10mm 20mm;
+    border-top: 0.5mm solid #e9ecef;
+    background: white;
+}
+
+.firma {
+    text-align: center;
+    padding: 5mm;
+}
+
+.linea-firma {
+    width: 50mm;
+    height: 0.3mm;
+    background: #333;
+    margin: 0 auto 3mm auto;
+}
+
+.firma-nombre {
+    font-weight: 600;
+    color: #001f3f;
+    margin: 2mm 0 1mm 0;
+    font-size: 9pt;
+}
+
+.firma-cargo {
+    color: #666;
+    margin: 0;
+    font-size: 7pt;
+}
+
+/* Footer */
+.recibo-footer {
+    text-align: center;
+    padding: 5mm 20mm;
+    background: #001f3f;
+    color: white;
+    border-top: 1mm solid #28a745;
+}
+
+.recibo-footer p {
+    margin: 1mm 0;
+    font-size: 6pt;
+    color: #e0e0e0;
+}
+
+/* Estilos de impresión */
+@media print {
+    @page {
+        margin: 0;
+        size: A4 portrait;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        background: white;
+    }
+    
+    .recibo-imprimible {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        box-shadow: none;
+    }
+    
+    /* Asegurar que los colores se impriman */
+    .recibo-header,
+    .recibo-title,
+    .cursos-table th,
+    .total,
+    .recibo-footer {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}

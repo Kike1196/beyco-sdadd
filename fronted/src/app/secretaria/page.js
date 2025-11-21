@@ -27,8 +27,8 @@ export default function SecretariaDashboard() {
                 <div className={styles.logoSection}>
                     <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
                     <div className={styles.logoText}>
-                        <span className={styles.logoTitle}>BEYCO</span>
-                        <span className={styles.logoSubtitle}>Consultores</span>
+                        <span className={styles.logoTitle}></span>
+                        <span className={styles.logoSubtitle}></span>
                     </div>
                 </div>
             </header>
@@ -90,7 +90,7 @@ export default function SecretariaDashboard() {
                         <div className={styles.cardIcon}>📊</div>
                         <div className={styles.cardContent}>
                             <h3>Evaluaciones</h3>
-                            <p>Gestionar evaluaciones y calificaciones</p>
+                            <p>Generar archivos de evaluaciones</p>
                         </div>
                         <div className={styles.cardArrow}>→</div>
                     </button>

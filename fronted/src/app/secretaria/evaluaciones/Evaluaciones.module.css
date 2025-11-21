@@ -1,35 +1,21 @@
+/* app/secretaria/evaluaciones/Evaluaciones.module.css */
 .pageContainer {
     background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
     min-height: 100vh;
+    padding: 0;
     font-family: 'Inter', sans-serif;
 }
 
+/* Header */
 .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background: rgba(0, 31, 63, 0.95);
     color: white;
     padding: 1.5rem 2.5rem;
     border-bottom: 3px solid #28a745;
-}
-
-.headerContent {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.backButton {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.backButton:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateX(-5px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .titleSection h1 {
@@ -46,9 +32,33 @@
     color: #e0e0e0;
 }
 
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .logo {
-    height: 60px;
+    height: 100px;
     border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.logoText {
+    display: flex;
+    flex-direction: column;
+}
+
+.logoTitle {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.logoSubtitle {
+    font-size: 1rem;
+    color: #28a745;
+    font-weight: 600;
 }
 
 .mainContent {
@@ -57,46 +67,109 @@
     min-height: calc(100vh - 120px);
 }
 
-.controlsSection {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
+/* Breadcrumb */
+.breadcrumb {
+    display: flex;
+    align-items: center;
     margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.breadcrumbLink {
+    color: #001f3f;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.breadcrumbLink:hover {
+    color: #003366;
+    text-decoration: underline;
+}
+
+.breadcrumbSeparator {
+    margin: 0 0.5rem;
+    color: #666;
+}
+
+.breadcrumbCurrent {
+    color: #666;
+    font-weight: 500;
+}
+
+/* Selector de Curso */
+.selectorSection {
+    margin-bottom: 2rem;
+}
+
+.selectorSection label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.selector {
+    width: 100%;
+    max-width: 500px;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: white;
+    transition: border-color 0.3s ease;
+}
+
+.selector:focus {
+    outline: none;
+    border-color: #001f3f;
+    box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
+}
+
+/* Tabla de Evaluaciones */
+.tableContainer {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.tableHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 2rem;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8f9fa;
 }
 
-.courseSelector {
+.tableHeader h3 {
+    margin: 0;
+    color: #001f3f;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.tipoCurso {
+    font-size: 1rem;
+    color: #666;
+    font-weight: 500;
+    margin-left: 1rem;
+}
+
+.accionesHeader {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    flex: 1;
+    gap: 1.5rem;
 }
 
-.courseSelector label {
-    font-weight: 600;
-    color: #001f3f;
-    white-space: nowrap;
-}
-
-.courseSelector select {
-    padding: 0.75rem 1rem;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 1rem;
-    flex: 1;
-    transition: all 0.3s ease;
-}
-
-.courseSelector select:focus {
-    outline: none;
-    border-color: #001f3f;
-}
-
-.saveButton {
+/* Botón imprimir */
+.btnImprimir {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
     border: none;
@@ -105,178 +178,629 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    white-space: nowrap;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
 }
 
-.saveButton:hover:not(:disabled) {
+.btnImprimir:hover:not(:disabled) {
     background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
 }
 
-.saveButton:disabled {
+.btnImprimir:disabled {
     background: #6c757d;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
 }
 
-.gradesSection {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
-    margin-bottom: 2rem;
-}
-
-.gradesSection h2 {
-    color: #001f3f;
-    margin: 0 0 1.5rem 0;
-    text-align: center;
-}
-
-.gradesTable {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    border: 1px solid #e9ecef;
+/* Notas importantes */
+.notasImportantes {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
     border-radius: 8px;
-    overflow: hidden;
+    padding: 1.5rem;
+    margin: 1rem 2rem;
+    font-size: 0.9rem;
+    color: #856404;
+    line-height: 1.5;
 }
 
-.tableHeader {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 1rem;
+.notasImportantes p {
+    margin: 0.5rem 0;
+    font-weight: 500;
+}
+
+/* Tabla */
+.cursosTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cursosTable th,
+.cursosTable td {
     padding: 1rem 1.5rem;
-    background: #001f3f;
-    color: white;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    color: #000000;
+}
+
+.cursosTable thead {
+    background-color: #001f3f;
+}
+
+.cursosTable th {
+    font-size: 0.875rem;
     font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1.25rem 1.5rem;
 }
 
-.tableRow {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e9ecef;
-    align-items: center;
-}
-
-.tableRow:last-child {
+.cursosTable tbody tr:last-child td {
     border-bottom: none;
 }
 
-.tableRow:hover {
+.cursosTable tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estilos específicos para modo lectura */
+.calificacionLectura {
+    display: inline-block;
+    padding: 0.5rem;
     background: #f8f9fa;
-}
-
-.studentName {
-    font-weight: 600;
-    color: #001f3f;
-}
-
-.gradeInput {
-    padding: 0.5rem 0.75rem;
-    border: 2px solid #e9ecef;
+    border: 1px solid #e5e7eb;
     border-radius: 6px;
-    font-size: 1rem;
-    width: 100%;
-    transition: all 0.3s ease;
-}
-
-.gradeInput:focus {
-    outline: none;
-    border-color: #001f3f;
-}
-
-.status {
+    min-width: 60px;
+    text-align: center;
     font-weight: 600;
-    text-align: center;
-}
-
-.statsSection {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
-}
-
-.statsSection h3 {
     color: #001f3f;
-    margin: 0 0 1.5rem 0;
-    text-align: center;
 }
 
-.statsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
-
-.statCard {
+.observacionesLectura {
+    display: inline-block;
+    padding: 0.5rem;
     background: #f8f9fa;
-    padding: 2rem;
-    border-radius: 8px;
-    text-align: center;
-    border: 2px solid #e9ecef;
-    transition: all 0.3s ease;
-}
-
-.statCard:hover {
-    border-color: #001f3f;
-    transform: translateY(-2px);
-}
-
-.statNumber {
-    display: block;
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #001f3f;
-}
-
-.statLabel {
-    display: block;
-    color: #666;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    max-width: 200px;
+    word-wrap: break-word;
     font-size: 0.9rem;
-    margin-top: 0.5rem;
+    color: #374151;
+}
+
+/* Información del alumno */
+.infoAlumno {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 200px;
+}
+
+.infoAlumno strong {
+    color: #001f3f;
+    font-size: 0.95rem;
+}
+
+.infoAlumno small {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+/* Promedio y Resultado */
+.promedio {
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    display: block;
+    padding: 0.5rem;
+    border-radius: 6px;
+}
+
+.promedioApto {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.promedioNoApto {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.resultado {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    display: inline-block;
+    min-width: 80px;
+}
+
+.apto {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.noApto {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Estados */
+.noData {
+    text-align: center;
+    padding: 3rem !important;
+    color: #666;
+    font-style: italic;
+    font-size: 1.1rem;
+}
+
+/* Loading */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.spinner {
+    border: 4px solid #f3f4f6;
+    border-left: 4px solid #001f3f;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Botón volver */
+.actionsSection {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.btnVolver {
+    background: #6c757d;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.btnVolver:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    color: white;
+}
+
+/* Notificaciones */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 1001;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification.success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.notification.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.notification.warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.notification.info {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+.notificationIcon {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.notificationMessage {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.notificationClose {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.notificationClose:hover {
+    opacity: 1;
+}
+
+.notificationProgress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: currentColor;
+    opacity: 0.3;
+    animation: progress 5s linear forwards;
+}
+
+@keyframes progress {
+    from { width: 100%; }
+    to { width: 0%; }
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+    .tableContainer {
+        margin: 1rem;
+    }
+    
+    .cursosTable {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
 @media (max-width: 768px) {
-    .headerContent {
+    .header {
         flex-direction: column;
-        gap: 1rem;
         text-align: center;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .titleSection h1 {
+        font-size: 1.8rem;
+    }
+    
+    .titleSection p {
+        font-size: 0.9rem;
+    }
+    
+    .logo {
+        height: 80px;
     }
     
     .mainContent {
         padding: 1rem;
     }
     
-    .controlsSection {
+    .tableHeader {
         flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
         text-align: center;
+        padding: 1rem;
     }
     
-    .courseSelector {
+    .tableHeader h3 {
+        font-size: 1.2rem;
+    }
+    
+    .accionesHeader {
         flex-direction: column;
-        width: 100%;
+        gap: 1rem;
     }
     
-    .tableHeader,
-    .tableRow {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-        text-align: center;
+    .notasImportantes {
+        margin: 1rem;
+        padding: 1rem;
+        font-size: 0.8rem;
     }
     
-    .statsGrid {
-        grid-template-columns: 1fr 1fr;
+    .cursosTable {
+        font-size: 0.8rem;
+    }
+    
+    .cursosTable th,
+    .cursosTable td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .calificacionLectura {
+        min-width: 50px;
+        font-size: 0.8rem;
+        padding: 0.4rem;
+    }
+    
+    .observacionesLectura {
+        max-width: 150px;
+        font-size: 0.8rem;
+    }
+    
+    .infoAlumno {
+        min-width: 150px;
+    }
+    
+    .breadcrumb {
+        flex-wrap: wrap;
+        font-size: 0.9rem;
+        padding: 0.75rem;
+    }
+    
+    .selector {
+        font-size: 0.9rem;
+    }
+    
+    .btnImprimir {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
     }
 }
 
 @media (max-width: 480px) {
-    .statsGrid {
-        grid-template-columns: 1fr;
+    .header {
+        padding: 0.75rem;
+    }
+    
+    .titleSection h1 {
+        font-size: 1.5rem;
+    }
+    
+    .logo {
+        height: 60px;
+    }
+    
+    .logoTitle {
+        font-size: 1.5rem;
+    }
+    
+    .mainContent {
+        padding: 0.5rem;
+    }
+    
+    .tableContainer {
+        margin: 0.5rem;
+        border-radius: 8px;
+    }
+    
+    .tableHeader {
+        padding: 0.75rem;
+    }
+    
+    .tableHeader h3 {
+        font-size: 1.1rem;
+    }
+    
+    .tipoCurso {
+        display: block;
+        margin-left: 0;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .cursosTable {
+        font-size: 0.75rem;
+    }
+    
+    .cursosTable th,
+    .cursosTable td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .cursosTable th {
+        font-size: 0.7rem;
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .infoAlumno strong {
+        font-size: 0.85rem;
+    }
+    
+    .infoAlumno small {
+        font-size: 0.7rem;
+    }
+    
+    .calificacionLectura {
+        min-width: 40px;
+        font-size: 0.75rem;
+        padding: 0.3rem;
+    }
+    
+    .observacionesLectura {
+        max-width: 120px;
+        font-size: 0.75rem;
+        padding: 0.3rem;
+    }
+    
+    .promedio {
+        font-size: 0.85rem;
+        padding: 0.3rem;
+    }
+    
+    .resultado {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+        min-width: 60px;
+    }
+    
+    .notasImportantes {
+        margin: 0.5rem;
+        padding: 0.75rem;
+        font-size: 0.75rem;
+    }
+    
+    .btnImprimir {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .btnVolver {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        padding: 0.75rem 1rem;
+    }
+    
+    .notificationMessage {
+        font-size: 0.8rem;
+    }
+}
+
+/* Estilos para impresión */
+@media print {
+    .pageContainer {
+        background: white !important;
+    }
+    
+    .header {
+        background: white !important;
+        color: black !important;
+        border-bottom: 2px solid #001f3f;
+    }
+    
+    .titleSection h1 {
+        color: #001f3f !important;
+    }
+    
+    .titleSection p {
+        color: #666 !important;
+    }
+    
+    .mainContent {
+        background: white !important;
+        padding: 0 !important;
+    }
+    
+    .breadcrumb,
+    .selectorSection,
+    .actionsSection,
+    .notification,
+    .btnImprimir {
+        display: none !important;
+    }
+    
+    .tableContainer {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+    
+    .tableHeader {
+        background: #f8f9fa !important;
+        border-bottom: 2px solid #001f3f !important;
+    }
+    
+    .cursosTable {
+        border: 1px solid #000 !important;
+    }
+    
+    .cursosTable th {
+        background: #001f3f !important;
+        color: white !important;
+    }
+    
+    .cursosTable td {
+        border-color: #ddd !important;
+    }
+}
+
+/* Utilidades de accesibilidad */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Estados de enfoque para accesibilidad */
+.btnImprimir:focus,
+.btnVolver:focus,
+.selector:focus,
+.notificationClose:focus {
+    outline: 2px solid #001f3f;
+    outline-offset: 2px;
+}
+
+/* Mejoras de rendimiento para animaciones - SE MANTIENE para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    .spinner,
+    .notification,
+    .btnImprimir,
+    .btnVolver,
+    .notificationProgress {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    .btnImprimir:hover,
+    .btnVolver:hover {
+        transform: none !important;
     }
 }

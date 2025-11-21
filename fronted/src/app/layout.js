@@ -1,4 +1,5 @@
 import './globals.css'; // Asegúrate de que tus estilos globales estén aquí
+import '../styles/print.css';
 
 export const metadata = {
   title: 'BEYCO Consultores',

@@ -169,7 +169,7 @@ export default function LoginPage() {
                 const { timestamp, attempts } = JSON.parse(lockData);
                 const now = Date.now();
                 const timeDiff = now - timestamp;
-                const lockDuration = 15 * 60 * 1000; // 15 minutos
+                const lockDuration = 5 * 60 * 1000; // 15 minutos
 
                 if (timeDiff < lockDuration) {
                     setIsLocked(true);

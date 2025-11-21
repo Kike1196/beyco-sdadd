@@ -517,8 +517,8 @@ export default function HonorariosPage() {
                 <div className={styles.logoSection}>
                     <img src="/logo.jpg" alt="BEYCO Consultores Logo" className={styles.logo} />
                     <div className={styles.logoText}>
-                        <span className={styles.logoTitle}>BEYCO</span>
-                        <span className={styles.logoSubtitle}>Consultores</span>
+                        <span className={styles.logoTitle}></span>
+                        <span className={styles.logoSubtitle}></span>
                     </div>
                 </div>
             </header>
@@ -794,7 +794,7 @@ export default function HonorariosPage() {
                             <div className={styles.infoGrid}>
                                 <div className={styles.infoItem}>
                                     <h4>🗓️ Fechas de Pago</h4>
-                                    <p>Los pagos se realizan el día 5 de cada mes por los cursos impartidos en el mes anterior.</p>
+                                    <p>Los pagos se realizan segun el periodo establecido en el contrato.</p>
                                 </div>
                                 <div className={styles.infoItem}>
                                     <h4>💰 Cálculo de Honorarios</h4>

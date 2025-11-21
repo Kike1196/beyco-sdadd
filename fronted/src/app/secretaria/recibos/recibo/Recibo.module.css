@@ -1,0 +1,229 @@
+/* app/secretaria/recibos/recibo/Recibo.module.css */
+.pageContainer {
+    background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+    min-height: 100vh;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 31, 63, 0.95);
+    color: white;
+    padding: 1.5rem 2.5rem;
+    border-bottom: 3px solid #28a745;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.titleSection h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+}
+
+.titleSection p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1rem;
+    color: #e0e0e0;
+}
+
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    height: 80px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.logoText {
+    display: flex;
+    flex-direction: column;
+}
+
+.logoTitle {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.logoSubtitle {
+    font-size: 1rem;
+    color: #28a745;
+    font-weight: 600;
+}
+
+.mainContent {
+    background: #f8f9fa;
+    padding: 2rem;
+    min-height: calc(100vh - 120px);
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    border: 2px solid #e9ecef;
+}
+
+.controlsLeft, .controlsRight {
+    display: flex;
+    gap: 1rem;
+}
+
+.btnAtras, .btnImprimir, .btnPrimario {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btnAtras {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+}
+
+.btnAtras:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btnImprimir {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: white;
+}
+
+.btnImprimir:hover {
+    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btnPrimario {
+    background: linear-gradient(135deg, #001f3f 0%, #00264d 100%);
+    color: white;
+}
+
+.btnPrimario:hover {
+    background: linear-gradient(135deg, #00264d 0%, #001f3f 100%);
+    transform: translateY(-2px);
+}
+
+.previewContainer {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.previewNote {
+    background: #e7f3ff;
+    border: 1px solid #b3d7ff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.previewNote p {
+    margin: 0;
+    color: #004085;
+}
+
+.printableArea {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    background: white;
+    overflow: auto;
+    max-height: 70vh;
+}
+
+/* Estilos de impresión SOLO para elementos de esta página */
+@media print {
+    .header,
+    .controls,
+    .previewNote,
+    .previewContainer {
+        display: none !important;
+    }
+    
+    .printableArea {
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+    
+    .pageContainer {
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        min-height: auto !important;
+    }
+    
+    .mainContent {
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+}
+
+.loadingContainer, .errorContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    font-size: 1.1rem;
+    color: white;
+    text-align: center;
+}
+
+.spinner {
+    border: 4px solid rgba(255,255,255,0.3);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.errorIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.errorContainer h3 {
+    margin: 0 0 1rem 0;
+    color: white;
+}
+
+.errorContainer p {
+    margin: 0 0 2rem 0;
+    opacity: 0.9;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

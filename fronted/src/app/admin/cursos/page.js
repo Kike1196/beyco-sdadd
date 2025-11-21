@@ -1,4 +1,4 @@
-// app/admin/cursos/page.js - VERSIÓN SIMPLIFICADA
+// app/admin/cursos/page.js - VERSIÓN COMPLETA MODIFICADA
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -157,6 +157,8 @@ const EditRow = ({ curso, onChange, instructores, empresas, catalogoCursos, form
                     min="0" 
                     step="0.01"
                     className={styles.pagoInput}
+                    readOnly={!!curso.nombre}
+                    title={curso.nombre ? "El pago se establece automáticamente desde el catálogo" : "Selecciona un curso primero"}
                 />
             </td>
         </tr>
@@ -190,6 +192,12 @@ export default function CursosPage() {
     };
     const closeNotification = () => {
         setNotification({ show: false, message: '', type: '' });
+    };
+
+    // Función para formatear el precio del catálogo
+    const formatPrecioFromCatalogo = (precio) => {
+        if (!precio && precio !== 0) return '';
+        return parseFloat(precio).toFixed(2);
     };
 
     useEffect(() => {
@@ -291,7 +299,7 @@ export default function CursosPage() {
         setCursoData({ 
             fechaIngreso: new Date().toISOString().split('T')[0],
             horas: 8,
-            pago: ''
+            pago: '' // Dejar vacío para que se llene automáticamente al seleccionar curso
         });
     };
 
@@ -451,9 +459,9 @@ export default function CursosPage() {
                 if (cursoSeleccionado.horas) {
                     updatedCursoData.horas = cursoSeleccionado.horas;
                 }
-                // El precio del catálogo se puede usar como valor por defecto para el pago
-                if (cursoSeleccionado.precio && !cursoData.pago) {
-                    updatedCursoData.pago = cursoSeleccionado.precio;
+                // ✅ ACTUALIZACIÓN: Usar el precio del catálogo para el pago
+                if (cursoSeleccionado.precio) {
+                    updatedCursoData.pago = formatPrecioFromCatalogo(cursoSeleccionado.precio);
                 }
             }
         }

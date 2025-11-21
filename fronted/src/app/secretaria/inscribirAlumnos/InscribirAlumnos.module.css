@@ -1,236 +1,871 @@
-.pageContainer {
-    background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
-    min-height: 100vh;
-    font-family: 'Inter', sans-serif;
-}
-
-.header {
-    background: rgba(0, 31, 63, 0.95);
-    color: white;
-    padding: 1.5rem 2.5rem;
-    border-bottom: 3px solid #28a745;
-}
-
-.headerContent {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.backButton {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-.backButton:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateX(-5px);
-}
-
-.titleSection h1 {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin: 0;
-    color: white;
-}
-
-.titleSection p {
-    margin: 0.5rem 0 0 0;
-    opacity: 0.9;
-    font-size: 1rem;
-    color: #e0e0e0;
-}
-
-.logo {
-    height: 60px;
-    border-radius: 8px;
-}
-
-.mainContent {
-    background: #f8f9fa;
-    padding: 2rem;
-    min-height: calc(100vh - 120px);
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
-}
-
-.formContainer {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
-}
-
-.formHeader {
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.formHeader h2 {
-    color: #001f3f;
-    margin: 0 0 0.5rem 0;
-    font-size: 1.8rem;
-}
-
-.formHeader p {
-    color: #666;
-    margin: 0;
-}
-
-.inscriptionForm {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.formGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-
-.formGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.formGroup label {
-    font-weight: 600;
-    color: #001f3f;
-    font-size: 0.9rem;
-}
-
-.formGroup input,
-.formGroup select {
-    padding: 0.75rem 1rem;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.formGroup input:focus,
-.formGroup select:focus {
-    outline: none;
-    border-color: #001f3f;
-    box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
-}
-
-.formActions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 1rem;
-}
-
-.cancelButton {
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.cancelButton:hover {
-    background: #5a6268;
-    transform: translateY(-1px);
-}
-
-.submitButton {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.submitButton:hover {
-    background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-}
-
-.quickStats {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
-    height: fit-content;
-}
-
-.quickStats h3 {
-    color: #001f3f;
-    margin: 0 0 1.5rem 0;
-    text-align: center;
-    font-size: 1.3rem;
-}
-
-.statsGrid {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.statCard {
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 8px;
-    text-align: center;
-    border: 2px solid #e9ecef;
-    transition: all 0.3s ease;
-}
-
-.statCard:hover {
-    border-color: #001f3f;
-    transform: translateY(-2px);
-}
-
-.statNumber {
-    display: block;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #001f3f;
-}
-
-.statLabel {
-    display: block;
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 0.5rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .mainContent {
-        grid-template-columns: 1fr;
-        padding: 1rem;
+    .pageContainer {
+        background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
     }
-    
+
+    .header {
+        background: rgba(0, 31, 63, 0.95);
+        color: white;
+        padding: 1.5rem 2.5rem;
+        border-bottom: 3px solid #28a745;
+    }
+
     .headerContent {
-        flex-direction: column;
-        gap: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .backButton {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .backButton:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(-5px);
+    }
+
+    .titleSection {
         text-align: center;
     }
-    
-    .formGrid {
-        grid-template-columns: 1fr;
+
+    .titleSection h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 0;
+        color: white;
     }
-    
-    .formActions {
+
+    .titleSection p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1rem;
+        color: #e0e0e0;
+    }
+
+    .logoSection {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo {
+        height: 100px;
+        border-radius: 8px;
+    }
+
+    .mainContent {
+        background: #f8f9fa;
+        padding: 2rem;
+        min-height: calc(100vh - 120px);
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Indicador de Pasos */
+    .pasosContainer {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+        gap: 2rem;
+        grid-column: 1 / -1;
+    }
+
+    .paso {
+        display: flex;
         flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        opacity: 0.5;
+        transition: all 0.3s ease;
     }
+
+    .pasoActivo {
+        opacity: 1;
+    }
+
+    .pasoNumero {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #666;
+        border: 3px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .pasoActivo .pasoNumero {
+        background: #001f3f;
+        color: white;
+        border-color: #001f3f;
+    }
+
+    .pasoTexto {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #666;
+        text-align: center;
+    }
+
+    .pasoActivo .pasoTexto {
+        color: #001f3f;
+    }
+
+    /* Contenedor del Formulario */
+    .formContainer {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
+    }
+
+    .formHeader {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .formHeader h2 {
+        color: #001f3f;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.8rem;
+    }
+
+    .formHeader p {
+        color: #666;
+        margin: 0 0 1.5rem 0;
+    }
+
+    /* Secciones de Pasos */
+    .pasoSection {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        color: black;
+    }
+
+    .pasoHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .pasoHeader h3 {
+        margin: 0;
+        color: #001f3f;
+    }
+
+    .btnRetroceder {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .btnRetroceder:hover {
+        background: #5a6268;
+        transform: translateX(-3px);
+    }
+
+    /* Selector de Modo */
+    .modoSelector {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        background: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 10px;
+    }
+
+    .modoBtn {
+        flex: 1;
+        padding: 0.75rem 1.5rem;
+        border: 2px solid transparent;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        color: #666;
+        font-size: 1rem;
+    }
+
+    .modoBtn:hover {
+        border-color: #001f3f;
+        transform: translateY(-2px);
+    }
+
+    .modoActivo {
+        background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+        color: white;
+        border-color: #001f3f;
+    }
+
+    /* Instructores */
+    .instructoresGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .instructorCard {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .instructorCard:hover {
+        border-color: #001f3f;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    }
+
+    .instructorSeleccionado {
+        border-color: #28a745;
+        background: #f8fff9;
+    }
+
+    .instructorInfo {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .instructorInfo strong {
+        color: #001f3f;
+        font-size: 1.1rem;
+    }
+
+    .instructorInfo span {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .instructorInfoCard {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #001f3f;
+        margin-bottom: 1rem;
+    }
+
+    .instructorInfoCard p {
+        margin: 0.3rem 0;
+        color: #333;
+    }
+
+    /* Cursos */
+    .cursosGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .cursoCard {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .cursoCard:hover {
+        border-color: #001f3f;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 31, 63, 0.1);
+    }
+
+    .cursoSeleccionado {
+        border-color: #28a745;
+        background: #f8fff9;
+    }
+
+    .cursoInfo {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .cursoInfo strong {
+        color: #001f3f;
+        font-size: 1.1rem;
+    }
+
+    .cursoInfo span {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .examenPractico {
+        color: #28a745 !important;
+        font-weight: 600;
+    }
+
+    .cursoInfoCard {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+        margin-bottom: 1.5rem;
+    }
+
+    .cursoInfoCard h4 {
+        margin: 0 0 0.5rem 0;
+        color: #001f3f;
+    }
+
+    .cursoInfoCard p {
+        margin: 0.3rem 0;
+        color: #333;
+    }
+
+    /* Búsqueda de Alumnos */
+    .busquedaSection {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .searchBox {
+        margin-bottom: 1rem;
+    }
+
+    .searchBox label {
+        display: block;
+        font-weight: 600;
+        color: #001f3f;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .searchInput {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .searchInput:focus {
+        outline: none;
+        border-color: #001f3f;
+        box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
+    }
+
+    .resultados {
+        max-height: 300px;
+        overflow-y: auto;
+        background: white;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+    }
+
+    .resultadoItem {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .resultadoItem:last-child {
+        border-bottom: none;
+    }
+
+    .resultadoItem:hover {
+        background: #f8f9fa;
+    }
+
+    .alumnoInfo {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .alumnoInfo strong {
+        color: #001f3f;
+        font-size: 1rem;
+    }
+
+    .curp {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .puesto {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .alumnoSeleccionado {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        padding: 1.5rem;
+        border-radius: 10px;
+        border: 2px solid #28a745;
+        margin-top: 1rem;
+    }
+
+    .seleccionadoHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .seleccionadoHeader h4 {
+        margin: 0;
+        color: #1b5e20;
+        font-size: 1.1rem;
+    }
+
+    .btnCambiar {
+        background: white;
+        border: 2px solid #28a745;
+        color: #28a745;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .btnCambiar:hover {
+        background: #28a745;
+        color: white;
+    }
+
+    .alumnoDetalles {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .alumnoDetalles p {
+        margin: 0;
+        color: #2e7d32;
+        font-size: 0.9rem;
+    }
+
+    .alumnoDetalles strong {
+        color: #1b5e20;
+    }
+
+    /* Formulario de Inscripción */
+    .inscriptionForm {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .formGrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .formGroup {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .formGroup label {
+        font-weight: 600;
+        color: #001f3f;
+        font-size: 0.9rem;
+    }
+
+    .formGroup input,
+    .formGroup select {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .formGroup input:focus,
+    .formGroup select:focus {
+        outline: none;
+        border-color: #001f3f;
+        box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
+    }
+
+    .formGroup select:disabled {
+        background: #f8f9fa;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    /* Acciones del Formulario */
+    .formActions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .cancelButton {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .cancelButton:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+    }
+
+    .submitButton {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .submitButton:hover:not(:disabled) {
+        background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .submitButton:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Panel de Estadísticas */
+    .quickStats {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
+        height: fit-content;
+    }
+
+    .quickStats h3 {
+        color: #001f3f;
+        margin: 0 0 1.5rem 0;
+        text-align: center;
+        font-size: 1.3rem;
+    }
+
+    .statsGrid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .statCard {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .statCard:hover {
+        border-color: #001f3f;
+        transform: translateY(-2px);
+    }
+
+    .statNumber {
+        display: block;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #001f3f;
+    }
+
+    .statLabel {
+        display: block;
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+
+    .instructorInfo {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #001f3f;
+    }
+
+    .instructorInfo p {
+        margin: 0.3rem 0;
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    /* Estados Vacíos */
+    .noInstructores, .noCursos {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #666;
+        background: white;
+        border-radius: 8px;
+        border: 2px dashed #e9ecef;
+        grid-column: 1 / -1;
+    }
+
+    .noInstructores p, .noCursos p {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    /* Spinner de Carga */
+    .spinner {
+        border: 4px solid #f3f4f6;
+        border-left: 4px solid #ffffff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .mainContent {
+            grid-template-columns: 1fr;
+            padding: 1.5rem;
+        }
+        
+        .formGrid {
+            grid-template-columns: 1fr;
+        }
+        
+        .instructoresGrid,
+        .cursosGrid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .headerContent {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .mainContent {
+            padding: 1rem;
+        }
+        
+        .formContainer {
+            padding: 1.5rem;
+        }
+        
+        .formActions {
+            flex-direction: column;
+        }
+        
+        .titleSection h1 {
+            font-size: 1.8rem;
+        }
+        
+        .modoSelector {
+            flex-direction: column;
+        }
+        
+        .backButton {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .pasosContainer {
+            gap: 1rem;
+        }
+        
+        .pasoTexto {
+            font-size: 0.8rem;
+        }
+        
+        .cursosGrid,
+        .instructoresGrid {
+            grid-template-columns: 1fr;
+        }
+        
+        .pasoHeader {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .btnRetroceder {
+            align-self: flex-start;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header {
+            padding: 1rem;
+        }
+        
+        .mainContent {
+            padding: 0.5rem;
+        }
+        
+        .formContainer {
+            padding: 1rem;
+        }
+        
+        .pasoSection {
+            padding: 1rem;
+        }
+        
+        .pasosContainer {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .paso {
+            flex-direction: row;
+            gap: 1rem;
+        }
+        
+        .pasoNumero {
+            width: 30px;
+            height: 30px;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* Estados de Deshabilitado Mejorados */
+    .formGroup input:disabled,
+    .formGroup select:disabled,
+    .submitButton:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* Efectos de Transición Mejorados */
+    .instructorCard,
+    .cursoCard,
+    .resultadoItem,
+    .statCard {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Scrollbar Personalizado */
+    .resultados::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .resultados::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .resultados::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    .resultados::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Agregar al archivo CSS */
+    .cargando {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+    }
+
+    .cargando .spinner {
+        margin: 0 auto 1rem auto;
+    }
+
+    .instructorDetalles {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .instructorDetalles p {
+        margin: 0;
+        color: #333;
+    }
+
+    .instructorDetalles strong {
+        color: #001f3f;
+    }
+
+    .reloadButton {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .reloadButton:hover {
+        background: #0056b3;
+    }
+
+    .loadingContainer {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh;
+    background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+    color: white;
+    flex-direction: column;
 }

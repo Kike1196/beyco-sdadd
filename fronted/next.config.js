@@ -1,13 +1,13 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    async rewrites() {
-        return [
-            {
-                source: '/api/:path*',
-                destination: 'http://localhost:8080/api/:path*',
-            },
-        ];
-    },
-}
+const path = require('path');
 
-module.exports = nextConfig
+const nextConfig = {
+  outputFileTracingRoot: path.join(__dirname),
+  env: {
+    DB_HOST: process.env.DB_HOST,
+    DB_USER: process.env.DB_USER,
+    DB_PASSWORD: process.env.DB_PASSWORD,
+    DB_NAME: process.env.DB_NAME,
+  },
+};
+
+module.exports = nextConfig;
